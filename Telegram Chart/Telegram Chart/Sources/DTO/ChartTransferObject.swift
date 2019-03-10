@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class ChartList: NSObject {
+public class ChartTransferObject: NSObject {
     public let charts: [Chart]?
     
     public init(charts: [Chart]?) {
@@ -28,8 +28,10 @@ public class ChartList: NSObject {
             self.colors = colors
         }
 
+        public typealias ColumnType = String
+
         public class Column: NSObject {
-            public let type: String?
+            public let type: ColumnType?
             public let values: [Int64]?
 
             public init(type: String?, values: [Int64]?) {
@@ -39,34 +41,26 @@ public class ChartList: NSObject {
         }
         
         public class Types: NSObject {
-            public let y0: String?
-            public let y1: String?
-            public let x: String?
+            public let values: [ColumnType: String]?
 
-            public init(y0: String?, y1: String?, x: String?) {
-                self.y0 = y0
-                self.y1 = y1
-                self.x = x
+            public init(values: [ColumnType: String]?) {
+                self.values = values
             }
         }
         
         public class Names: NSObject {
-            public let y0: String?
-            public let y1: String?
+            public let values: [ColumnType: String]?
 
-            public init(y0: String?, y1: String?) {
-                self.y0 = y0
-                self.y1 = y1
+            public init(values: [ColumnType: String]?) {
+                self.values = values
             }
         }
         
         public class Colors: NSObject {
-            public let y0: String?
-            public let y1: String?
+            public let values: [ColumnType: String]?
 
-            public init(y0: String?, y1: String?) {
-                self.y0 = y0
-                self.y1 = y1
+            public init(values: [ColumnType: String]?) {
+                self.values = values
             }
         }
     }
