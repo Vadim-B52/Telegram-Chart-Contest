@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DDC16F4322358CCA0060596D /* sample_data.json in Resources */ = {isa = PBXBuildFile; fileRef = DDC16F4222358CCA0060596D /* sample_data.json */; };
+		DDC16F4722358D670060596D /* ChartData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC16F4622358D670060596D /* ChartData.swift */; };
 		DDFF54DF22358A79005EB0D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFF54DE22358A79005EB0D9 /* AppDelegate.swift */; };
 		DDFF54E122358A79005EB0D9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDFF54E022358A79005EB0D9 /* ViewController.swift */; };
 		DDFF54E422358A79005EB0D9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DDFF54E222358A79005EB0D9 /* Main.storyboard */; };
@@ -15,6 +17,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DDC16F4222358CCA0060596D /* sample_data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = sample_data.json; sourceTree = "<group>"; };
+		DDC16F4622358D670060596D /* ChartData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartData.swift; sourceTree = "<group>"; };
 		DDFF54DB22358A79005EB0D9 /* Telegram Chart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Telegram Chart.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DDFF54DE22358A79005EB0D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DDFF54E022358A79005EB0D9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -35,6 +39,43 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DDC16F3D22358C420060596D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DDC16F4222358CCA0060596D /* sample_data.json */,
+				DDFF54E222358A79005EB0D9 /* Main.storyboard */,
+				DDFF54E522358A7A005EB0D9 /* Assets.xcassets */,
+				DDFF54E722358A7A005EB0D9 /* LaunchScreen.storyboard */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		DDC16F3E22358C490060596D /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				DDC16F4522358D2C0060596D /* DTO */,
+				DDC16F4422358D210060596D /* UI */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		DDC16F4422358D210060596D /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				DDFF54DE22358A79005EB0D9 /* AppDelegate.swift */,
+				DDFF54E022358A79005EB0D9 /* ViewController.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		DDC16F4522358D2C0060596D /* DTO */ = {
+			isa = PBXGroup;
+			children = (
+				DDC16F4622358D670060596D /* ChartData.swift */,
+			);
+			path = DTO;
+			sourceTree = "<group>";
+		};
 		DDFF54D222358A79005EB0D9 = {
 			isa = PBXGroup;
 			children = (
@@ -54,11 +95,8 @@
 		DDFF54DD22358A79005EB0D9 /* Telegram Chart */ = {
 			isa = PBXGroup;
 			children = (
-				DDFF54DE22358A79005EB0D9 /* AppDelegate.swift */,
-				DDFF54E022358A79005EB0D9 /* ViewController.swift */,
-				DDFF54E222358A79005EB0D9 /* Main.storyboard */,
-				DDFF54E522358A7A005EB0D9 /* Assets.xcassets */,
-				DDFF54E722358A7A005EB0D9 /* LaunchScreen.storyboard */,
+				DDC16F3E22358C490060596D /* Sources */,
+				DDC16F3D22358C420060596D /* Resources */,
 				DDFF54EA22358A7A005EB0D9 /* Info.plist */,
 			);
 			path = "Telegram Chart";
@@ -125,6 +163,7 @@
 				DDFF54E922358A7A005EB0D9 /* LaunchScreen.storyboard in Resources */,
 				DDFF54E622358A7A005EB0D9 /* Assets.xcassets in Resources */,
 				DDFF54E422358A79005EB0D9 /* Main.storyboard in Resources */,
+				DDC16F4322358CCA0060596D /* sample_data.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,6 +174,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DDC16F4722358D670060596D /* ChartData.swift in Sources */,
 				DDFF54E122358A79005EB0D9 /* ViewController.swift in Sources */,
 				DDFF54DF22358A79005EB0D9 /* AppDelegate.swift in Sources */,
 			);
