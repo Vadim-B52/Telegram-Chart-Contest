@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class ChartTransferObject: NSObject {
+public class ChartTO: NSObject {
     public let charts: [Chart]?
     
     public init(charts: [Chart]?) {
