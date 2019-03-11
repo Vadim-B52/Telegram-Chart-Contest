@@ -10,9 +10,8 @@ import Foundation
 
 public class ChartListScreen {
     
-    private let charts: [Chart]
-    private let errorText: String?
-    
+    public let charts: [Chart]
+    public let errorText: String?
     public private(set) var isNightModeEnabled = false
 
     public init() {

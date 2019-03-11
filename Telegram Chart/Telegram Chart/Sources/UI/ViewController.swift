@@ -20,8 +20,15 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         reloadButtonsAnimated(false)
     }
 
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return model.charts.count + 1
+    }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        if section == model.charts.count {
+            return 2
+        }
+        return model.charts[section].plots.count + 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
