@@ -12,7 +12,7 @@ public final class ChartJsonParser {
     public init() {
     }
 
-    public func parseData(_ data: Data) throws -> ChartTO {
+    public func parseData(_ data: Data) throws -> ChartListTO {
         guard let json = try? JSONSerialization.jsonObject(with: data) else {
             throw ChartParserError.noJson
         }
@@ -20,10 +20,10 @@ public final class ChartJsonParser {
             throw ChartParserError.noChart
         }
         let charts = try remoteCharts.map { return try readChart($0) }
-        return ChartTO(charts: charts)
+        return ChartListTO(charts: charts)
     }
 
-    private func readChart(_ remoteChart0: Any) throws -> ChartTO.Chart {
+    private func readChart(_ remoteChart0: Any) throws -> ChartTO {
         guard let remoteChart = remoteChart0 as? [String: Any] else {
             throw ChartParserError.noChart
         }
@@ -35,51 +35,51 @@ public final class ChartJsonParser {
         }
         let names = try readNames(remoteChart["names"])
         let colors = try readColors(remoteChart["colors"])
-        return ChartTO.Chart(columns: columns, types: types, names: names, colors: colors)
+        return ChartTO(columns: columns, types: types, names: names, colors: colors)
     }
 
-    private func readColors(_ remoteColors: Any?) throws -> ChartTO.Chart.Colors {
-        return try ChartTO.Chart.Colors(values: readValues(remoteColors))
+    private func readColors(_ remoteColors: Any?) throws -> ChartTO.Colors {
+        return try ChartTO.Colors(values: readValues(remoteColors))
     }
 
-    private func readNames(_ remoteNames: Any?) throws -> ChartTO.Chart.Names {
-        return try ChartTO.Chart.Names(values: readValues(remoteNames))
+    private func readNames(_ remoteNames: Any?) throws -> ChartTO.Names {
+        return try ChartTO.Names(values: readValues(remoteNames))
     }
 
-    private func readTypes(_ remoteTypes0: Any?, columnKeys: [String]) throws -> ChartTO.Chart.Types {
+    private func readTypes(_ remoteTypes0: Any?, columnKeys: [String]) throws -> ChartTO.Types {
         let remoteTypes = try readValues(remoteTypes0)
-        var types = [ChartTO.Chart.ColumnKey: ChartTO.Chart.ColumnType]()
+        var types = [ChartTO.ColumnKey: ChartTO.ColumnType]()
         for key in columnKeys {
             guard let type = remoteTypes[key] else {
                 continue
             }
             switch type {
-            case ChartTO.Chart.ColumnType.x.rawValue:
+            case ChartTO.ColumnType.x.rawValue:
                 types[key] = .x
-            case ChartTO.Chart.ColumnType.line.rawValue:
+            case ChartTO.ColumnType.line.rawValue:
                 types[key] = .line
             default:
                 continue
             }
         }
-        return ChartTO.Chart.Types(values: types)
+        return ChartTO.Types(values: types)
     }
 
-    private func readValues(_ remotes0: Any?) throws -> [ChartTO.Chart.ColumnKey: String] {
+    private func readValues(_ remotes0: Any?) throws -> [ChartTO.ColumnKey: String] {
         guard let remotes = remotes0 as? [String: String] else {
             throw ChartParserError.noChart
         }
         return remotes
     }
 
-    private func readColumns(_ remoteColumns0: Any?) throws -> [ChartTO.Chart.Column] {
+    private func readColumns(_ remoteColumns0: Any?) throws -> [ChartTO.Column] {
         guard let remoteColumns = remoteColumns0 as? [[Any]] else {
             throw ChartParserError.noChart
         }
         return try remoteColumns.map { try readColumn($0) }
     }
 
-    private func readColumn(_ remoteColumn: [Any]) throws -> ChartTO.Chart.Column {
+    private func readColumn(_ remoteColumn: [Any]) throws -> ChartTO.Column {
         guard let key = remoteColumn.first as? String else {
             throw ChartParserError.noChart
         }
@@ -90,7 +90,7 @@ public final class ChartJsonParser {
             }
             values.append(val)
         }
-        return ChartTO.Chart.Column(key: key, values: values)
+        return ChartTO.Column(key: key, values: values)
     }
 }
 

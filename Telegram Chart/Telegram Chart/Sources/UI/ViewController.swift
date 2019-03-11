@@ -8,13 +8,48 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
+    @IBOutlet weak var tableView: UITableView!
+    
+    private let model = ChartListScreen()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+
+        reloadButtonsAnimated(false)
     }
 
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 0
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        return UITableViewCell()
+    }
 
+    @objc
+    private func handleNightModeButtonTap() {
+        model.switchMode()
+        reloadButtonsAnimated(true)
+        updateSkin()
+    }
+    
+    private func reloadButtonsAnimated(_ animated: Bool) {
+        let title = model.isNightModeEnabled ?
+            NSLocalizedString("Switch to Day Mode", comment: "") :
+            NSLocalizedString("Switch To Night Mode", comment: "")
+        
+        let button = UIBarButtonItem(title: title,
+                                     style: .plain,
+                                     target: self,
+                                     action: #selector(handleNightModeButtonTap))
+        
+        navigationItem.setRightBarButtonItems([button], animated: animated)
+    }
+    
+    private func updateSkin() {
+        // TODO: implement
+    }
 }
 
