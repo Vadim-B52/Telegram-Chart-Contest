@@ -8,8 +8,10 @@ import UIKit
 public class Chart {
 
     public let plots: [Plot]
+    public let timestamps: [Int64]
 
-    public init(plots: [Plot]) {
+    public init(timestamps: [Int64], plots: [Plot]) {
+        self.timestamps = timestamps
         self.plots = plots
     }
 
@@ -17,35 +19,17 @@ public class Chart {
         public let identifier: String
         public let name: String
         public let color: UIColor
-        public let timestamps: [Int64]
         public let values: [Int64]
 
-        fileprivate init(identifier: String,
+        public init(identifier: String,
                          name: String,
                          color: UIColor,
-                         timestamps: [Int64],
                          values: [Int64]) {
             
             self.identifier = identifier
             self.name = name
             self.color = color
-            self.timestamps = timestamps
             self.values = values
-        }
-    }
-    
-    public class LinePlot: Plot {
-        public override init(identifier: String,
-                             name: String,
-                             color: UIColor,
-                             timestamps: [Int64],
-                             values: [Int64]) {
-            
-            super.init(identifier: identifier,
-                       name: name,
-                       color: color,
-                       timestamps: timestamps,
-                       values: values)
         }
     }
 }

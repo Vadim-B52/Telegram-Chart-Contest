@@ -45,23 +45,23 @@ public class ChartClient {
             let columnType = chartTO.types.values[key]!
             switch columnType {
             case .line:
-                let plot = try linePlotWithKey(key, chartTO: chartTO, timestamps: timestamps, values: column.values)
+                let plot = try plotWithKey(key, chartTO: chartTO, values: column.values)
                 plots.append(plot)
             default:
                 break
             }
         }
 
-        return Chart(plots: plots)
+        return Chart(timestamps: timestamps, plots: plots)
     }
 
-    private func linePlotWithKey(_ key: String, chartTO: ChartTO, timestamps: [Int64], values: [Int64]) throws -> Chart.Plot {
+    private func plotWithKey(_ key: String, chartTO: ChartTO, values: [Int64]) throws -> Chart.Plot {
         guard let name = chartTO.names.values[key],
               let colorCode = chartTO.colors.values[key] else {
             throw ChartClientError.invalidData
         }
         let color = colorWithCode(colorCode)
-        let plot = Chart.LinePlot(identifier: key, name: name, color: color, timestamps: timestamps, values: values)
+        let plot = Chart.Plot(identifier: key, name: name, color: color, values: values)
         return plot
     }
 
@@ -101,7 +101,7 @@ public class ChartClient {
                    break
             }
         }
-        guard timestamps != nil else {
+        guard let ts = timestamps, ts.count > 1 else {
             throw ChartClientError.invalidData
         }
         return timestamps!

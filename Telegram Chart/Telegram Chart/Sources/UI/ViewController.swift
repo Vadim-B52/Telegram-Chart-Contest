@@ -79,7 +79,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             cell.miniChartView.backgroundColor = UIColor.blue.withAlphaComponent(0.1)
 
             // TODO: reorganize
-            cell.miniChartView.data =  chart.plots.map { PlotDrawingData(plot: $0) }
+            cell.miniChartView.chart = DrawingChart(timestamps: chart.timestamps, plots: chart.plots)
 
             return cell
         }

@@ -5,32 +5,26 @@
 
 import Foundation
 
-public class PlotDrawingData {
+public class DrawingChart {
 
-    public let plot: Chart.Plot
+    public let timestamps: [Int64]
+    public let plots: [Chart.Plot]
 
-    public init(plot: Chart.Plot) {
-        self.plot = plot
+    public init(timestamps: [Int64], plots: [Chart.Plot]) {
+        self.timestamps = timestamps
+        self.plots = plots
     }
 
-    public private(set) lazy var ranges: (timeRange: TimeRange, valueRange: ValueRange)? = {
-        let values = plot.values
-        guard values.count > 1 else {
-            return nil
-        }   
-        var r = ValueRange(value: values[0], idx: 0)
-        for i in 1..<values.count {
-            let v = values[i]
-            if v < r.min {
-                r.min = v
-                r.minIdx = i
-            } else if v > r.max {
-                r.max = v
-                r.maxIdx = i
-            }
+    public private(set) lazy var timeRange: TimeRange = {
+        guard let min = timestamps.first,
+              let max = timestamps.last else {
+            fatalError("Invalid chart to display")
         }
-        r.size = r.max - r.min
-        return (TimeRange(min: plot.timestamps.first!, max: plot.timestamps.last!), r)
+        return TimeRange(min: min, max: max)
+    }()
+
+    public private(set) lazy var valueRange: ValueRange = {
+        return ValueRange(ranges: plots.map { ValueRange(plot: $0) } )
     }()
 }
 
@@ -49,10 +43,31 @@ public struct ValueRange {
         maxIdx = idx
     }
 
-    public init?(ranges: [ValueRange]) {
-        guard !ranges.isEmpty else {
-            return nil
+    fileprivate init(plot: Chart.Plot) {
+        let values = plot.values
+        guard values.count > 1 else {
+            fatalError("Invalid plot")
         }
+
+        min = values[0]
+        max = values[0]
+        minIdx = 0
+        maxIdx = 0
+
+        for i in 1..<values.count {
+            let v = values[i]
+            if v < min {
+                min = v
+                minIdx = i
+            } else if v > max {
+                max = v
+                maxIdx = i
+            }
+        }
+        size = max - min
+    }
+
+    fileprivate init(ranges: [ValueRange]) {
         min = ranges[0].min
         max = ranges[0].max
         minIdx = ranges[0].minIdx
@@ -68,7 +83,6 @@ public struct ValueRange {
                 maxIdx = r.maxIdx
             }
         }
-
         size = max - min
     }
 }
@@ -78,7 +92,7 @@ public struct TimeRange {
     public let max: Int64
     public let size: Int64
 
-    init(min: Int64, max: Int64) {
+    fileprivate init(min: Int64, max: Int64) {
         self.min = min
         self.max = max
         size = max - min

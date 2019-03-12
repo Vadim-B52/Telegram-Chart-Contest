@@ -7,7 +7,7 @@ import UIKit
 
 public class MiniChartView: UIView {
 
-    public var data: [PlotDrawingData]? = nil {
+    public var chart: DrawingChart? = nil {
         didSet {
             setNeedsDisplay()
         }
@@ -19,7 +19,7 @@ public class MiniChartView: UIView {
         isOpaque = true
     }
 
-    public override required init?(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         contentMode = .redraw
         isOpaque = true
@@ -27,45 +27,32 @@ public class MiniChartView: UIView {
 
     public override func draw(_ rect: CGRect) {
         super.draw(rect)
-        guard let data = data, !data.isEmpty,
+        guard var chart = chart,
               let ctx = UIGraphicsGetCurrentContext() else {
             return
         }
-        // TODO: move to drawing data
-        var ranges = [ValueRange]()
-        data.forEach { plot in
-            guard let r = plot.ranges?.valueRange else {
-                return
-            }
-            ranges.append(r)
-        }
-        let valueRange = ValueRange(ranges: ranges)!
         ctx.saveGState()
         ctx.scaleBy(x: 1, y: -1)
         ctx.translateBy(x: 0, y: -rect.size.height)
-        data.forEach { plot in
-            drawInContext(ctx, plot: plot, valueRange: valueRange)
+        chart.plots.forEach { plot in
+            drawInContext(ctx, chart: chart, plot: plot)
         }
         ctx.restoreGState()
     }
 
-    private func drawInContext(_ ctx: CGContext, plot: PlotDrawingData, valueRange: ValueRange) {
-        guard let timeRange = plot.ranges?.timeRange else {
-            return
-        }
-
-        plot.plot.color.setStroke()
+    private func drawInContext(_ ctx: CGContext, chart: DrawingChart, plot: Chart.Plot) {
+        plot.color.setStroke()
         ctx.setLineWidth(1)
 
-        let args = plot.plot.timestamps
-        let values = plot.plot.values
+        let args = chart.timestamps
+        let values = plot.values
 
-        ctx.move(to: pointAtTimestamp(args[0], value: values[0], valueRange: valueRange, timeRange: timeRange))
+        ctx.move(to: pointAtTimestamp(args[0], value: values[0], chart: chart))
 
         for i in 1..<args.count {
             let time = args[i]
             let value = values[i]
-            ctx.addLine(to: pointAtTimestamp(time, value: value, valueRange: valueRange, timeRange: timeRange))
+            ctx.addLine(to: pointAtTimestamp(time, value: value, chart: chart))
         }
 
         ctx.strokePath()
@@ -77,9 +64,10 @@ public class MiniChartView: UIView {
 
     private func pointAtTimestamp(_ timestamp: Int64,
                                   value: Int64,
-                                  valueRange: ValueRange,
-                                  timeRange: TimeRange) -> CGPoint {
+                                  chart: DrawingChart) -> CGPoint {
 
+        let timeRange = chart.timeRange
+        let valueRange = chart.valueRange
         let t = CGFloat(timestamp - timeRange.min) / CGFloat(timeRange.size)
         let x = bounds.minX + bounds.size.width * t
         let v = CGFloat(value - valueRange.min) / CGFloat(valueRange.size)
