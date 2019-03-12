@@ -37,11 +37,15 @@ public class ChartClient {
         let timestamps = try timestampsFromColumns(columns, chartTO)
 
         var plots = [Chart.Plot]()
-        for (key, values) in columns {
+        for column in chartTO.columns {
+            let key = column.key
+            if chartTO.types.values[key] == ChartTO.ColumnType.x {
+                continue
+            }
             let columnType = chartTO.types.values[key]!
             switch columnType {
             case .line:
-                let plot = try linePlotWithKey(key, chartTO: chartTO, timestamps: timestamps, values: values)
+                let plot = try linePlotWithKey(key, chartTO: chartTO, timestamps: timestamps, values: column.values)
                 plots.append(plot)
             default:
                 break

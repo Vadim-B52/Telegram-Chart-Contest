@@ -8,6 +8,9 @@
 
 import UIKit
 
+// TODO: separarators
+// TODO: taps
+// TODO: skin
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     @IBOutlet weak var tableView: UITableView!
@@ -49,7 +52,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             return 44
         }
         if indexPath.row == 0 {
-            return 100 // TODO: adjust
+            return UIScreen.main.bounds.size.height / 2
         }
         return 44
     }
@@ -72,6 +75,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             let cell: ChartTableViewCell = tableView.dequeueReusableCell(withIdentifier: chartCellReuseId) as! ChartTableViewCell
             cell.selectionStyle = .none
             cell.separatorInset = UIEdgeInsets(top: 0, left: 9999, bottom: 0, right: -9999)
+            cell.chartView.backgroundColor = UIColor.green.withAlphaComponent(0.1)
+            cell.miniChartView.backgroundColor = UIColor.blue.withAlphaComponent(0.1)
             return cell
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: plotCellReuseId)!

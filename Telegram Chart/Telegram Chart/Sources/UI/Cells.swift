@@ -9,7 +9,32 @@
 import UIKit
 
 public class ChartTableViewCell: UITableViewCell {
-    
+
+    public let chartView: ChartView
+    public let miniChartView: MiniChartView
+
+    public override init(style: CellStyle, reuseIdentifier: String?) {
+        chartView = ChartView()
+        miniChartView = MiniChartView()
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+
+        chartView.translatesAutoresizingMaskIntoConstraints = false
+        miniChartView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(chartView)
+        contentView.addSubview(miniChartView)
+
+        let views = ["chartView": chartView, "miniChartView": miniChartView]
+        NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "V:|[chartView][miniChartView(==60)]|",
+                options: [], metrics: nil, views: views))
+        NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "H:|-15-[chartView]-15-|",
+                options: [], metrics: nil, views: views))
+        NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "H:|-15-[miniChartView]-15-|",
+                options: [], metrics: nil, views: views))
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
 
 public class NightModeTableViewCell: UITableViewCell {
