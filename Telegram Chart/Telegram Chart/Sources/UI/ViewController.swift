@@ -77,6 +77,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             cell.separatorInset = UIEdgeInsets(top: 0, left: 9999, bottom: 0, right: -9999)
             cell.chartView.backgroundColor = UIColor.green.withAlphaComponent(0.1)
             cell.miniChartView.backgroundColor = UIColor.blue.withAlphaComponent(0.1)
+
+            // TODO: reorganize
+            cell.miniChartView.data =  chart.plots.map { PlotDrawingData(plot: $0) }
+
             return cell
         }
         let cell = tableView.dequeueReusableCell(withIdentifier: plotCellReuseId)!

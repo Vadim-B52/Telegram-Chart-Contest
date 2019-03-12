@@ -8,9 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		6AC710D129DADD88ED4B4E25 /* ChartClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71E1470CB6775F9CA41BA /* ChartClient.swift */; };
+		6AC7150428B2635F24CD07F3 /* ValueAxisPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC7172228330B7244FC78BC /* ValueAxisPanel.swift */; };
+		6AC715F14D7E92D56ED99063 /* TouchPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC713E8A3CB6E0E2EB3FACC /* TouchPanel.swift */; };
 		6AC71680C695B78D82912F8E /* Chart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC715D6F57BFF6CEAC49574 /* Chart.swift */; };
 		6AC717180E31FF41DA067C70 /* ChartJsonParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71E59D6E64D1805DD1E06 /* ChartJsonParser.swift */; };
 		6AC718FE6281F398AA30C088 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71D0F5222D855E5D0D7E2 /* ChartView.swift */; };
+		6AC71AF612E9F2391E23B537 /* ChartDrawingData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71BCE78E14B1D2B96914F /* ChartDrawingData.swift */; };
+		6AC71B2C965039AFF8AC19BB /* PopupPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC716046717D7C509E9DAD3 /* PopupPanel.swift */; };
+		6AC71BE65323747013FCC0F1 /* TimeAxisPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71D6D5371B4AE6E8D75AF /* TimeAxisPanel.swift */; };
+		6AC71EBD7BF2879ECC8DB908 /* ChartPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71F1C11EF230B241273B2 /* ChartPanel.swift */; };
 		6AC71FBB96111686990B3956 /* MiniChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC715537FCA8B8EBF73BF21 /* MiniChartView.swift */; };
 		DDC16F4322358CCA0060596D /* sample_data.json in Resources */ = {isa = PBXBuildFile; fileRef = DDC16F4222358CCA0060596D /* sample_data.json */; };
 		DDC16F4722358D670060596D /* ChartListTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC16F4622358D670060596D /* ChartListTO.swift */; };
@@ -26,11 +32,17 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6AC713E8A3CB6E0E2EB3FACC /* TouchPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TouchPanel.swift; sourceTree = "<group>"; };
 		6AC715537FCA8B8EBF73BF21 /* MiniChartView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MiniChartView.swift; sourceTree = "<group>"; };
 		6AC715D6F57BFF6CEAC49574 /* Chart.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chart.swift; sourceTree = "<group>"; };
+		6AC716046717D7C509E9DAD3 /* PopupPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PopupPanel.swift; sourceTree = "<group>"; };
+		6AC7172228330B7244FC78BC /* ValueAxisPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValueAxisPanel.swift; sourceTree = "<group>"; };
+		6AC71BCE78E14B1D2B96914F /* ChartDrawingData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartDrawingData.swift; sourceTree = "<group>"; };
 		6AC71D0F5222D855E5D0D7E2 /* ChartView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
+		6AC71D6D5371B4AE6E8D75AF /* TimeAxisPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeAxisPanel.swift; sourceTree = "<group>"; };
 		6AC71E1470CB6775F9CA41BA /* ChartClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartClient.swift; sourceTree = "<group>"; };
 		6AC71E59D6E64D1805DD1E06 /* ChartJsonParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartJsonParser.swift; sourceTree = "<group>"; };
+		6AC71F1C11EF230B241273B2 /* ChartPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPanel.swift; sourceTree = "<group>"; };
 		DDC16F4222358CCA0060596D /* sample_data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = sample_data.json; sourceTree = "<group>"; };
 		DDC16F4622358D670060596D /* ChartListTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartListTO.swift; sourceTree = "<group>"; };
 		DDC16F482236EC4B0060596D /* ChartListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartListScreen.swift; sourceTree = "<group>"; };
@@ -63,6 +75,19 @@
 				6AC715D6F57BFF6CEAC49574 /* Chart.swift */,
 			);
 			path = Domain;
+			sourceTree = "<group>";
+		};
+		6AC7163371B1B361DA9AB5EF /* ChartCore */ = {
+			isa = PBXGroup;
+			children = (
+				6AC71F1C11EF230B241273B2 /* ChartPanel.swift */,
+				6AC71D6D5371B4AE6E8D75AF /* TimeAxisPanel.swift */,
+				6AC7172228330B7244FC78BC /* ValueAxisPanel.swift */,
+				6AC713E8A3CB6E0E2EB3FACC /* TouchPanel.swift */,
+				6AC716046717D7C509E9DAD3 /* PopupPanel.swift */,
+				6AC71BCE78E14B1D2B96914F /* ChartDrawingData.swift */,
+			);
+			path = ChartCore;
 			sourceTree = "<group>";
 		};
 		6AC71A142182A9B4EEE2E8BE /* Client */ = {
@@ -107,6 +132,7 @@
 				DDC16F4E2237070E0060596D /* Images.swift */,
 				6AC715537FCA8B8EBF73BF21 /* MiniChartView.swift */,
 				6AC71D0F5222D855E5D0D7E2 /* ChartView.swift */,
+				6AC7163371B1B361DA9AB5EF /* ChartCore */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -229,6 +255,12 @@
 				6AC710D129DADD88ED4B4E25 /* ChartClient.swift in Sources */,
 				6AC71FBB96111686990B3956 /* MiniChartView.swift in Sources */,
 				6AC718FE6281F398AA30C088 /* ChartView.swift in Sources */,
+				6AC71EBD7BF2879ECC8DB908 /* ChartPanel.swift in Sources */,
+				6AC71BE65323747013FCC0F1 /* TimeAxisPanel.swift in Sources */,
+				6AC7150428B2635F24CD07F3 /* ValueAxisPanel.swift in Sources */,
+				6AC715F14D7E92D56ED99063 /* TouchPanel.swift in Sources */,
+				6AC71B2C965039AFF8AC19BB /* PopupPanel.swift in Sources */,
+				6AC71AF612E9F2391E23B537 /* ChartDrawingData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
