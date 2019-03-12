@@ -58,10 +58,6 @@ public class MiniChartView: UIView {
         ctx.strokePath()
     }
 
-    private func lerp<T: Numeric>(min: T, max: T, value: T) -> T {
-        return min + (value * (max - min))
-    }
-
     private func pointAtTimestamp(_ timestamp: Int64,
                                   value: Int64,
                                   chart: DrawingChart) -> CGPoint {
