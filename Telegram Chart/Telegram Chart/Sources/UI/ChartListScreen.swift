@@ -11,6 +11,7 @@ import Foundation
 public class ChartListScreen {
     
     public let charts: [Chart]
+    public let chartStates: [ChartState]
     public let errorText: String?
     public private(set) var isNightModeEnabled = false
 
@@ -27,10 +28,20 @@ public class ChartListScreen {
         }
         self.charts = charts
         self.errorText = errorText
+        self.chartStates = charts.map({ (chart) -> ChartState in
+            return ChartState(enabledPlotId: Set(chart.plots.map { $0.identifier }))
+        })
     }
     
     public func switchMode() {
         isNightModeEnabled = !isNightModeEnabled
     }
-    
+ 
+    public func dataAt(_ idx: Int) -> (Chart, ChartState) {
+        return (charts[idx], chartStates[idx])
+    }
+}
+
+public struct ChartState {
+    public let enabledPlotId: Set<String>
 }

@@ -57,7 +57,7 @@ public class ChartClient {
             throw ChartClientError.invalidData
         }
         let color = colorWithCode(colorCode)
-        let plot = Chart.LinePlot(name: name, color: color, timestamps: timestamps, values: values)
+        let plot = Chart.LinePlot(identifier: key, name: name, color: color, timestamps: timestamps, values: values)
         return plot
     }
 

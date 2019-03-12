@@ -47,7 +47,7 @@
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="oUw-b5-dae" secondAttribute="trailing" id="6ny-fC-VVH"/>
                             <constraint firstItem="oUw-b5-dae" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="ZCl-VY-2f9"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="oUw-b5-dae" secondAttribute="bottom" id="i0o-dB-gqQ"/>
+                            <constraint firstAttribute="bottom" secondItem="oUw-b5-dae" secondAttribute="bottom" id="i0o-dB-gqQ"/>
                             <constraint firstItem="oUw-b5-dae" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="sUr-go-Nbj"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
@@ -59,7 +59,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="271" y="143"/>
+            <point key="canvasLocation" x="269.60000000000002" y="142.57871064467767"/>
         </scene>
     </scenes>
 </document>
