@@ -3,7 +3,7 @@
 // Copyright (c) 2019 Vadim Belotitskiy. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 public class DrawingChart {
 
@@ -85,16 +85,37 @@ public struct ValueRange {
         }
         size = max - min
     }
+
+    public func y(in rect: CGRect, value: Int64) -> CGFloat {
+        let v = CGFloat(value - min) / CGFloat(size)
+        let x = rect.minY + rect.size.height * v
+        return x
+    }
 }
 
+// TODO: add validation
 public struct TimeRange {
     public let min: Int64
     public let max: Int64
     public let size: Int64
 
-    fileprivate init(min: Int64, max: Int64) {
+    public init(min: Int64, max: Int64) {
         self.min = min
         self.max = max
         size = max - min
+    }
+
+    public func x(in rect: CGRect, timestamp: Int64) -> CGFloat {
+        let t = CGFloat(timestamp - min) / CGFloat(size)
+        let x = rect.minX + rect.size.width * t
+        return x
+    }
+
+    public func beforeTimestamp(_ timestamp: Int64) -> TimeRange {
+        return TimeRange(min: min, max: timestamp)
+    }
+
+    public func afterTimestamp(_ timestamp: Int64) -> TimeRange {
+        return TimeRange(min: timestamp, max: max)
     }
 }

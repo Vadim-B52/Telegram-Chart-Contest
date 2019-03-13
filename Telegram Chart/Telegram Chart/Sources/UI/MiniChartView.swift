@@ -7,9 +7,16 @@ import UIKit
 
 public class MiniChartView: UIView {
 
+    private let timeSelector = TimeSelectorView()
+
     public var chart: DrawingChart? = nil {
         didSet {
             setNeedsDisplay()
+
+            if let chart = chart {
+                timeSelector.timeRange = chart.timeRange
+                timeSelector.selectedTimeRange = TimeRange(min: chart.timestamps[10], max: chart.timestamps[30])
+            }
         }
     }
 
@@ -17,12 +24,19 @@ public class MiniChartView: UIView {
         super.init(frame: frame)
         contentMode = .redraw
         isOpaque = true
+        addSubview(timeSelector)
     }
 
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         contentMode = .redraw
         isOpaque = true
+        addSubview(timeSelector)
+    }
+
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        timeSelector.frame = bounds
     }
 
     public override func draw(_ rect: CGRect) {
@@ -61,13 +75,9 @@ public class MiniChartView: UIView {
     private func pointAtTimestamp(_ timestamp: Int64,
                                   value: Int64,
                                   chart: DrawingChart) -> CGPoint {
-
-        let timeRange = chart.timeRange
-        let valueRange = chart.valueRange
-        let t = CGFloat(timestamp - timeRange.min) / CGFloat(timeRange.size)
-        let x = bounds.minX + bounds.size.width * t
-        let v = CGFloat(value - valueRange.min) / CGFloat(valueRange.size)
-        let y = bounds.minY + bounds.size.height * v
+        
+        let x = chart.timeRange.x(in: bounds, timestamp: timestamp)
+        let y = chart.valueRange.y(in: bounds, value: value)
         return CGPoint(x: x, y: y)
     }
 }
