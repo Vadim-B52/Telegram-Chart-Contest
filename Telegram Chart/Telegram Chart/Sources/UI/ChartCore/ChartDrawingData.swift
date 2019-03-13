@@ -5,7 +5,6 @@
 
 import UIKit
 
-// TODO: fix bug with wrong ranges!
 public class DrawingChart {
 
     public let timestamps: [Int64]

@@ -37,11 +37,9 @@ public class ChartTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public func display(chart: DrawingChart) {
-        let timeRange = TimeRange(min: chart.timestamps[10], max: chart.timestamps[30])
-        chartView.chart = chart
-        chartView.selectedTimeRange = timeRange
-        miniChartView.chart = chart
+    public func display(chart: Chart, timeRange: TimeRange) {
+        chartView.chart = DrawingChart(timestamps: chart.timestamps, timeRange: chart.timeRange, selectedTimeRange: timeRange, plots: chart.plots)
+        miniChartView.chart = DrawingChart(timestamps: chart.timestamps, timeRange: chart.timeRange, plots: chart.plots)
         miniChartView.selectedTimeRange = timeRange
     }
 }

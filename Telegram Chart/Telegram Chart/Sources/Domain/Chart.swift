@@ -78,7 +78,7 @@ public struct ValueRange {
         minIdx = r.startIdx
         maxIdx = r.startIdx
 
-        for i in (r.startIdx + 1)..<(r.startIdx + r.length ) {
+        for i in (r.startIdx + 1)..<(r.startIdx + r.length) {
             let v = values[i]
             if v < min {
                 min = v
@@ -147,15 +147,14 @@ public struct TimeIndexRange {
         for i in 0..<timestamps.count - 1 {
             if timestamps[i] == timeRange.min || (timestamps[i] < timeRange.min && timeRange.min < timestamps[i + 1]) {
                 startIdx = i
-                length = 1
                 break
             }
         }
         for i in startIdx..<timestamps.count - 1 {
-            if timestamps[i] == timeRange.max || (timestamps[i] < timeRange.max && timeRange.min < timestamps[i + 1]) {
+            length += 1
+            if timestamps[i] == timeRange.max || (timestamps[i] < timeRange.max && timeRange.max < timestamps[i + 1]) {
                 break
             }
-            length += 1
         }
 
         self.startIdx = startIdx

@@ -59,14 +59,14 @@ public class TimeSelectorView: UIView {
 
         var (slice0, rest0) = bounds.divided(atDistance: timeRange.x(in: bounds, timestamp: leftRange.max), from: .minXEdge)
         leftDimming.frame = slice0
-
-        var (slice1, rest1) = bounds.divided(atDistance: timeRange.x(in: bounds, timestamp: rightRange.min), from: .maxXEdge)
-        rightDimming.frame = slice1
-
-        var rest = rest0.intersection(rest1)
-        (slice0, rest) = rest.divided(atDistance: 11, from: .minXEdge)
-        (slice1, rest) = rest.divided(atDistance: 11, from: .maxXEdge)
+        (slice0, rest0) = rest0.divided(atDistance: 11, from: .minXEdge)
         leftControl.frame = slice0
+
+        var (slice1, rest1) = bounds.divided(atDistance: timeRange.x(in: bounds, timestamp: rightRange.min), from: .minXEdge)
+        rightDimming.frame = rest1
+
+        var rest = rest0.intersection(slice1)
+        (slice1, rest) = rest.divided(atDistance: 11, from: .maxXEdge)
         rightControl.frame = slice1
 
         (slice0, rest) = rest.divided(atDistance: 1, from: .minYEdge)
