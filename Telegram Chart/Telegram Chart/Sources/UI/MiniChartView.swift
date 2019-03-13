@@ -11,12 +11,14 @@ public class MiniChartView: UIView {
 
     public var chart: DrawingChart? = nil {
         didSet {
+            timeSelector.timeRange = chart?.timeRange
             setNeedsDisplay()
+        }
+    }
 
-            if let chart = chart {
-                timeSelector.timeRange = chart.timeRange
-                timeSelector.selectedTimeRange = TimeRange(min: chart.timestamps[10], max: chart.timestamps[30])
-            }
+    public var selectedTimeRange: TimeRange? {
+        didSet {
+            timeSelector.selectedTimeRange = selectedTimeRange
         }
     }
 

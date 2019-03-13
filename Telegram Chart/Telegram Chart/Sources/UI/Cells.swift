@@ -38,7 +38,11 @@ public class ChartTableViewCell: UITableViewCell {
     }
 
     public func display(chart: DrawingChart) {
+        let timeRange = TimeRange(min: chart.timestamps[10], max: chart.timestamps[30])
+        chartView.chart = chart
+        chartView.selectedTimeRange = timeRange
         miniChartView.chart = chart
+        miniChartView.selectedTimeRange = timeRange
     }
 }
 
