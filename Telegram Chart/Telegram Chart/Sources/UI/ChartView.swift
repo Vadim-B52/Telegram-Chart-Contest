@@ -15,7 +15,7 @@ public class ChartView: UIView {
 
     public var selectedTimeRange: TimeRange? {
         didSet {
-//            timeSelector.selectedTimeRange = selectedTimeRange
+            setNeedsDisplay()
         }
     }
 

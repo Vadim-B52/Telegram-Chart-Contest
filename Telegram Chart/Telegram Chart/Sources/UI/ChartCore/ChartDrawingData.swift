@@ -5,20 +5,35 @@
 
 import UIKit
 
+// TODO: fix bug with wrong ranges!
 public class DrawingChart {
 
     public let timestamps: [Int64]
     public let timeRange: TimeRange
+    public let selectedTimeRange: TimeRange
     public let plots: [Chart.Plot]
 
-    public init(timestamps: [Int64], timeRange: TimeRange, plots: [Chart.Plot]) {
+    public init(timestamps: [Int64],
+                timeRange: TimeRange,
+                selectedTimeRange: TimeRange? = nil,
+                plots: [Chart.Plot]) {
         self.timestamps = timestamps
         self.timeRange = timeRange
+        self.selectedTimeRange = selectedTimeRange ?? timeRange
         self.plots = plots
     }
 
+    public private(set) lazy var timeIndexRange: TimeIndexRange = {
+        if selectedTimeRange != timeRange {
+            return TimeIndexRange(timestamps: timestamps, timeRange: selectedTimeRange)
+        } else {
+            return TimeIndexRange(length: timestamps.count)
+        }
+    }()
+
     public private(set) lazy var valueRange: ValueRange = {
-        return ValueRange(ranges: plots.map { $0.valueRange } )
+        let ranges = plots.map { $0.valueRange(indexRange: timeIndexRange) }
+        return ValueRange(ranges: ranges)
     }()
 }
 

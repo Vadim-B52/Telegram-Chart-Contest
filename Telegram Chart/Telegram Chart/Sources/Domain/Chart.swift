@@ -41,9 +41,14 @@ public class Chart {
             self.values = values
         }
 
+        // TODO: is needed or optimize
         public private(set) lazy var valueRange: ValueRange = {
-            return ValueRange(plot: self)
+            return ValueRange(values: values)
         }()
+
+        public func valueRange(indexRange: TimeIndexRange) -> ValueRange {
+            return ValueRange(values: values, indexRange: indexRange)
+        }
     }
 }
 
@@ -62,18 +67,18 @@ public struct ValueRange {
         maxIdx = idx
     }
 
-    fileprivate init(plot: Chart.Plot) {
-        let values = plot.values
+    fileprivate init(values: [Int64], indexRange: TimeIndexRange? = nil) {
         guard values.count > 1 else {
             fatalError("Invalid plot")
         }
 
-        min = values[0]
-        max = values[0]
-        minIdx = 0
-        maxIdx = 0
+        let r = indexRange ?? TimeIndexRange(length: values.count)
+        min = values[r.startIdx]
+        max = values[r.startIdx]
+        minIdx = r.startIdx
+        maxIdx = r.startIdx
 
-        for i in 1..<values.count {
+        for i in (r.startIdx + 1)..<(r.startIdx + r.length ) {
             let v = values[i]
             if v < min {
                 min = v
@@ -106,7 +111,7 @@ public struct ValueRange {
     }
 }
 
-public struct TimeRange {
+public struct TimeRange: Equatable {
     public let min: Int64
     public let max: Int64
     public let size: Int64
@@ -123,5 +128,37 @@ public struct TimeRange {
 
     public func afterTimestamp(_ timestamp: Int64) -> TimeRange {
         return TimeRange(min: timestamp, max: max)
+    }
+}
+
+public struct TimeIndexRange {
+    let startIdx: Int
+    let length: Int
+
+    public init(length: Int) {
+        self.startIdx = 0
+        self.length = length
+    }
+
+    public init(timestamps: [Int64], timeRange: TimeRange) {
+        var startIdx = 0
+        var length = 0
+
+        for i in 0..<timestamps.count - 1 {
+            if timestamps[i] == timeRange.min || (timestamps[i] < timeRange.min && timeRange.min < timestamps[i + 1]) {
+                startIdx = i
+                length = 1
+                break
+            }
+        }
+        for i in startIdx..<timestamps.count - 1 {
+            if timestamps[i] == timeRange.max || (timestamps[i] < timeRange.max && timeRange.min < timestamps[i + 1]) {
+                break
+            }
+            length += 1
+        }
+
+        self.startIdx = startIdx
+        self.length = length
     }
 }
