@@ -41,7 +41,7 @@ public class MiniChartView: UIView {
 
     public override func draw(_ rect: CGRect) {
         super.draw(rect)
-        guard var chart = chart,
+        guard let chart = chart,
               let ctx = UIGraphicsGetCurrentContext() else {
             return
         }
