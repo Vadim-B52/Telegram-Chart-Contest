@@ -5,7 +5,7 @@
 
 import UIKit
 
-public class MiniChartView: UIView {
+public class MiniChartView: UIControl {
 
     private let timeSelector = TimeSelectorView()
 
@@ -17,8 +17,11 @@ public class MiniChartView: UIView {
     }
 
     public var selectedTimeRange: TimeRange? {
-        didSet {
-            timeSelector.selectedTimeRange = selectedTimeRange
+        get {
+            return timeSelector.selectedTimeRange
+        }
+        set {
+            timeSelector.selectedTimeRange = newValue
         }
     }
 
@@ -27,13 +30,12 @@ public class MiniChartView: UIView {
         contentMode = .redraw
         isOpaque = true
         addSubview(timeSelector)
+
+        timeSelector.addTarget(self, action: #selector(handleValueChanged), for: .valueChanged)
     }
 
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        contentMode = .redraw
-        isOpaque = true
-        addSubview(timeSelector)
     }
 
     public override func layoutSubviews() {
@@ -53,5 +55,10 @@ public class MiniChartView: UIView {
             panel.drawInContext(ctx, rect: bounds)
             ctx.restoreGState()
         }
+    }
+
+    @objc
+    private func handleValueChanged() {
+        sendActions(for: .valueChanged)
     }
 }

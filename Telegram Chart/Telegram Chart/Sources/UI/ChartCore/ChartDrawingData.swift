@@ -34,6 +34,10 @@ public class DrawingChart {
         let ranges = plots.map { $0.valueRange(indexRange: timeIndexRange) }
         return ValueRange(ranges: ranges)
     }()
+
+    public func changeSelectedTimeRange(_ range: TimeRange?) -> DrawingChart {
+        return DrawingChart(timestamps: timestamps, timeRange: timeRange, selectedTimeRange: range, plots: plots)
+    }
 }
 
 public extension ValueRange {

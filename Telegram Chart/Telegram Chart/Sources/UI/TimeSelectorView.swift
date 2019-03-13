@@ -5,7 +5,7 @@
 
 import UIKit
 
-public class TimeSelectorView: UIView {
+public class TimeSelectorView: UIControl {
 
     private let leftControl = UIView()
     private let rightControl = UIView()
@@ -137,7 +137,7 @@ public class TimeSelectorView: UIView {
             let min = timeRange.timestampAt(x: leftRect.minX, rect: bounds)
             let max = timeRange.timestampAt(x: rightRect.maxX, rect: bounds)
             selectedTimeRange = TimeRange(min: min, max: max)
+            sendActions(for: .valueChanged)
         }
     }
 }
-

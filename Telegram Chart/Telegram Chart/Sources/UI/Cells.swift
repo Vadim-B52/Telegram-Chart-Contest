@@ -31,6 +31,8 @@ public class ChartTableViewCell: UITableViewCell {
                 options: [], metrics: nil, views: views))
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "H:|-15-[miniChartView]-15-|",
                 options: [], metrics: nil, views: views))
+
+        miniChartView.addTarget(self, action: #selector(handleValueChanged), for: .valueChanged)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -41,6 +43,12 @@ public class ChartTableViewCell: UITableViewCell {
         chartView.chart = DrawingChart(timestamps: chart.timestamps, timeRange: chart.timeRange, selectedTimeRange: timeRange, plots: chart.plots)
         miniChartView.chart = DrawingChart(timestamps: chart.timestamps, timeRange: chart.timeRange, plots: chart.plots)
         miniChartView.selectedTimeRange = timeRange
+    }
+
+    @objc
+    private func handleValueChanged() {
+        chartView.chart = chartView.chart?.changeSelectedTimeRange(miniChartView.selectedTimeRange)
+        // TODO: delegate
     }
 }
 
