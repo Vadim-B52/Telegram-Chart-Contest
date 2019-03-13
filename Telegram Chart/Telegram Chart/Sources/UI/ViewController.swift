@@ -77,7 +77,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             cell.separatorInset = UIEdgeInsets(top: 0, left: 9999, bottom: 0, right: -9999)
 
             // TODO: reorganize
-            let selectedTimeRange = TimeRange(min: chart.timestamps[5], max: chart.timestamps[14])
+            let selectedTimeRange = TimeRange(min: chart.timestamps.first!, max: chart.timestamps.last!)
             cell.display(chart: chart, timeRange: selectedTimeRange)
 
             return cell

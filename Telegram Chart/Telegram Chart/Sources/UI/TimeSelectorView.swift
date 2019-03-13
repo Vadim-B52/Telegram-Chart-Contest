@@ -14,6 +14,10 @@ public class TimeSelectorView: UIView {
     private let topBalk = UIView()
     private let bottomBalk = UIView()
 
+    private let longPress = UILongPressGestureRecognizer()
+    private var actionView: UIView?
+    private var panPoint = CGPoint.zero
+
     public var timeRange: TimeRange? {
         didSet {
             setNeedsLayout()
@@ -27,12 +31,12 @@ public class TimeSelectorView: UIView {
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        addSubview(leftDimming)
-        addSubview(rightDimming)
-        addSubview(leftControl)
-        addSubview(rightControl)
-        addSubview(topBalk)
-        addSubview(bottomBalk)
+
+        let controls = [leftDimming, rightDimming, leftControl, rightControl, topBalk, bottomBalk]
+        controls.forEach { v in
+            addSubview(v)
+            v.isUserInteractionEnabled = false
+        }
 
         let dimmingColor = UIColor.black.withAlphaComponent(0.1)
         let color = UIColor.black.withAlphaComponent(0.2)
@@ -40,6 +44,10 @@ public class TimeSelectorView: UIView {
         leftDimming.backgroundColor = dimmingColor
         rightDimming.backgroundColor = dimmingColor
         [leftControl, rightControl, topBalk, bottomBalk].forEach { $0.backgroundColor = color }
+
+        longPress.addTarget(self, action: #selector(handleLongPress))
+        longPress.minimumPressDuration = 0
+        addGestureRecognizer(longPress)
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -73,6 +81,63 @@ public class TimeSelectorView: UIView {
         (slice1, rest) = rest.divided(atDistance: 1, from: .maxYEdge)
         topBalk.frame = slice0
         bottomBalk.frame = slice1
+    }
+
+    @objc
+    private func handleLongPress() {
+        switch longPress.state {
+        case .began:
+            updateActionView(point: longPress.location(in: self))
+            break
+        case .changed:
+            handleTranslation(point: longPress.location(in: self))
+            break
+        default:
+            break
+        }
+    }
+
+    private func updateActionView(point: CGPoint) {
+        // TODO: extend touch area
+        panPoint = point
+        if leftControl.frame.contains(point) {
+            actionView = leftControl
+        } else if rightControl.frame.contains(point) {
+            actionView = rightControl
+        } else if point.x > leftControl.center.x && point.x < rightControl.center.x {
+            actionView = self
+        } else {
+            actionView = nil
+        }
+    }
+
+    private func handleTranslation(point: CGPoint) {
+        guard actionView != nil,
+              let timeRange = timeRange else {
+            return
+        }
+
+        let dx = point.x - panPoint.x
+        panPoint = point
+
+        var leftRect = leftControl.frame
+        var rightRect = rightControl.frame
+
+        if actionView == leftControl {
+            leftRect = leftRect.offsetBy(dx: dx, dy: 0)
+        } else if actionView == rightControl {
+            rightRect = rightRect.offsetBy(dx: dx, dy: 0)
+        } else if actionView == self {
+            leftRect = leftRect.offsetBy(dx: dx, dy: 0)
+            rightRect = rightRect.offsetBy(dx: dx, dy: 0)
+        }
+
+        // TODO: corner positions
+        if bounds.contains(leftRect) && bounds.contains(rightRect) && leftRect.maxX + 30 <= rightRect.minX {
+            let min = timeRange.timestampAt(x: leftRect.minX, rect: bounds)
+            let max = timeRange.timestampAt(x: rightRect.maxX, rect: bounds)
+            selectedTimeRange = TimeRange(min: min, max: max)
+        }
     }
 }
 

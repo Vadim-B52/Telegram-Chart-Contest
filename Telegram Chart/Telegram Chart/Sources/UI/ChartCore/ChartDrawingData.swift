@@ -50,4 +50,10 @@ public extension TimeRange {
         let x = rect.minX + rect.size.width * t
         return x
     }
+
+    public func timestampAt(x: CGFloat, rect: CGRect) -> Int64 {
+        let d = (x - rect.minX) / rect.size.width
+        let timestamp = CGFloat(min) + CGFloat(size) * d
+        return Int64(timestamp)
+    }
 }
