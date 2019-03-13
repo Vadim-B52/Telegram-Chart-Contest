@@ -75,11 +75,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             let cell: ChartTableViewCell = tableView.dequeueReusableCell(withIdentifier: chartCellReuseId) as! ChartTableViewCell
             cell.selectionStyle = .none
             cell.separatorInset = UIEdgeInsets(top: 0, left: 9999, bottom: 0, right: -9999)
-            cell.chartView.backgroundColor = UIColor.green.withAlphaComponent(0.1)
-            cell.miniChartView.backgroundColor = UIColor.blue.withAlphaComponent(0.1)
 
             // TODO: reorganize
-            cell.miniChartView.chart = DrawingChart(timestamps: chart.timestamps, timeRange: chart.timeRange, plots: chart.plots)
+            let drawingChart = DrawingChart(timestamps: chart.timestamps, timeRange: chart.timeRange, plots: chart.plots)
+            cell.display(chart: drawingChart)
 
             return cell
         }

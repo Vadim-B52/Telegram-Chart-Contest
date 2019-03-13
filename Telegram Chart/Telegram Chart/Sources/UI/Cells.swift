@@ -10,13 +10,14 @@ import UIKit
 
 public class ChartTableViewCell: UITableViewCell {
 
-    public let chartView: ChartView
-    public let miniChartView: MiniChartView
+    private let chartView = ChartView()
+    private let miniChartView = MiniChartView()
 
     public override init(style: CellStyle, reuseIdentifier: String?) {
-        chartView = ChartView()
-        miniChartView = MiniChartView()
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+
+        chartView.backgroundColor = .white
+        miniChartView.backgroundColor = .white
 
         chartView.translatesAutoresizingMaskIntoConstraints = false
         miniChartView.translatesAutoresizingMaskIntoConstraints = false
@@ -34,6 +35,10 @@ public class ChartTableViewCell: UITableViewCell {
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    public func display(chart: DrawingChart) {
+        miniChartView.chart = chart
     }
 }
 
