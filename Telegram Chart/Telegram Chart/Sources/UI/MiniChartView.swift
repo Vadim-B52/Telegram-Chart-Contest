@@ -45,39 +45,11 @@ public class MiniChartView: UIView {
               let ctx = UIGraphicsGetCurrentContext() else {
             return
         }
-        ctx.saveGState()
-        ctx.scaleBy(x: 1, y: -1)
-        ctx.translateBy(x: 0, y: -rect.size.height)
-        chart.plots.forEach { plot in
-            drawInContext(ctx, chart: chart, plot: plot)
+        for (idx, _) in chart.plots.enumerated() {
+            ctx.saveGState()
+            let panel = ChartPanel(chart: chart, plotIndex: idx)
+            panel.drawInContext(ctx, rect: bounds)
+            ctx.restoreGState()
         }
-        ctx.restoreGState()
-    }
-
-    private func drawInContext(_ ctx: CGContext, chart: DrawingChart, plot: Chart.Plot) {
-        plot.color.setStroke()
-        ctx.setLineWidth(1)
-
-        let args = chart.timestamps
-        let values = plot.values
-
-        ctx.move(to: pointAtTimestamp(args[0], value: values[0], chart: chart))
-
-        for i in 1..<args.count {
-            let time = args[i]
-            let value = values[i]
-            ctx.addLine(to: pointAtTimestamp(time, value: value, chart: chart))
-        }
-
-        ctx.strokePath()
-    }
-
-    private func pointAtTimestamp(_ timestamp: Int64,
-                                  value: Int64,
-                                  chart: DrawingChart) -> CGPoint {
-        
-        let x = chart.timeRange.x(in: bounds, timestamp: timestamp)
-        let y = chart.valueRange.y(in: bounds, value: value)
-        return CGPoint(x: x, y: y)
     }
 }
