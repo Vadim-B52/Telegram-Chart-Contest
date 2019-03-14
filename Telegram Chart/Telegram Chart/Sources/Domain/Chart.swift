@@ -78,7 +78,7 @@ public struct ValueRange {
         minIdx = r.startIdx
         maxIdx = r.startIdx
 
-        for i in (r.startIdx + 1)..<(r.startIdx + r.length) {
+        for i in (r.startIdx + 1)...r.endIdx {
             let v = values[i]
             if v < min {
                 min = v
@@ -134,6 +134,9 @@ public struct TimeRange: Equatable {
 public struct TimeIndexRange {
     let startIdx: Int
     let length: Int
+    var endIdx: Int {
+        return startIdx + length - 1
+    }
 
     public init(length: Int) {
         self.startIdx = 0
