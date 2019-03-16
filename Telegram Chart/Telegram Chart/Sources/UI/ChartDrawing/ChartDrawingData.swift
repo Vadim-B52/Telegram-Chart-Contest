@@ -58,7 +58,7 @@ public class DrawingChart {
                 }
             }
             if timestamps[mid] < timestamp {
-                low = mid
+                low = mid + 1
             } else {
                 high = mid
             }
@@ -109,6 +109,31 @@ public class DrawingChart {
             let x = xCalc.x(in: rect, timestamp: timestamp)
             let y = yCalc.y(in: rect, value: value)
             return CGPoint(x: x, y: y)
+        }
+    }
+
+    public class Formatter {
+
+        private lazy var popupFormatter: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            return formatter
+        }()
+
+        func popupDateText(timestamp: Int64) -> NSAttributedString {
+            let date = Date(timeIntervalSince1970: TimeInterval(timestamp / 1000))
+            return NSAttributedString(string: popupFormatter.string(from: date))
+        }
+
+        func popupValueText(index idx: Int, plots: [Chart.Plot]) -> NSAttributedString {
+            let str = NSMutableAttributedString()
+            for plot in plots {
+                let attrs = [NSAttributedString.Key.foregroundColor: plot.color]
+                let value = NSAttributedString(string: "\(plot.values[idx])\n", attributes: attrs)
+                str.append(value)
+            }
+            str.replaceCharacters(in: NSRange(location: str.length - 1, length: 1), with: "")
+            return str
         }
     }
 }

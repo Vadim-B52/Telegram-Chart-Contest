@@ -46,7 +46,7 @@ public class MiniChartTimeSelectorView: UIControl {
         [leftControl, rightControl, topBalk, bottomBalk].forEach { $0.backgroundColor = color }
 
         longPress.addTarget(self, action: #selector(handleLongPress))
-        longPress.minimumPressDuration = 0
+        longPress.minimumPressDuration = 0.1
         addGestureRecognizer(longPress)
     }
 
