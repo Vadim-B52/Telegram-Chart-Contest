@@ -60,8 +60,14 @@ public class DrawingChart {
 
         public func y(in rect: CGRect, value: Int64) -> CGFloat {
             let v = CGFloat(value - valueRange.min) / CGFloat(valueRange.size)
-            let x = rect.minY + rect.size.height * v
-            return x
+            let y = rect.minY + rect.size.height * v
+            return y
+        }
+
+        public func valueAt(y: CGFloat, rect: CGRect) -> Int64 {
+            let d = (y - rect.minY) / rect.size.height
+            let v = CGFloat(valueRange.min) + CGFloat(valueRange.size) * d
+            return Int64(v)
         }
     }
 

@@ -32,11 +32,16 @@ public class ChartView: UIView {
             return
         }
         
-        let (timeRect, chartRect) = bounds.divided(atDistance: 40, from: .maxYEdge)
+        let (timeRect, chartRect) = bounds.divided(atDistance: 30, from: .maxYEdge)
 
         ctx.saveGState()
         let timePanel = TimeAxisPanel(chart: chart)
         timePanel.drawInContext(ctx, rect: timeRect)
+        ctx.restoreGState()
+
+        ctx.saveGState()
+        let valuePanel = ValueAxisPanel(chart: chart)
+        valuePanel.drawInContext(ctx, rect: chartRect)
         ctx.restoreGState()
 
         for (idx, _) in chart.plots.enumerated() {
