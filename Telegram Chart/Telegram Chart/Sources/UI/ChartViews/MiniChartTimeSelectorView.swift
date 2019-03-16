@@ -32,6 +32,23 @@ public class MiniChartTimeSelectorView: UIControl {
     public override init(frame: CGRect) {
         super.init(frame: frame)
 
+        func prepareControl(_ control: UIView) {
+            control.layer.cornerRadius = 2
+            control.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
+            let label = UILabel()
+            label.translatesAutoresizingMaskIntoConstraints = false
+            control.addSubview(label)
+            label.text = "\u{203A}"
+            NSLayoutConstraint.activate([
+                label.centerXAnchor.constraint(equalTo: control.centerXAnchor),
+                label.centerYAnchor.constraint(equalTo: control.centerYAnchor),
+            ])
+        }
+
+        prepareControl(leftControl)
+        prepareControl(rightControl)
+        leftControl.transform = CGAffineTransform(scaleX: -1, y: 1)
+
         let controls = [leftDimming, rightDimming, leftControl, rightControl, topBalk, bottomBalk]
         controls.forEach { v in
             addSubview(v)
@@ -62,17 +79,18 @@ public class MiniChartTimeSelectorView: UIControl {
             return
         }
 
+        let rect = bounds.insetBy(dx: 0, dy: 6)
         let leftRange = timeRange.beforeTimestamp(selectedTimeRange.min)
         let rightRange = timeRange.afterTimestamp(selectedTimeRange.max)
         let calculator = DrawingChart.XCalculator(timeRange: timeRange)
 
-        var (slice0, rest0) = bounds.divided(atDistance: calculator.x(in: bounds, timestamp: leftRange.max), from: .minXEdge)
-        leftDimming.frame = slice0
+        var (slice0, rest0) = rect.divided(atDistance: calculator.x(in: rect, timestamp: leftRange.max), from: .minXEdge)
+        leftDimming.frame = slice0.insetBy(dx: 0, dy: 2)
         (slice0, rest0) = rest0.divided(atDistance: 11, from: .minXEdge)
         leftControl.frame = slice0
 
-        var (slice1, rest1) = bounds.divided(atDistance: calculator.x(in: bounds, timestamp: rightRange.min), from: .minXEdge)
-        rightDimming.frame = rest1
+        var (slice1, rest1) = rect.divided(atDistance: calculator.x(in: rect, timestamp: rightRange.min), from: .minXEdge)
+        rightDimming.frame = rest1.insetBy(dx: 0, dy: 2)
 
         var rest = rest0.intersection(slice1)
         (slice1, rest) = rest.divided(atDistance: 11, from: .maxXEdge)
