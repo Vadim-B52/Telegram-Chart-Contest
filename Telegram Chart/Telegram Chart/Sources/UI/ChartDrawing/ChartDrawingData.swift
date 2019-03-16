@@ -39,6 +39,33 @@ public class DrawingChart {
         return DrawingChart(timestamps: timestamps, timeRange: timeRange, selectedTimeRange: range, plots: plots)
     }
 
+    public func closestIdxTo(timestamp: Int64) -> Int {
+        if timestamp <= selectedTimeRange.min {
+            return timeIndexRange.startIdx
+        }
+        if timestamp >= selectedTimeRange.max {
+            return timeIndexRange.endIdx
+        }
+        var low = timeIndexRange.startIdx
+        var high = timeIndexRange.endIdx
+        while low != high {
+            let mid = low + (high - low) / 2
+            if timestamps[mid] <= timestamp && timestamp <= timestamps[mid + 1] {
+                if timestamp - timestamps[mid] < timestamps[mid + 1] - timestamp {
+                    return mid
+                } else {
+                    return mid + 1
+                }
+            }
+            if timestamps[mid] < timestamp {
+                low = mid
+            } else {
+                high = mid
+            }
+        }
+        return low
+    }
+
     public struct XCalculator {
         public let timeRange: TimeRange
 

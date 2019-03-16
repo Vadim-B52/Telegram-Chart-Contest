@@ -7,8 +7,17 @@ import UIKit
 
 public class ChartTimeSelectorView: UIView {
 
+    private let scrollView = UIScrollView()
+    private let longPress = UILongPressGestureRecognizer()
 
-    class PopupView: UIView {
-        
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        scrollView.frame = bounds
+        scrollView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        addSubview(scrollView)
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
