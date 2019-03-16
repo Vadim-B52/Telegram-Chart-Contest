@@ -7,7 +7,7 @@ import UIKit
 
 public class MiniChartView: UIControl {
 
-    private let timeSelector = TimeSelectorView()
+    private let timeSelector = MiniChartTimeSelectorView()
 
     public var chart: DrawingChart? = nil {
         didSet {

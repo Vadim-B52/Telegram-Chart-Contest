@@ -5,7 +5,7 @@
 
 import UIKit
 
-public class TimeSelectorView: UIControl {
+public class MiniChartTimeSelectorView: UIControl {
 
     private let leftControl = UIView()
     private let rightControl = UIView()
