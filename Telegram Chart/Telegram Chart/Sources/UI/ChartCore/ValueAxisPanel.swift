@@ -30,12 +30,12 @@ public class ValueAxisPanel {
 
         for _ in 0..<numberOfLines {
             var slice, line: CGRect
-            (slice, rest) = rest.divided(atDistance: step, from: .minYEdge)
-            (line, _) = slice.divided(atDistance: thinLineWidth, from: .minYEdge)
+            (slice, rest) = rest.divided(atDistance: step, from: .maxYEdge)
+            (line, _) = slice.divided(atDistance: thinLineWidth, from: .maxYEdge)
             color.setFill()
             ctx.fill(line)
 
-            (slice, _) = slice.divided(atDistance: font.lineHeight, from: .minYEdge)
+            (slice, _) = slice.divided(atDistance: font.lineHeight, from: .maxYEdge)
             let value = calculator.valueAt(y: line.minY, rect: rect)
             let str = "\(value)"
             str.draw(with: slice, options: options, attributes: attributes, context: nil)

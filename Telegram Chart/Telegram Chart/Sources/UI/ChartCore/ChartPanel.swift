@@ -16,9 +16,6 @@ public class ChartPanel {
     }
 
     public func drawInContext(_ ctx: CGContext, rect rect0: CGRect) {
-        ctx.scaleBy(x: 1, y: -1)
-        ctx.translateBy(x: 0, y: -rect0.size.height)
-
         let rect = drawingRect(with: rect0)
         let plot = chart.plots[plotIndex]
         plot.color.setStroke()
