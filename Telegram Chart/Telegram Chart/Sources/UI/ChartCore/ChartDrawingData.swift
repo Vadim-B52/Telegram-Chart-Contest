@@ -38,26 +38,43 @@ public class DrawingChart {
     public func changeSelectedTimeRange(_ range: TimeRange?) -> DrawingChart {
         return DrawingChart(timestamps: timestamps, timeRange: timeRange, selectedTimeRange: range, plots: plots)
     }
-}
 
-public extension ValueRange {
-    public func y(in rect: CGRect, value: Int64) -> CGFloat {
-        let v = CGFloat(value - min) / CGFloat(size)
-        let x = rect.minY + rect.size.height * v
-        return x
+    public struct XCalculator {
+        public let timeRange: TimeRange
+
+        public func x(in rect: CGRect, timestamp: Int64) -> CGFloat {
+            let t = CGFloat(timestamp - timeRange.min) / CGFloat(timeRange.size)
+            let x = rect.minX + rect.size.width * t
+            return x
+        }
+
+        public func timestampAt(x: CGFloat, rect: CGRect) -> Int64 {
+            let d = (x - rect.minX) / rect.size.width
+            let timestamp = CGFloat(timeRange.min) + CGFloat(timeRange.size) * d
+            return Int64(timestamp)
+        }
     }
-}
 
-public extension TimeRange {
-    public func x(in rect: CGRect, timestamp: Int64) -> CGFloat {
-        let t = CGFloat(timestamp - min) / CGFloat(size)
-        let x = rect.minX + rect.size.width * t
-        return x
+    public struct YCalculator {
+        public let valueRange: ValueRange
+
+        public func y(in rect: CGRect, value: Int64) -> CGFloat {
+            let v = CGFloat(value - valueRange.min) / CGFloat(valueRange.size)
+            let x = rect.minY + rect.size.height * v
+            return x
+        }
     }
 
-    public func timestampAt(x: CGFloat, rect: CGRect) -> Int64 {
-        let d = (x - rect.minX) / rect.size.width
-        let timestamp = CGFloat(min) + CGFloat(size) * d
-        return Int64(timestamp)
+    public struct Calculator {
+        public let timeRange: TimeRange
+        public let valueRange: ValueRange
+
+        public func pointAtTimestamp(_ timestamp: Int64, value: Int64, rect: CGRect) -> CGPoint {
+            let xCalc = XCalculator(timeRange: timeRange)
+            let yCalc = YCalculator(valueRange: valueRange)
+            let x = xCalc.x(in: rect, timestamp: timestamp)
+            let y = yCalc.y(in: rect, value: value)
+            return CGPoint(x: x, y: y)
+        }
     }
 }

@@ -28,7 +28,7 @@ public class ChartPanel {
         let timestamps = chart.timestamps
         let values = plot.values
 
-        let calc = Calculator(timeRange: chart.selectedTimeRange, valueRange: chart.valueRange)
+        let calc = DrawingChart.Calculator(timeRange: chart.selectedTimeRange, valueRange: chart.valueRange)
         let startIdx = time.startIdx
         let startPoint = calc.pointAtTimestamp(timestamps[startIdx], value: values[startIdx], rect: rect)
         ctx.move(to: startPoint)
@@ -63,16 +63,5 @@ public class ChartPanel {
             drawingRect.size.width += d
         }
         return drawingRect
-    }
-
-    private struct Calculator {
-        let timeRange: TimeRange
-        let valueRange: ValueRange
-
-        func pointAtTimestamp(_ timestamp: Int64, value: Int64, rect: CGRect) -> CGPoint {
-            let x = timeRange.x(in: rect, timestamp: timestamp)
-            let y = valueRange.y(in: rect, value: value)
-            return CGPoint(x: x, y: y)
-        }
     }
 }

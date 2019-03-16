@@ -64,13 +64,14 @@ public class TimeSelectorView: UIControl {
 
         let leftRange = timeRange.beforeTimestamp(selectedTimeRange.min)
         let rightRange = timeRange.afterTimestamp(selectedTimeRange.max)
+        let calculator = DrawingChart.XCalculator(timeRange: timeRange)
 
-        var (slice0, rest0) = bounds.divided(atDistance: timeRange.x(in: bounds, timestamp: leftRange.max), from: .minXEdge)
+        var (slice0, rest0) = bounds.divided(atDistance: calculator.x(in: bounds, timestamp: leftRange.max), from: .minXEdge)
         leftDimming.frame = slice0
         (slice0, rest0) = rest0.divided(atDistance: 11, from: .minXEdge)
         leftControl.frame = slice0
 
-        var (slice1, rest1) = bounds.divided(atDistance: timeRange.x(in: bounds, timestamp: rightRange.min), from: .minXEdge)
+        var (slice1, rest1) = bounds.divided(atDistance: calculator.x(in: bounds, timestamp: rightRange.min), from: .minXEdge)
         rightDimming.frame = rest1
 
         var rest = rest0.intersection(slice1)
@@ -133,9 +134,10 @@ public class TimeSelectorView: UIControl {
         }
 
         // TODO: corner positions
+        let calculator = DrawingChart.XCalculator(timeRange: timeRange)
         if bounds.contains(leftRect) && bounds.contains(rightRect) && leftRect.maxX + 30 <= rightRect.minX {
-            let min = timeRange.timestampAt(x: leftRect.minX, rect: bounds)
-            let max = timeRange.timestampAt(x: rightRect.maxX, rect: bounds)
+            let min = calculator.timestampAt(x: leftRect.minX, rect: bounds)
+            let max = calculator.timestampAt(x: rightRect.maxX, rect: bounds)
             selectedTimeRange = TimeRange(min: min, max: max)
             sendActions(for: .valueChanged)
         }

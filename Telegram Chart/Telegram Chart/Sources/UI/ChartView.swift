@@ -31,10 +31,15 @@ public class ChartView: UIView {
               let ctx = UIGraphicsGetCurrentContext() else {
             return
         }
+        let (timeRect, chartRect) = bounds.divided(atDistance: 40, from: .maxYEdge)
+        ctx.saveGState()
+        let timePanel = TimeAxisPanel(chart: chart)
+        timePanel.drawInContext(ctx, rect: timeRect)
+        ctx.restoreGState()
         for (idx, _) in chart.plots.enumerated() {
             ctx.saveGState()
             let panel = ChartPanel(chart: chart, plotIndex: idx)
-            panel.drawInContext(ctx, rect: bounds)
+            panel.drawInContext(ctx, rect: chartRect)
             ctx.restoreGState()
         }
     }
