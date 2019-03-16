@@ -16,10 +16,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     @IBOutlet weak var tableView: UITableView!
     
     private let model = ChartListScreen()
-    private let skin: Skin = DaySkin()
     private let chartCellReuseId = "chartCell"
     private let plotCellReuseId = "plotCell"
     private let nightModeCellId = "nightModeCell"
+    private var skin: Skin = DaySkin()
     private lazy var chartCellHeight = UIScreen.main.bounds.size.height / 2
     
     override func viewDidLoad() {
@@ -80,6 +80,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     private func updateSkin() {
         // TODO: implement
+        let isNight = model.isNightModeEnabled
+        skin = isNight ? NightSkin() : DaySkin()
+        let navigationBar = navigationController?.navigationBar
+        navigationBar?.barStyle = isNight ? .blackOpaque : .default
+        navigationBar?.barTintColor = skin.navigationBarColor
         tableView.backgroundColor = skin.sectionHeaderColor
         tableView.separatorColor = skin.separatorColor
         tableView.reloadData()
@@ -116,6 +121,8 @@ fileprivate extension ViewController {
 
         cell.button.setTitle(title, for: .normal)
         cell.button.addTarget(self, action: #selector(handleNightModeButtonTap), for: .touchUpInside)
+        cell.backgroundColor = skin.cellBackgroundColor
+        cell.backgroundView?.backgroundColor = skin.cellBackgroundColor
         return cell
     }
 
@@ -128,6 +135,8 @@ fileprivate extension ViewController {
         // TODO: reorganize
         let selectedTimeRange = TimeRange(min: chart.timestamps.first!, max: chart.timestamps.last!)
         cell.display(chart: chart, timeRange: selectedTimeRange)
+        cell.backgroundColor = skin.cellBackgroundColor
+        cell.backgroundView?.backgroundColor = skin.cellBackgroundColor
         return cell
     }
 
@@ -137,8 +146,14 @@ fileprivate extension ViewController {
         let plotIdx = indexPath.row - 1
         let plot = chart.plots[plotIdx]
         cell.textLabel?.text = plot.name
+        cell.textLabel?.textColor = skin.mainTextColor
+        cell.imageView?.clipsToBounds = true
+        cell.imageView?.backgroundColor = skin.cellBackgroundColor
+        cell.imageView?.layer.cornerRadius = 2
         cell.imageView?.image = UIImage.plotIndicatorWithColor(plot.color)
         cell.accessoryType = state.enabledPlotId.contains(plot.identifier) ? .checkmark : .none
+        cell.backgroundColor = skin.cellBackgroundColor
+        cell.backgroundView?.backgroundColor = skin.cellBackgroundColor
         return cell
     }
 }
