@@ -7,8 +7,8 @@ import UIKit
 
 public class MiniChartTimeSelectorView: UIControl {
 
-    private let leftControl = UIView()
-    private let rightControl = UIView()
+    private let leftControl = UILabel()
+    private let rightControl = UILabel()
     private let leftDimming = UIView()
     private let rightDimming = UIView()
     private let topBalk = UIView()
@@ -17,6 +17,12 @@ public class MiniChartTimeSelectorView: UIControl {
     private let longPress = UILongPressGestureRecognizer()
     private var actionView: UIView?
     private var panPoint = CGPoint.zero
+
+    public weak var colorSource: MiniChartTimeSelectorViewColorSource? {
+        didSet {
+            reloadColors()
+        }
+    }
 
     public var timeRange: TimeRange? {
         didSet {
@@ -32,20 +38,6 @@ public class MiniChartTimeSelectorView: UIControl {
     public override init(frame: CGRect) {
         super.init(frame: frame)
 
-        func prepareControl(_ control: UIView) {
-            control.layer.cornerRadius = 2
-            control.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
-            let label = UILabel()
-            label.textColor = .white
-            label.translatesAutoresizingMaskIntoConstraints = false
-            control.addSubview(label)
-            label.text = "\u{203A}"
-            NSLayoutConstraint.activate([
-                label.centerXAnchor.constraint(equalTo: control.centerXAnchor),
-                label.centerYAnchor.constraint(equalTo: control.centerYAnchor),
-            ])
-        }
-
         prepareControl(leftControl)
         prepareControl(rightControl)
         leftControl.transform = CGAffineTransform(scaleX: -1, y: 1)
@@ -56,16 +48,10 @@ public class MiniChartTimeSelectorView: UIControl {
             v.isUserInteractionEnabled = false
         }
 
-        let dimmingColor = UIColor.black.withAlphaComponent(0.1)
-        let color = UIColor.black.withAlphaComponent(0.2)
-
-        leftDimming.backgroundColor = dimmingColor
-        rightDimming.backgroundColor = dimmingColor
-        [leftControl, rightControl, topBalk, bottomBalk].forEach { $0.backgroundColor = color }
-
         longPress.addTarget(self, action: #selector(handleLongPress))
-        longPress.minimumPressDuration = 0.1
+        longPress.minimumPressDuration = 0.125
         addGestureRecognizer(longPress)
+        reloadColors()
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -103,6 +89,27 @@ public class MiniChartTimeSelectorView: UIControl {
         bottomBalk.frame = slice1
     }
 
+    public func reloadColors() {
+        let chevronColor = self.chevronColor
+        leftControl.textColor = chevronColor
+        rightControl.textColor = chevronColor
+
+        let dimmingColor = self.dimmingColor
+        leftDimming.backgroundColor = dimmingColor
+        rightDimming.backgroundColor = dimmingColor
+
+        let controlColor = self.controlColor
+        [leftControl, rightControl, topBalk, bottomBalk].forEach { $0.backgroundColor = controlColor }
+    }
+
+    private func prepareControl(_ control: UILabel) {
+        control.layer.cornerRadius = 2
+        control.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
+        control.text = "\u{203A}"
+        control.textAlignment = .center
+        control.clipsToBounds = true
+    }
+
     @objc
     private func handleLongPress() {
         switch longPress.state {
@@ -118,11 +125,10 @@ public class MiniChartTimeSelectorView: UIControl {
     }
 
     private func updateActionView(point: CGPoint) {
-        // TODO: extend touch area
         panPoint = point
-        if leftControl.frame.contains(point) {
+        if leftControl.frame.insetBy(dx: -10, dy: 0).contains(point) {
             actionView = leftControl
-        } else if rightControl.frame.contains(point) {
+        } else if rightControl.frame.insetBy(dx: -10, dy: 0).contains(point) {
             actionView = rightControl
         } else if point.x > leftControl.center.x && point.x < rightControl.center.x {
             actionView = self
@@ -145,20 +151,47 @@ public class MiniChartTimeSelectorView: UIControl {
 
         if actionView == leftControl {
             leftRect = leftRect.offsetBy(dx: dx, dy: 0)
+            if leftRect.minX < bounds.minX {
+                leftRect.origin.x = bounds.minX
+            }
+            if leftRect.maxX + 20 > rightRect.minX {
+                leftRect.origin.x = rightRect.minX - 20 - leftRect.size.width
+            }
         } else if actionView == rightControl {
             rightRect = rightRect.offsetBy(dx: dx, dy: 0)
+            if rightRect.maxX > bounds.maxX {
+                rightRect.origin.x = bounds.maxX - rightRect.width
+            }
+            if leftRect.maxX + 20 > rightRect.minX {
+                rightRect.origin.x = leftRect.maxX + 20
+            }
         } else if actionView == self {
             leftRect = leftRect.offsetBy(dx: dx, dy: 0)
             rightRect = rightRect.offsetBy(dx: dx, dy: 0)
         }
-
-        // TODO: corner positions
+        
+    // TODO: corners
         let calculator = DrawingChart.XCalculator(timeRange: timeRange)
-        if bounds.contains(leftRect) && bounds.contains(rightRect) && leftRect.maxX + 30 <= rightRect.minX {
-            let min = calculator.timestampAt(x: leftRect.minX, rect: bounds)
-            let max = calculator.timestampAt(x: rightRect.maxX, rect: bounds)
-            selectedTimeRange = TimeRange(min: min, max: max)
-            sendActions(for: .valueChanged)
-        }
+        let min = calculator.timestampAt(x: leftRect.minX, rect: bounds)
+        let max = calculator.timestampAt(x: rightRect.maxX, rect: bounds)
+        selectedTimeRange = TimeRange(min: min, max: max)
+        sendActions(for: .valueChanged)
     }
+
+    private var chevronColor: UIColor {
+        return colorSource?.chevronColor(miniChartTimeSelectorView: self) ?? UIColor.white
+    }
+
+    private var dimmingColor: UIColor {
+        return colorSource?.dimmingColor(miniChartTimeSelectorView: self) ?? UIColor.black.withAlphaComponent(0.1)
+    }
+    private var controlColor: UIColor {
+        return colorSource?.controlColor(miniChartTimeSelectorView: self) ?? UIColor.black.withAlphaComponent(0.2)
+    }
+}
+
+public protocol MiniChartTimeSelectorViewColorSource: AnyObject {
+    func chevronColor(miniChartTimeSelectorView view: MiniChartTimeSelectorView) -> UIColor
+    func dimmingColor(miniChartTimeSelectorView view: MiniChartTimeSelectorView) -> UIColor
+    func controlColor(miniChartTimeSelectorView view: MiniChartTimeSelectorView) -> UIColor
 }

@@ -63,3 +63,14 @@ public class MiniChartView: UIControl {
         sendActions(for: .valueChanged)
     }
 }
+
+public extension MiniChartView {
+    public weak var miniChartTimeSelectorViewColorSource: MiniChartTimeSelectorViewColorSource? {
+        get {
+            return timeSelector.colorSource
+        }
+        set {
+            timeSelector.colorSource = newValue
+        }
+    }
+}

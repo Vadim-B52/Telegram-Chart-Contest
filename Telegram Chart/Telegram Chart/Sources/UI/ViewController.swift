@@ -137,6 +137,7 @@ fileprivate extension ViewController {
         cell.display(chart: chart, timeRange: selectedTimeRange)
         cell.backgroundColor = skin.cellBackgroundColor
         cell.backgroundView?.backgroundColor = skin.cellBackgroundColor
+        cell.miniChartTimeSelectorViewColorSource = self
         return cell
     }
 
@@ -155,5 +156,19 @@ fileprivate extension ViewController {
         cell.backgroundColor = skin.cellBackgroundColor
         cell.backgroundView?.backgroundColor = skin.cellBackgroundColor
         return cell
+    }
+}
+
+extension ViewController: MiniChartTimeSelectorViewColorSource {
+    func chevronColor(miniChartTimeSelectorView view: MiniChartTimeSelectorView) -> UIColor {
+        return skin.timeSelectorChevronColor
+    }
+
+    func dimmingColor(miniChartTimeSelectorView view: MiniChartTimeSelectorView) -> UIColor {
+        return skin.timeSelectorDimmingColor
+    }
+
+    func controlColor(miniChartTimeSelectorView view: MiniChartTimeSelectorView) -> UIColor {
+        return skin.timeSelectorControlColor
     }
 }

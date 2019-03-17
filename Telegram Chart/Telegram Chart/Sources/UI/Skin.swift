@@ -14,6 +14,9 @@ public protocol Skin {
     var separatorColor: UIColor { get }
     var mainTextColor: UIColor { get }
     var navigationBarColor: UIColor { get }
+    var timeSelectorDimmingColor: UIColor { get }
+    var timeSelectorControlColor: UIColor { get }
+    var timeSelectorChevronColor: UIColor { get }
 }
 
 extension Skin {
@@ -39,6 +42,18 @@ public class NightSkin: Skin {
     public var mainTextColor: UIColor {
         return UIColor.white
     }
+
+    public var timeSelectorDimmingColor: UIColor {
+        return  UIColor.black.withAlphaComponent(0.1)
+    }
+
+    public var timeSelectorControlColor: UIColor {
+        return  UIColor.black.withAlphaComponent(0.2)
+    }
+
+    public var timeSelectorChevronColor: UIColor {
+        return UIColor.white
+    }
 }
 
 public class DaySkin: Skin {
@@ -56,5 +71,17 @@ public class DaySkin: Skin {
 
     public var mainTextColor: UIColor {
         return UIColor.black
+    }
+
+    public var timeSelectorDimmingColor: UIColor {
+        return  UIColor.black.withAlphaComponent(0.1)
+    }
+
+    public var timeSelectorControlColor: UIColor {
+        return  UIColor.black.withAlphaComponent(0.2)
+    }
+
+    public var timeSelectorChevronColor: UIColor {
+        return UIColor.white
     }
 }

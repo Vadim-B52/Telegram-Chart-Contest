@@ -52,6 +52,17 @@ public class ChartTableViewCell: UITableViewCell {
     }
 }
 
+public extension ChartTableViewCell {
+    public weak var miniChartTimeSelectorViewColorSource: MiniChartTimeSelectorViewColorSource? {
+        get {
+            return miniChartView.miniChartTimeSelectorViewColorSource
+        }
+        set {
+            miniChartView.miniChartTimeSelectorViewColorSource = newValue
+        }
+    }
+}
+
 public class NightModeTableViewCell: UITableViewCell {
     public private(set) lazy var button: UIButton = {
         let button = UIButton(type: .system)
