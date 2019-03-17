@@ -127,14 +127,13 @@ fileprivate extension ViewController {
     }
 
     private func chartCellAt(_ indexPath: IndexPath, tableView: UITableView) -> ChartTableViewCell {
-        let (chart, _) = model.dataAt(indexPath.section)
+        let (chart, state) = model.dataAt(indexPath.section)
         let cell: ChartTableViewCell = tableView.dequeueReusableCell(withIdentifier: chartCellReuseId) as! ChartTableViewCell
         cell.selectionStyle = .none
+        cell.delegate = self
         cell.separatorInset = UIEdgeInsets(top: 0, left: 9999, bottom: 0, right: -9999)
 
-        // TODO: reorganize
-        let selectedTimeRange = TimeRange(min: chart.timestamps.first!, max: chart.timestamps.last!)
-        cell.display(chart: chart, timeRange: selectedTimeRange)
+        cell.display(chart: chart, timeRange: state.selectedTimeRange)
         cell.backgroundColor = skin.cellBackgroundColor
         cell.backgroundView?.backgroundColor = skin.cellBackgroundColor
         cell.miniChartTimeSelectorViewColorSource = self
@@ -170,5 +169,14 @@ extension ViewController: MiniChartTimeSelectorViewColorSource {
 
     func controlColor(miniChartTimeSelectorView view: MiniChartTimeSelectorView) -> UIColor {
         return skin.timeSelectorControlColor
+    }
+}
+
+extension ViewController: ChartTableViewCellDelegate {
+    func chartTableViewCell(_ cell: ChartTableViewCell, didChangeSelectedTimeRange timeRange: TimeRange) {
+        guard let indexPath = tableView.indexPath(for: cell) else {
+            return
+        }
+        model.updateSelectedTimeRange(timeRange, at: indexPath.row)
     }
 }

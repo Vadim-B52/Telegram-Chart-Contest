@@ -8,10 +8,16 @@
 
 import UIKit
 
+public protocol ChartTableViewCellDelegate: AnyObject {
+    func chartTableViewCell(_ cell: ChartTableViewCell, didChangeSelectedTimeRange timeRange: TimeRange)
+}
+
 public class ChartTableViewCell: UITableViewCell {
 
     private let chartView = ChartView()
     private let miniChartView = MiniChartView()
+
+    public weak var delegate: ChartTableViewCellDelegate?
 
     public override var backgroundColor: UIColor? {
         get {
@@ -50,16 +56,25 @@ public class ChartTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public func display(chart: Chart, timeRange: TimeRange) {
-        chartView.chart = DrawingChart(timestamps: chart.timestamps, timeRange: chart.timeRange, selectedTimeRange: timeRange, plots: chart.plots)
+    public func display(chart: Chart, timeRange: TimeRange?) {
+        chartView.chart = DrawingChart(
+                timestamps: chart.timestamps,
+                timeRange: chart.timeRange,
+                selectedTimeRange: timeRange,
+                plots: chart.plots)
+
         miniChartView.chart = DrawingChart(timestamps: chart.timestamps, timeRange: chart.timeRange, plots: chart.plots)
         miniChartView.selectedTimeRange = timeRange
     }
 
     @objc
     private func handleValueChanged() {
-        chartView.chart = chartView.chart?.changeSelectedTimeRange(miniChartView.selectedTimeRange)
-        // TODO: delegate
+        guard let chart = chartView.chart else {
+            return
+        }
+        let newChart = chart.changeSelectedTimeRange(miniChartView.selectedTimeRange)
+        chartView.chart = newChart
+        delegate?.chartTableViewCell(self, didChangeSelectedTimeRange: chart.selectedTimeRange)
     }
 }
 

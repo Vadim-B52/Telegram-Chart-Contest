@@ -60,11 +60,10 @@ public class MiniChartTimeSelectorView: UIControl {
 
     public override func layoutSubviews() {
         super.layoutSubviews()
-        guard let timeRange = timeRange,
-              let selectedTimeRange = selectedTimeRange else {
-
+        guard let timeRange = timeRange else {
             return
         }
+        let selectedTimeRange = self.selectedTimeRange ?? timeRange
 
         let rect = bounds.insetBy(dx: 0, dy: 6)
         let leftRange = timeRange.beforeTimestamp(selectedTimeRange.min)
@@ -185,6 +184,7 @@ public class MiniChartTimeSelectorView: UIControl {
     private var dimmingColor: UIColor {
         return colorSource?.dimmingColor(miniChartTimeSelectorView: self) ?? UIColor.black.withAlphaComponent(0.1)
     }
+
     private var controlColor: UIColor {
         return colorSource?.controlColor(miniChartTimeSelectorView: self) ?? UIColor.black.withAlphaComponent(0.2)
     }
