@@ -62,9 +62,10 @@ public class ChartView: UIView {
         valuePanel.drawInContext(ctx, rect: chartRect)
         ctx.restoreGState()
 
+        let config = ChartPanel.Config(lineWidth: 2)
         for (idx, _) in chart.plots.enumerated() {
             ctx.saveGState()
-            let panel = ChartPanel(chart: chart, plotIndex: idx)
+            let panel = ChartPanel(chart: chart, plotIndex: idx, config: config)
             panel.drawInContext(ctx, rect: chartRect)
             ctx.restoreGState()
         }

@@ -9,17 +9,19 @@ public class ChartPanel {
 
     public let chart: DrawingChart
     public let plotIndex: Int
+    public let config: Config
 
-    public init(chart: DrawingChart, plotIndex: Int) {
+    public init(chart: DrawingChart, plotIndex: Int, config: Config) {
         self.chart = chart
         self.plotIndex = plotIndex
+        self.config = config
     }
 
     public func drawInContext(_ ctx: CGContext, rect rect0: CGRect) {
         let rect = drawingRect(with: rect0)
         let plot = chart.plots[plotIndex]
         plot.color.setStroke()
-        ctx.setLineWidth(1)
+        ctx.setLineWidth(config.lineWidth)
 
         let time = chart.timeIndexRange
         let timestamps = chart.timestamps
@@ -60,5 +62,9 @@ public class ChartPanel {
             drawingRect.size.width += d
         }
         return drawingRect
+    }
+
+    public struct Config {
+        public let lineWidth: CGFloat
     }
 }
