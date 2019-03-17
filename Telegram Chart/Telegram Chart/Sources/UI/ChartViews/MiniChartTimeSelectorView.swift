@@ -36,6 +36,7 @@ public class MiniChartTimeSelectorView: UIControl {
             control.layer.cornerRadius = 2
             control.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
             let label = UILabel()
+            label.textColor = .white
             label.translatesAutoresizingMaskIntoConstraints = false
             control.addSubview(label)
             label.text = "\u{203A}"

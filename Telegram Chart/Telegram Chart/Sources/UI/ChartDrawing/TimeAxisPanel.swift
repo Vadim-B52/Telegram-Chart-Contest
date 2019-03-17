@@ -34,6 +34,8 @@ public class TimeAxisPanel {
             var textRect = rest
             textRect.origin.x = floor(calculator.x(in: rect, timestamp: timestamp)) - textWidth / 2
             textRect.size.width = textWidth
+            textRect.origin.y = rest.origin.y + floor((rest.size.height - boundingRect.size.height) / 2)
+            textRect.size.height = ceil(boundingRect.size.height)
 
             if rest.contains(textRect) {
                 str.draw(with: textRect, options: options, attributes: attributes, context: nil)

@@ -49,7 +49,8 @@ public class ChartView: UIView {
             return
         }
         
-        let (timeRect, chartRect) = bounds.divided(atDistance: 30, from: .maxYEdge)
+        var (timeRect, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
+        chartRect = chartRect.inset(by: UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0))
 
         ctx.saveGState()
         let timePanel = TimeAxisPanel(chart: chart)
