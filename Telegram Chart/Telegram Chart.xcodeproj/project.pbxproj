@@ -20,7 +20,7 @@
 		6AC71CF045E8F005A1810E71 /* MiniChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC719E00E6C9086C284B48B /* MiniChartView.swift */; };
 		6AC71EBD7BF2879ECC8DB908 /* ChartPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71F1C11EF230B241273B2 /* ChartPanel.swift */; };
 		DDC16F4322358CCA0060596D /* sample_data.json in Resources */ = {isa = PBXBuildFile; fileRef = DDC16F4222358CCA0060596D /* sample_data.json */; };
-		DDC16F4722358D670060596D /* ChartListTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC16F4622358D670060596D /* ChartListTO.swift */; };
+		DDC16F4722358D670060596D /* ChartTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC16F4622358D670060596D /* ChartTO.swift */; };
 		DDC16F492236EC4B0060596D /* ChartListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC16F482236EC4B0060596D /* ChartListScreen.swift */; };
 		DDC16F4B2236FBCB0060596D /* Cells.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC16F4A2236FBCB0060596D /* Cells.swift */; };
 		DDC16F4D223700BE0060596D /* Skin.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC16F4C223700BE0060596D /* Skin.swift */; };
@@ -46,7 +46,7 @@
 		6AC71F1C11EF230B241273B2 /* ChartPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPanel.swift; sourceTree = "<group>"; };
 		6AC71FCB29C5626EA888BBDE /* ChartTimeSelectorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartTimeSelectorView.swift; sourceTree = "<group>"; };
 		DDC16F4222358CCA0060596D /* sample_data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = sample_data.json; sourceTree = "<group>"; };
-		DDC16F4622358D670060596D /* ChartListTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartListTO.swift; sourceTree = "<group>"; };
+		DDC16F4622358D670060596D /* ChartTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartTO.swift; sourceTree = "<group>"; };
 		DDC16F482236EC4B0060596D /* ChartListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartListScreen.swift; sourceTree = "<group>"; };
 		DDC16F4A2236FBCB0060596D /* Cells.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cells.swift; sourceTree = "<group>"; };
 		DDC16F4C223700BE0060596D /* Skin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Skin.swift; sourceTree = "<group>"; };
@@ -151,7 +151,7 @@
 		DDC16F4522358D2C0060596D /* DTO */ = {
 			isa = PBXGroup;
 			children = (
-				DDC16F4622358D670060596D /* ChartListTO.swift */,
+				DDC16F4622358D670060596D /* ChartTO.swift */,
 			);
 			path = DTO;
 			sourceTree = "<group>";
@@ -256,7 +256,7 @@
 			files = (
 				DDC16F492236EC4B0060596D /* ChartListScreen.swift in Sources */,
 				DDC16F4B2236FBCB0060596D /* Cells.swift in Sources */,
-				DDC16F4722358D670060596D /* ChartListTO.swift in Sources */,
+				DDC16F4722358D670060596D /* ChartTO.swift in Sources */,
 				DDFF54E122358A79005EB0D9 /* ViewController.swift in Sources */,
 				DDFF54DF22358A79005EB0D9 /* AppDelegate.swift in Sources */,
 				DDC16F4D223700BE0060596D /* Skin.swift in Sources */,

@@ -12,15 +12,14 @@ public final class ChartJsonParser {
     public init() {
     }
 
-    public func parseData(_ data: Data) throws -> ChartListTO {
+    public func parseData(_ data: Data) throws -> [ChartTO] {
         guard let json = try? JSONSerialization.jsonObject(with: data) else {
             throw ChartParserError.noJson
         }
         guard let remoteCharts = json as? [Any] else {
             throw ChartParserError.noChart
         }
-        let charts = try remoteCharts.map { return try readChart($0) }
-        return ChartListTO(charts: charts)
+        return try remoteCharts.map { return try readChart($0) }
     }
 
     private func readChart(_ remoteChart0: Any) throws -> ChartTO {

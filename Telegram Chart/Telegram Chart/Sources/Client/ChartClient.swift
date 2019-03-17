@@ -16,8 +16,8 @@ public class ChartClient {
             throw ChartClientError.noData
         }
         let parser = ChartJsonParser()
-        let chartTO = try parser.parseData(data)
-        return try chartTO.charts.map { try chartFromChartTO($0) }
+        let chartTOs = try parser.parseData(data)
+        return try chartTOs.map { try chartFromChartTO($0) }
     }
     
     // TODO: validate
