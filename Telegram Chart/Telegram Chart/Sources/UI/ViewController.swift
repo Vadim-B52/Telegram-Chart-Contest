@@ -8,9 +8,6 @@
 
 import UIKit
 
-// TODO: separarators
-// TODO: taps
-// TODO: skin
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     @IBOutlet weak var tableView: UITableView!
@@ -20,6 +17,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     private let plotCellReuseId = "plotCell"
     private let nightModeCellId = "nightModeCell"
     private var skin: Skin = DaySkin()
+
+    private lazy var screenMaxEdge = max(UIScreen.main.bounds.size.height, UIScreen.main.bounds.size.width)
     private lazy var chartCellHeight = UIScreen.main.bounds.size.height / 2
     
     override func viewDidLoad() {
@@ -133,7 +132,7 @@ fileprivate extension ViewController {
         let cell: ChartTableViewCell = tableView.dequeueReusableCell(withIdentifier: chartCellReuseId) as! ChartTableViewCell
         cell.selectionStyle = .none
         cell.delegate = self
-        cell.separatorInset = UIEdgeInsets(top: 0, left: 9999, bottom: 0, right: -9999)
+        cell.separatorInset = UIEdgeInsets(top: 0, left: screenMaxEdge, bottom: 0, right: -screenMaxEdge)
 
         cell.display(chart: chart, timeRange: state.selectedTimeRange)
         cell.backgroundColor = skin.cellBackgroundColor
@@ -156,6 +155,8 @@ fileprivate extension ViewController {
         cell.accessoryType = state.enabledPlotId.contains(plot.identifier) ? .checkmark : .none
         cell.backgroundColor = skin.cellBackgroundColor
         cell.backgroundView?.backgroundColor = skin.cellBackgroundColor
+        cell.selectedBackgroundView? = UIView()
+        cell.selectedBackgroundView?.backgroundColor = skin.rowSelectionColor
         return cell
     }
 }

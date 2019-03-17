@@ -18,6 +18,7 @@ public protocol Skin {
     var timeSelectorControlColor: UIColor { get }
     var timeSelectorChevronColor: UIColor { get }
     var barStyle: UIBarStyle { get }
+    var rowSelectionColor: UIColor { get }
 }
 
 extension Skin {
@@ -59,6 +60,10 @@ public class NightSkin: Skin {
     public var barStyle: UIBarStyle {
         return .black
     }
+
+    public var rowSelectionColor: UIColor {
+        return UIColor(white: 0.85, alpha: 0.3)
+    }
 }
 
 public class DaySkin: Skin {
@@ -96,5 +101,9 @@ public class DaySkin: Skin {
 
     public var barStyle: UIBarStyle {
         return .default
+    }
+
+    public var rowSelectionColor: UIColor {
+        return UIColor(white: 0.85, alpha: 1)
     }
 }
