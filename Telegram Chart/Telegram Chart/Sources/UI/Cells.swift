@@ -13,6 +13,17 @@ public class ChartTableViewCell: UITableViewCell {
     private let chartView = ChartView()
     private let miniChartView = MiniChartView()
 
+    public override var backgroundColor: UIColor? {
+        get {
+            return super.backgroundColor
+        }
+        set {
+            super.backgroundColor = newValue
+            chartView.backgroundColor = newValue
+            miniChartView.backgroundColor = newValue
+        }
+    }
+
     public override init(style: CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 

@@ -44,11 +44,11 @@ public class NightSkin: Skin {
     }
 
     public var timeSelectorDimmingColor: UIColor {
-        return  UIColor.black.withAlphaComponent(0.1)
+        return  UIColor(red: 0.21, green: 0.27, blue: 0.35, alpha: 0.6)
     }
 
     public var timeSelectorControlColor: UIColor {
-        return  UIColor.black.withAlphaComponent(0.2)
+        return  UIColor(red: 0.21, green: 0.27, blue: 0.35, alpha: 0.8)
     }
 
     public var timeSelectorChevronColor: UIColor {
