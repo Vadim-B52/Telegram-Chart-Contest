@@ -83,8 +83,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let isNight = model.isNightModeEnabled
         skin = isNight ? NightSkin() : DaySkin()
         let navigationBar = navigationController?.navigationBar
-        navigationBar?.barStyle = isNight ? .blackOpaque : .default
+        navigationBar?.isTranslucent = false
+        navigationBar?.barStyle = skin.barStyle
         navigationBar?.barTintColor = skin.navigationBarColor
+        navigationBar?.setBackgroundImage(UIImage.navigationBarImage(skin.navigationBarColor), for: .default)
         tableView.backgroundColor = skin.sectionHeaderColor
         tableView.separatorColor = skin.separatorColor
         tableView.reloadData()
