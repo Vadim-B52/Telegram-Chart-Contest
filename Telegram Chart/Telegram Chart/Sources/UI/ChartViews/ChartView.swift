@@ -52,29 +52,29 @@ public class ChartView: UIView {
         var (timeRect, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
         chartRect = chartRect.inset(by: UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0))
 
-        ctx.saveGState()
+//        ctx.saveGState()
         let timePanel = TimeAxisPanel(chart: chart)
         timePanel.drawInContext(ctx, rect: timeRect)
-        ctx.restoreGState()
+//        ctx.restoreGState()
 
-        ctx.saveGState()
+//        ctx.saveGState()
         let valuePanel = ValueAxisPanel(chart: chart)
         valuePanel.drawInContext(ctx, rect: chartRect)
-        ctx.restoreGState()
+//        ctx.restoreGState()
 
         let config = ChartPanel.Config(lineWidth: 2)
         for (idx, _) in chart.plots.enumerated() {
-            ctx.saveGState()
+//            ctx.saveGState()
             let panel = ChartPanel(chart: chart, plotIndex: idx, config: config)
             panel.drawInContext(ctx, rect: chartRect)
-            ctx.restoreGState()
+//            ctx.restoreGState()
         }
 
         if let idx = crosshairTimeIdx {
-            ctx.saveGState()
+//            ctx.saveGState()
             let panel = CrosshairPanel(chart: chart, timestampIndex: idx)
             panel.drawInContext(ctx, rect: chartRect)
-            ctx.restoreGState()
+//            ctx.restoreGState()
         }
     }
 
@@ -148,10 +148,10 @@ public class ChartView: UIView {
             popup.timeLabel.attributedText = formatter.popupDateText(timestamp: timestamp)
             popup.valueLabel.attributedText = formatter.popupValueText(index: idx, plots: chart.plots)
             setNeedsLayout()
-            let options: UIView.AnimationOptions = [.beginFromCurrentState, .curveLinear]
-            UIView.animate(withDuration: 0.05, delay: 0, options: options, animations: {
-                self.layoutIfNeeded()
-            }, completion: nil)
+//            let options: UIView.AnimationOptions = [.beginFromCurrentState, .curveLinear]
+//            UIView.animate(withDuration: 0.05, delay: 0, options: options, animations: {
+//                self.layoutIfNeeded()
+//            }, completion: nil)
         } else {
             popup?.removeFromSuperview()
             popup = nil
