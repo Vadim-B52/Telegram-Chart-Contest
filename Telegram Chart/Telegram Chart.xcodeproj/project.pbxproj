@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6AC710D129DADD88ED4B4E25 /* ChartClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71E1470CB6775F9CA41BA /* ChartClient.swift */; };
+		6AC713A923BFECA23488860A /* ChartViewTimeSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC715096E2D394D012B9201 /* ChartViewTimeSelector.swift */; };
 		6AC714191C0737A814D1A877 /* ChartTimeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71FCB29C5626EA888BBDE /* ChartTimeSelectorView.swift */; };
 		6AC7150428B2635F24CD07F3 /* ValueAxisPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC7172228330B7244FC78BC /* ValueAxisPanel.swift */; };
 		6AC71680C695B78D82912F8E /* Chart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC715D6F57BFF6CEAC49574 /* Chart.swift */; };
@@ -34,6 +35,7 @@
 
 /* Begin PBXFileReference section */
 		6AC7120BA3BC285553BA4F18 /* CrosshairPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrosshairPanel.swift; sourceTree = "<group>"; };
+		6AC715096E2D394D012B9201 /* ChartViewTimeSelector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartViewTimeSelector.swift; sourceTree = "<group>"; };
 		6AC715D6F57BFF6CEAC49574 /* Chart.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chart.swift; sourceTree = "<group>"; };
 		6AC7172228330B7244FC78BC /* ValueAxisPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValueAxisPanel.swift; sourceTree = "<group>"; };
 		6AC7182470DC4721FF0E7432 /* ChartView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 				6AC7182470DC4721FF0E7432 /* ChartView.swift */,
 				6AC7182DFA440C98E17796F3 /* MiniChartTimeSelectorView.swift */,
 				6AC71FCB29C5626EA888BBDE /* ChartTimeSelectorView.swift */,
+				6AC715096E2D394D012B9201 /* ChartViewTimeSelector.swift */,
 			);
 			path = ChartViews;
 			sourceTree = "<group>";
@@ -273,6 +276,7 @@
 				6AC71BACBB3F6D48EC7797A3 /* MiniChartTimeSelectorView.swift in Sources */,
 				6AC714191C0737A814D1A877 /* ChartTimeSelectorView.swift in Sources */,
 				6AC71C6A237C12C965FAD3DA /* CrosshairPanel.swift in Sources */,
+				6AC713A923BFECA23488860A /* ChartViewTimeSelector.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
