@@ -14,33 +14,32 @@ public class TimeAxisPanel {
     }
 
     public func drawInContext(_ ctx: CGContext, rect: CGRect) {
+        guard let firstTS = chart.timestamps.first else {
+            return
+        }
 //        let color = UIColor.gray // TODO: color
 
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM\u{00a0}dd"
         let options = NSStringDrawingOptions.usesLineFragmentOrigin
         let attributes: [NSAttributedString.Key: Any]? = nil
-        let indexRange = chart.timeIndexRange
         let calculator = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
         var rest = rect
+        
+        let sizingDate = Date(timeIntervalSince1970: Double(firstTS) / 1000.0)
+        let sizingStr = formatter.string(from: sizingDate)
+        let dateSize = sizingStr.boundingRect(with: rest.size, options: options, attributes: attributes, context: nil)
 
-        for i in indexRange.startIdx...indexRange.endIdx {
-            let timestamp = chart.timestamps[i]
+        var slice: CGRect
+        while rest.size.width >= dateSize.width {
+            (slice, rest) = rest.divided(atDistance: ceil(dateSize.width), from: .minXEdge)
+            let timestamp = calculator.timestampAt(x: slice.midX, rect: rect)
             let date = Date(timeIntervalSince1970: Double(timestamp) / 1000.0)
             let str = formatter.string(from: date)
-
-            let boundingRect = str.boundingRect(with: rest.size, options: options, attributes: attributes, context: nil)
-            let textWidth = ceil(boundingRect.size.width)
-            var textRect = rest
-            textRect.origin.x = floor(calculator.x(in: rect, timestamp: timestamp)) - textWidth / 2
-            textRect.size.width = textWidth
-            textRect.origin.y = rest.origin.y + floor((rest.size.height - boundingRect.size.height) / 2)
-            textRect.size.height = ceil(boundingRect.size.height)
-
-            if rest.contains(textRect) {
-                str.draw(with: textRect, options: options, attributes: attributes, context: nil)
-                (_, rest) = rest.divided(atDistance: textRect.maxX - rest.minX + 10, from: .minXEdge)
-            }
+            slice.origin.y = rest.origin.y + floor((rest.size.height - dateSize.height) / 2)
+            slice.size.height = ceil(dateSize.size.height)
+            str.draw(with: slice, options: options, attributes: attributes, context: nil)
+            (_, rest) = rest.divided(atDistance: slice.maxX - rest.minX + 10, from: .minXEdge)
         }
     }
 }
