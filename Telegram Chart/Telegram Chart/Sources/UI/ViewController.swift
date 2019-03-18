@@ -71,8 +71,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             return
         }
         model.changeVisibilityForChartAt(indexPath.section, plotIndex: plotIdx)
-        tableView.reloadData()
-        // TODO: implement
+        let chartIndexPath = IndexPath(row: 0, section: indexPath.section)
+        if let chartCell = tableView.cellForRow(at: chartIndexPath) as? ChartTableViewCell {
+            configure(chartCell: chartCell, atIndexPath: chartIndexPath, animated: true)
+        }
+        if let plotCell = tableView.cellForRow(at: indexPath) {
+            configure(plotCell: plotCell, atIndexPath: indexPath)
+        }
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -139,43 +144,51 @@ fileprivate extension ViewController {
     }
 
     private func chartCellAt(_ indexPath: IndexPath, tableView: UITableView) -> ChartTableViewCell {
-        let (chart, state) = model.dataAt(indexPath.section)
         let cell: ChartTableViewCell = tableView.dequeueReusableCell(withIdentifier: chartCellReuseId) as! ChartTableViewCell
         cell.selectionStyle = .none
-        cell.delegate = self
         cell.separatorInset = UIEdgeInsets(top: 0, left: screenMaxEdge, bottom: 0, right: -screenMaxEdge)
+        cell.backgroundColor = skin.cellBackgroundColor
+        cell.backgroundView?.backgroundColor = skin.cellBackgroundColor
+        cell.delegate = self
+        cell.miniChartTimeSelectorViewColorSource = self
+        cell.chartViewColorSource = self
+        configure(chartCell: cell, atIndexPath: indexPath)
+        return cell
+    }
 
-        var drawingChart = DrawingChart(
+    private func configure(chartCell cell: ChartTableViewCell, atIndexPath indexPath: IndexPath, animated: Bool = false) {
+        let (chart, state) = model.dataAt(indexPath.section)
+
+        let drawingChart = DrawingChart(
                 timestamps: chart.timestamps,
                 timeRange: chart.timeRange,
                 selectedTimeRange: state.selectedTimeRange,
                 plots: chart.plots.filter { state.enabledPlotId.contains($0.identifier)  })
 
-        cell.display(chart: drawingChart)
-        cell.backgroundColor = skin.cellBackgroundColor
-        cell.backgroundView?.backgroundColor = skin.cellBackgroundColor
-        cell.miniChartTimeSelectorViewColorSource = self
-        cell.chartViewColorSource = self
-        return cell
+        cell.display(chart: drawingChart, animated: animated)
     }
 
     private func plotCellAt(_ indexPath: IndexPath, tableView: UITableView) -> UITableViewCell {
-        let (chart, state) = model.dataAt(indexPath.section)
         let cell = tableView.dequeueReusableCell(withIdentifier: plotCellReuseId)!
-        let plotIdx = indexPath.row - 1
-        let plot = chart.plots[plotIdx]
-        cell.textLabel?.text = plot.name
         cell.textLabel?.textColor = skin.mainTextColor
         cell.imageView?.clipsToBounds = true
         cell.imageView?.backgroundColor = skin.cellBackgroundColor
         cell.imageView?.layer.cornerRadius = 2
-        cell.imageView?.image = UIImage.plotIndicatorWithColor(plot.color)
-        cell.accessoryType = state.enabledPlotId.contains(plot.identifier) ? .checkmark : .none
         cell.backgroundColor = skin.cellBackgroundColor
         cell.backgroundView?.backgroundColor = skin.cellBackgroundColor
         cell.selectedBackgroundView? = UIView()
         cell.selectedBackgroundView?.backgroundColor = skin.rowSelectionColor
+        configure(plotCell: cell, atIndexPath: indexPath)
         return cell
+    }
+
+    private func configure(plotCell cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
+        let (chart, state) = model.dataAt(indexPath.section)
+        let plotIdx = indexPath.row - 1
+        let plot = chart.plots[plotIdx]
+        cell.textLabel?.text = plot.name
+        cell.imageView?.image = UIImage.plotIndicatorWithColor(plot.color)
+        cell.accessoryType = state.enabledPlotId.contains(plot.identifier) ? .checkmark : .none
     }
 }
 
