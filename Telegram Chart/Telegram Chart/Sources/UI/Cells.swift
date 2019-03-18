@@ -16,6 +16,7 @@ public class ChartTableViewCell: UITableViewCell {
 
     private let chartView = ChartView()
     private let miniChartView = MiniChartView()
+    private var chart: DrawingChart?
 
     public weak var delegate: ChartTableViewCellDelegate?
 
@@ -57,9 +58,12 @@ public class ChartTableViewCell: UITableViewCell {
     }
 
     public func display(chart: DrawingChart, animated: Bool) {
-        chartView.chart = chart
-        miniChartView.chart = DrawingChart(timestamps: chart.timestamps, timeRange: chart.timeRange, plots: chart.plots)
-        miniChartView.selectedTimeRange = chart.timeRange
+        if let prevChart = self.chart, animated {
+            animatedDisplay(chart: chart, prevChart: prevChart)
+        } else {
+            deadDisplay(chart: chart)
+        }
+        self.chart = chart
     }
 
     @objc
@@ -70,6 +74,33 @@ public class ChartTableViewCell: UITableViewCell {
         let newChart = chart.changeSelectedTimeRange(miniChartView.selectedTimeRange)
         chartView.chart = newChart
         delegate?.chartTableViewCell(self, didChangeSelectedTimeRange: chart.selectedTimeRange)
+    }
+
+    private func deadDisplay(chart: DrawingChart) {
+        chartView.chart = chart
+        miniChartView.chart = DrawingChart(timestamps: chart.timestamps, timeRange: chart.timeRange, plots: chart.plots)
+        miniChartView.selectedTimeRange = chart.timeRange
+    }
+
+    private var animator: ChartViewAnimator!
+    private func animatedDisplay(chart: DrawingChart, prevChart: DrawingChart) {
+        let startValue = ChartViewAnimator.Value(valueRange: prevChart.valueRange, alpha: 1)
+        let endValue = ChartViewAnimator.Value(valueRange: chart.valueRange, alpha: 1)
+        let animator = ChartViewAnimator(animationDuration: 0.3, startValue: startValue, endValue: endValue)
+        animator.callback = { (finished, value) in
+            let c = DrawingChart(
+                    timestamps: chart.timestamps,
+                    timeRange: chart.timeRange,
+                    valueRange: value.valueRange,
+                    plots: chart.plots)
+
+            self.deadDisplay(chart: c)
+            if finished {
+                self.animator = nil
+            }
+        }
+        self.animator = animator
+        animator.startAnimation()
     }
 }
 

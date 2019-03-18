@@ -10,16 +10,19 @@ public class DrawingChart {
     public let timestamps: [Int64]
     public let timeRange: TimeRange
     public let selectedTimeRange: TimeRange
+    private let _valueRange: ValueRange?
     public let plots: [Chart.Plot]
 
     public init(timestamps: [Int64],
                 timeRange: TimeRange,
                 selectedTimeRange: TimeRange? = nil,
+                valueRange: ValueRange? = nil,
                 plots: [Chart.Plot]) {
         self.timestamps = timestamps
         self.timeRange = timeRange
         self.selectedTimeRange = selectedTimeRange ?? timeRange
         self.plots = plots
+        self._valueRange = valueRange
     }
 
     public private(set) lazy var timeIndexRange: TimeIndexRange = {
@@ -31,6 +34,9 @@ public class DrawingChart {
     }()
 
     public private(set) lazy var valueRange: ValueRange = {
+        if let range = _valueRange {
+            return range
+        }
         let ranges = plots.map { $0.valueRange(indexRange: timeIndexRange) }
         return ValueRange(ranges: ranges)
     }()

@@ -53,18 +53,20 @@ public class Chart {
 }
 
 public struct ValueRange {
-    public fileprivate(set) var min: Int64
-    public fileprivate(set) var max: Int64
-    public fileprivate(set) var size: Int64
-    public fileprivate(set) var minIdx: Int
-    public fileprivate(set) var maxIdx: Int
+    public var min: Int64
+    public var max: Int64
+    public var size: Int64
 
-    fileprivate init(value: Int64, idx: Int) {
+    public init(min: Int64, max: Int64) {
+        self.min = min
+        self.max = max
+        size = max - min
+    }
+
+    public init(value: Int64, idx: Int) {
         min = value
         max = value
         size = 0
-        minIdx = idx
-        maxIdx = idx
     }
 
     fileprivate init(values: [Int64], indexRange: TimeIndexRange? = nil) {
@@ -75,17 +77,13 @@ public struct ValueRange {
         let r = indexRange ?? TimeIndexRange(length: values.count)
         min = values[r.startIdx]
         max = values[r.startIdx]
-        minIdx = r.startIdx
-        maxIdx = r.startIdx
 
         for i in (r.startIdx + 1)...r.endIdx {
             let v = values[i]
             if v < min {
                 min = v
-                minIdx = i
             } else if v > max {
                 max = v
-                maxIdx = i
             }
         }
         size = max - min
@@ -94,17 +92,13 @@ public struct ValueRange {
     init(ranges: [ValueRange]) {
         min = ranges[0].min
         max = ranges[0].max
-        minIdx = ranges[0].minIdx
-        maxIdx = ranges[0].maxIdx
 
         for i in 1..<ranges.count {
             let r = ranges[i]
             if r.min < min {
                 min = r.min
-                minIdx = r.minIdx
             } else if r.max > max {
                 max = r.max
-                maxIdx = r.maxIdx
             }
         }
         size = max - min
