@@ -8,21 +8,22 @@ import UIKit
 public class TimeAxisPanel {
 
     public let chart: DrawingChart
+    public let config: Config
 
-    public init(chart: DrawingChart) {
+    public init(chart: DrawingChart, config: Config) {
         self.chart = chart
+        self.config = config
     }
 
     public func drawInContext(_ ctx: CGContext, rect: CGRect) {
         guard let firstTS = chart.timestamps.first else {
             return
         }
-//        let color = UIColor.gray // TODO: color
 
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM\u{00a0}dd"
         let options = NSStringDrawingOptions.usesLineFragmentOrigin
-        let attributes: [NSAttributedString.Key: Any]? = nil
+        let attributes: [NSAttributedString.Key: Any]? = [NSAttributedString.Key.foregroundColor: config.textColor]
         let calculator = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
         var rest = rect
         
@@ -41,5 +42,9 @@ public class TimeAxisPanel {
             str.draw(with: slice, options: options, attributes: attributes, context: nil)
             (_, rest) = rest.divided(atDistance: slice.maxX - rest.minX + 10, from: .minXEdge)
         }
+    }
+    
+    public struct Config {
+        let textColor: UIColor
     }
 }

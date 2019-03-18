@@ -9,9 +9,11 @@ import UIKit
 public class ValueAxisPanel {
 
     public let chart: DrawingChart
+    public let config: Config
 
-    public init(chart: DrawingChart) {
+    public init(chart: DrawingChart, config: Config) {
         self.chart = chart
+        self.config = config
     }
 
     public func drawInContext(_ ctx: CGContext, rect: CGRect) {
@@ -23,16 +25,25 @@ public class ValueAxisPanel {
         var rest = rect
         let thinLineWidth = 1 / UIScreen.main.scale
         let options = NSStringDrawingOptions.usesLineFragmentOrigin
-        let attributes: [NSAttributedString.Key: Any]? = nil
+        let attributes: [NSAttributedString.Key: Any]? = [NSAttributedString.Key.foregroundColor: config.textColor]
 
-        let color = UIColor.gray // TODO: color
-        color.setFill()
+        config.zeroAxisColor.setFill()
 
-        for _ in 0..<numberOfLines {
+        var slice, line: CGRect
+        (slice, rest) = rest.divided(atDistance: step, from: .maxYEdge)
+        (line, _) = slice.divided(atDistance: thinLineWidth, from: .maxYEdge)
+        ctx.fill(line)
+
+        (slice, _) = slice.divided(atDistance: font.lineHeight, from: .maxYEdge)
+        let value = calculator.valueAt(y: line.minY, rect: rect)
+        let str = "\(value)"
+        str.draw(with: slice, options: options, attributes: attributes, context: nil)
+
+        config.axisColor.setFill()
+        for _ in 1..<numberOfLines {
             var slice, line: CGRect
             (slice, rest) = rest.divided(atDistance: step, from: .maxYEdge)
             (line, _) = slice.divided(atDistance: thinLineWidth, from: .maxYEdge)
-            color.setFill()
             ctx.fill(line)
 
             (slice, _) = slice.divided(atDistance: font.lineHeight, from: .maxYEdge)
@@ -40,5 +51,11 @@ public class ValueAxisPanel {
             let str = "\(value)"
             str.draw(with: slice, options: options, attributes: attributes, context: nil)
         }
+    }
+
+    public struct Config {
+        let axisColor: UIColor
+        let zeroAxisColor: UIColor
+        let textColor: UIColor
     }
 }

@@ -89,6 +89,17 @@ public extension ChartTableViewCell {
     }
 }
 
+public extension ChartTableViewCell {
+    public weak var chartViewColorSource: ChartViewColorSource? {
+        get {
+            return chartView.colorSource
+        }
+        set {
+            chartView.colorSource = newValue
+        }
+    }
+}
+
 public class NightModeTableViewCell: UITableViewCell {
     public private(set) lazy var button: UIButton = {
         let button = UIButton(type: .system)

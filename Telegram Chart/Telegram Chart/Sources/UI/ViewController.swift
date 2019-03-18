@@ -138,6 +138,7 @@ fileprivate extension ViewController {
         cell.backgroundColor = skin.cellBackgroundColor
         cell.backgroundView?.backgroundColor = skin.cellBackgroundColor
         cell.miniChartTimeSelectorViewColorSource = self
+        cell.chartViewColorSource = self
         return cell
     }
 
@@ -172,6 +173,28 @@ extension ViewController: MiniChartTimeSelectorViewColorSource {
 
     func controlColor(miniChartTimeSelectorView view: MiniChartTimeSelectorView) -> UIColor {
         return skin.timeSelectorControlColor
+    }
+}
+
+extension ViewController: ChartViewColorSource {
+    public func valueAxisColor(chartView: ChartView) -> UIColor {
+        return skin.valueAxisColor
+    }
+
+    public func zeroValueAxisColor(chartView: ChartView) -> UIColor {
+        return skin.zeroValueAxisColor
+    }
+
+    public func chartAxisLabelColor(chartView: ChartView) -> UIColor {
+        return skin.chartAxisLabelColor
+    }
+
+    public func popupBackgroundColor(chartView: ChartView) -> UIColor {
+        return skin.popupBackgroundColor
+    }
+
+    public func popupLabelColor(chartView: ChartView) -> UIColor {
+        return skin.popupLabelColor
     }
 }
 

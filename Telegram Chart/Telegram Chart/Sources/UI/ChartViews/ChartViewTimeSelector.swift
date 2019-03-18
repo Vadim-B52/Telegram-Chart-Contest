@@ -5,7 +5,7 @@
 
 import UIKit
 
-public class ChartViewTimeSelector: UIView {
+public class CrosshairView: UIView {
 
     private let longPress = UILongPressGestureRecognizer()
     private var popup: PopupView?

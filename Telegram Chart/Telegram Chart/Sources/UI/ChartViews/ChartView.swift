@@ -7,7 +7,15 @@ import UIKit
 
 public class ChartView: UIView {
 
-    private let timeSelector = ChartViewTimeSelector()
+    private let timeSelector = CrosshairView()
+    private var timePanelConfig: TimeAxisPanel.Config!
+    private var valuePanelConfig: ValueAxisPanel.Config!
+
+    public weak var colorSource: ChartViewColorSource? {
+        didSet {
+            reloadColors()
+        }
+    }
 
     public var chart: DrawingChart? = nil {
         didSet {
@@ -29,6 +37,8 @@ public class ChartView: UIView {
             timeSelector.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24),
             timeSelector.trailingAnchor.constraint(equalTo: trailingAnchor),
         ])
+        
+        reloadColors()
     }
 
     @available(*, unavailable)
@@ -46,10 +56,10 @@ public class ChartView: UIView {
         var (timeRect, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
         chartRect = chartRect.inset(by: UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0))
 
-        let timePanel = TimeAxisPanel(chart: chart)
+        let timePanel = TimeAxisPanel(chart: chart, config: timePanelConfig)
         timePanel.drawInContext(ctx, rect: timeRect)
 
-        let valuePanel = ValueAxisPanel(chart: chart)
+        let valuePanel = ValueAxisPanel(chart: chart, config: valuePanelConfig)
         valuePanel.drawInContext(ctx, rect: chartRect)
 
         let config = ChartPanel.Config(lineWidth: 2)
@@ -58,4 +68,41 @@ public class ChartView: UIView {
             panel.drawInContext(ctx, rect: chartRect)
         }
     }
+
+    public func reloadColors() {
+        reloadTimePanelConfig()
+        reloadValuePanelConfig()
+        setNeedsDisplay()
+    }
+
+    private func reloadValuePanelConfig() {
+        guard let colorSource = colorSource else {
+            valuePanelConfig = ValueAxisPanel.Config(
+                    axisColor: .gray,
+                    zeroAxisColor: .gray,
+                    textColor: .gray)
+            return
+        }
+        valuePanelConfig = ValueAxisPanel.Config(
+                axisColor: colorSource.zeroValueAxisColor(chartView: self),
+                zeroAxisColor: colorSource.zeroValueAxisColor(chartView: self),
+                textColor: colorSource.chartAxisLabelColor(chartView: self))
+    }
+
+    private func reloadTimePanelConfig() {
+        guard let colorSource = colorSource else {
+            timePanelConfig = TimeAxisPanel.Config(textColor: .gray)
+            return
+        }
+        timePanelConfig = TimeAxisPanel.Config(textColor: colorSource.chartAxisLabelColor(chartView: self))
+
+    }
+}
+
+public protocol ChartViewColorSource: AnyObject {
+    func valueAxisColor(chartView: ChartView) -> UIColor
+    func zeroValueAxisColor(chartView: ChartView) -> UIColor
+    func chartAxisLabelColor(chartView: ChartView) -> UIColor
+    func popupBackgroundColor(chartView: ChartView) -> UIColor
+    func popupLabelColor(chartView: ChartView) -> UIColor
 }

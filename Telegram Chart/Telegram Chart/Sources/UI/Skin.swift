@@ -19,6 +19,11 @@ public protocol Skin {
     var timeSelectorChevronColor: UIColor { get }
     var barStyle: UIBarStyle { get }
     var rowSelectionColor: UIColor { get }
+    var valueAxisColor: UIColor { get }
+    var zeroValueAxisColor: UIColor { get }
+    var chartAxisLabelColor: UIColor { get }
+    var popupBackgroundColor: UIColor { get }
+    var popupLabelColor: UIColor { get }
 }
 
 extension Skin {
@@ -64,6 +69,26 @@ public class NightSkin: Skin {
     public var rowSelectionColor: UIColor {
         return UIColor(white: 0.85, alpha: 0.3)
     }
+
+    public var valueAxisColor: UIColor {
+        return UIColor(red: 0.11, green: 0.16, blue: 0.21, alpha: 1)
+    }
+
+    public var zeroValueAxisColor: UIColor {
+        return UIColor(red: 0.09, green: 0.13, blue: 0.16, alpha: 1)
+    }
+
+    public var chartAxisLabelColor: UIColor {
+        return UIColor(red: 0.37, green: 0.43, blue: 0.49, alpha: 1)
+    }
+
+    public var popupBackgroundColor: UIColor {
+        return UIColor(red: 0.11, green: 0.16, blue: 0.21, alpha: 1)
+    }
+
+    public var popupLabelColor: UIColor {
+        return UIColor.white
+    }
 }
 
 public class DaySkin: Skin {
@@ -105,5 +130,25 @@ public class DaySkin: Skin {
 
     public var rowSelectionColor: UIColor {
         return UIColor(white: 0.85, alpha: 1)
+    }
+    
+    public var valueAxisColor: UIColor {
+        return UIColor(white: 0.95, alpha: 1)
+    }
+    
+    public var zeroValueAxisColor: UIColor {
+        return UIColor(white: 0.87, alpha: 1)
+    }
+    
+    public var chartAxisLabelColor: UIColor {
+        return UIColor(red: 0.56, green: 0.59, blue: 0.61, alpha: 1)
+    }
+    
+    public var popupBackgroundColor: UIColor {
+        return UIColor(red: 0.94, green: 0.94, blue: 0.96, alpha: 1)
+    }
+    
+    public var popupLabelColor: UIColor {
+        return UIColor(red: 0.42, green: 0.42, blue: 0.4, alpha: 1)
     }
 }

@@ -52,10 +52,8 @@ public class MiniChartView: UIControl {
         let drawingRect = bounds.inset(by: UIEdgeInsets(top: 11, left: 0, bottom: 9, right: 0))
         let config = ChartPanel.Config(lineWidth: 1)
         for (idx, _) in chart.plots.enumerated() {
-//            ctx.saveGState()
             let panel = ChartPanel(chart: chart, plotIndex: idx, config: config)
             panel.drawInContext(ctx, rect: drawingRect)
-//            ctx.restoreGState()
         }
     }
 
