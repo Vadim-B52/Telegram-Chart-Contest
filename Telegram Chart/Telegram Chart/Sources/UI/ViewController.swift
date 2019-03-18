@@ -65,6 +65,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             updateSkin()
             return
         }
+        guard isPlotRowAt(indexPath) else {
+            return
+        }
         let plotIdx = indexPath.row - 1
         guard model.canChangeVisibilityForChartAt(indexPath.section, plotIndex: plotIdx) else {
             UIAlertView(title: "Cannot change", message: "Enable other plot before", delegate: nil, cancelButtonTitle: "Ok").show()

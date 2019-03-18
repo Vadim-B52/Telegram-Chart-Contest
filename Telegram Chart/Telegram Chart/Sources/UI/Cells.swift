@@ -78,7 +78,7 @@ public class ChartTableViewCell: UITableViewCell {
 
     private func deadDisplay(chart: DrawingChart) {
         chartView.chart = chart
-        miniChartView.chart = DrawingChart(timestamps: chart.timestamps, timeRange: chart.timeRange, plots: chart.plots)
+        miniChartView.chart = DrawingChart(timestamps: chart.timestamps, timeRange: chart.timeRange, valueRange: chart.valueRange, plots: chart.plots)
         miniChartView.selectedTimeRange = chart.timeRange
     }
 
