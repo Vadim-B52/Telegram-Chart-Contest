@@ -59,8 +59,20 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // TOOD: implement
         tableView.deselectRow(at: indexPath, animated: false)
+        guard isChartSection(indexPath.section) else {
+            model.switchMode()
+            updateSkin()
+            return
+        }
+        let plotIdx = indexPath.row - 1
+        guard model.canChangeVisibilityForChartAt(indexPath.section, plotIndex: plotIdx) else {
+            UIAlertView(title: "Cannot change", message: "Enable other plot before", delegate: nil, cancelButtonTitle: "Ok").show()
+            return
+        }
+        model.changeVisibilityForChartAt(indexPath.section, plotIndex: plotIdx)
+        tableView.reloadData()
+        // TODO: implement
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -78,7 +90,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     private func updateSkin() {
-        // TODO: implement
         let isNight = model.isNightModeEnabled
         skin = isNight ? NightSkin() : DaySkin()
         let navigationBar = navigationController?.navigationBar
@@ -134,7 +145,13 @@ fileprivate extension ViewController {
         cell.delegate = self
         cell.separatorInset = UIEdgeInsets(top: 0, left: screenMaxEdge, bottom: 0, right: -screenMaxEdge)
 
-        cell.display(chart: chart, timeRange: state.selectedTimeRange)
+        var drawingChart = DrawingChart(
+                timestamps: chart.timestamps,
+                timeRange: chart.timeRange,
+                selectedTimeRange: state.selectedTimeRange,
+                plots: chart.plots.filter { state.enabledPlotId.contains($0.identifier)  })
+
+        cell.display(chart: drawingChart)
         cell.backgroundColor = skin.cellBackgroundColor
         cell.backgroundView?.backgroundColor = skin.cellBackgroundColor
         cell.miniChartTimeSelectorViewColorSource = self

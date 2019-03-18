@@ -38,20 +38,49 @@ public class ChartListScreen {
         isNightModeEnabled = !isNightModeEnabled
     }
  
-    public func dataAt(_ idx: Int) -> (Chart, ChartState) {
+    public func dataAt(_ idx: Int) -> (chart: Chart, state: ChartState) {
         return (charts[idx], chartStates[idx])
     }
 
     public func updateSelectedTimeRange(_ timeRange: TimeRange, at idx: Int) {
         chartStates[idx] = chartStates[idx].byChanging(selectedTimeRange: timeRange)
     }
+
+    public func canChangeVisibilityForChartAt(_ idx: Int, plotIndex: Int) -> Bool {
+        let (chart, state) = dataAt(idx)
+        let plotId = chart.plots[plotIndex].identifier
+        if state.enabledPlotId.contains(plotId) {
+            return state.enabledPlotId.count > 1
+        } else {
+            return true
+        }
+    }
+
+    public func changeVisibilityForChartAt(_ idx: Int, plotIndex: Int) {
+        let (chart, state) = dataAt(idx)
+        let plotId = chart.plots[plotIndex].identifier
+        if state.enabledPlotId.contains(plotId) {
+            chartStates[idx] = state.byDisablingPlotWith(identifier: plotId)
+        } else {
+            chartStates[idx] = state.byEnablingPlotWith(identifier: plotId)
+        }
+    }
 }
 
 public struct ChartState {
+
     public let enabledPlotId: Set<String>
     public let selectedTimeRange: TimeRange?
 
     public func byChanging(selectedTimeRange: TimeRange?) -> ChartState {
         return ChartState(enabledPlotId: enabledPlotId, selectedTimeRange: selectedTimeRange)
+    }
+
+    func byEnablingPlotWith(identifier: String) -> ChartState {
+        return ChartState(enabledPlotId: enabledPlotId.union([identifier]), selectedTimeRange: selectedTimeRange)
+    }
+
+    func byDisablingPlotWith(identifier: String) -> ChartState {
+        return ChartState(enabledPlotId: enabledPlotId.subtracting([identifier]), selectedTimeRange: selectedTimeRange)
     }
 }

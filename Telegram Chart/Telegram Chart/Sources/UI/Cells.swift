@@ -56,15 +56,10 @@ public class ChartTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public func display(chart: Chart, timeRange: TimeRange?) {
-        chartView.chart = DrawingChart(
-                timestamps: chart.timestamps,
-                timeRange: chart.timeRange,
-                selectedTimeRange: timeRange,
-                plots: chart.plots)
-
+    public func display(chart: DrawingChart) {
+        chartView.chart = chart
         miniChartView.chart = DrawingChart(timestamps: chart.timestamps, timeRange: chart.timeRange, plots: chart.plots)
-        miniChartView.selectedTimeRange = timeRange
+        miniChartView.selectedTimeRange = chart.timeRange
     }
 
     @objc
