@@ -76,7 +76,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         model.changeVisibilityForChartAt(indexPath.section, plotIndex: plotIdx)
         let chartIndexPath = IndexPath(row: 0, section: indexPath.section)
         if let chartCell = tableView.cellForRow(at: chartIndexPath) as? ChartTableViewCell {
-            configure(chartCell: chartCell, atIndexPath: chartIndexPath, animated: true)
+            let (chart, state) = model.dataAt(plotIdx)
+            let plotId = chart.plots[plotIdx].identifier
+            if state.enabledPlotId.contains(plotId) {
+                chartCell.showPlot(plotId: plotId)
+            } else {
+                chartCell.hidePlot(plotId: plotId)
+            }
         }
         if let plotCell = tableView.cellForRow(at: indexPath) {
             configure(plotCell: plotCell, atIndexPath: indexPath)
@@ -155,20 +161,9 @@ fileprivate extension ViewController {
         cell.delegate = self
         cell.miniChartTimeSelectorViewColorSource = self
         cell.chartViewColorSource = self
-        configure(chartCell: cell, atIndexPath: indexPath)
-        return cell
-    }
-
-    private func configure(chartCell cell: ChartTableViewCell, atIndexPath indexPath: IndexPath, animated: Bool = false) {
         let (chart, state) = model.dataAt(indexPath.section)
-
-        let drawingChart = DrawingChart(
-                timestamps: chart.timestamps,
-                timeRange: chart.timeRange,
-                selectedTimeRange: state.selectedTimeRange,
-                plots: chart.plots.filter { state.enabledPlotId.contains($0.identifier)  })
-
-        cell.display(chart: drawingChart, animated: animated)
+        cell.display(chart: chart, state: state)
+        return cell
     }
 
     private func plotCellAt(_ indexPath: IndexPath, tableView: UITableView) -> UITableViewCell {

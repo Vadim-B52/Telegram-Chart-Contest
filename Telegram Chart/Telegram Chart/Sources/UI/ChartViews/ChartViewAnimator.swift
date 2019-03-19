@@ -8,19 +8,27 @@ import UIKit
 public class ChartViewAnimator {
     private weak var displayLink: CADisplayLink?
     private var startTime: CFTimeInterval!
+    public let identifier: String
     public let animationDuration: CFTimeInterval
     public let startValue: Value
     public let endValue: Value
+    public private(set) var currentValue: Value
     public  var callback: ((Bool, Value) -> Void)?
 
     deinit {
         displayLink?.invalidate()
     }
 
-    public init(animationDuration: TimeInterval, startValue: Value, endValue: Value) {
+    public init(identifier: String,
+                animationDuration: TimeInterval,
+                startValue: Value,
+                endValue: Value) {
+
+        self.identifier = identifier
         self.animationDuration = animationDuration
         self.startValue = startValue
         self.endValue = endValue
+        currentValue = startValue
     }
 
     public func startAnimation() {
@@ -44,7 +52,7 @@ public class ChartViewAnimator {
             endAnimation()
             return
         }
-        var currentValue = startValue
+        currentValue = startValue
         let minD = endValue.valueRange.min - startValue.valueRange.min
         let maxD = endValue.valueRange.max - startValue.valueRange.max
         let alphaD = endValue.alpha - startValue.alpha

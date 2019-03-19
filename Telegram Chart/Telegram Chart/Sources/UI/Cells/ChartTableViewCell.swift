@@ -19,7 +19,9 @@ public class ChartTableViewCell: UITableViewCell {
     private let miniChartView = MiniChartView()
     private lazy var miniChartDataSource: MiniChartDataSource = MiniChartDataSource(this: self)
     private var animator: ChartViewAnimator?
-    private var chart: DrawingChart!
+    private var chart: Chart!
+    private var state: ChartState!
+    private var drawingChart: DrawingChart!
 
     public weak var delegate: ChartTableViewCellDelegate?
 
@@ -60,24 +62,68 @@ public class ChartTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public func display(chart: DrawingChart, animated: Bool) {
+    public func display(chart: Chart, state: ChartState) {
         chartView.dataSource = chartDataSource
         miniChartView.dataSource = miniChartDataSource
+
         self.chart = chart
-        if let prevChart = self.chart, animated {
-            animatedDisplay(chart: chart, prevChart: prevChart)
-        } else {
-            reloadData()
+        self.state = state
+        self.drawingChart = DrawingChart(
+                timestamps: chart.timestamps,
+                timeRange: chart.timeRange,
+                selectedTimeRange: state.selectedTimeRange,
+                plots: chart.plots.filter {
+                    state.enabledPlotId.contains($0.identifier)
+                })
+
+        reloadData()
+    }
+
+    public func hidePlot(plotId: String) {
+        state = state.byDisablingPlotWith(identifier: plotId)
+        dispatchAnimation(toShow: false, identifier: plotId)
+    }
+
+    public func showPlot(plotId: String) {
+        state = state.byEnablingPlotWith(identifier: plotId)
+        dispatchAnimation(toShow: true, identifier: plotId)
+    }
+
+    private func dispatchAnimation(toShow: Bool, identifier: String) {
+        let oldDrawingChart = drawingChart!
+        let newDrawingChart = DrawingChart(
+                timestamps: drawingChart.timestamps,
+                timeRange: drawingChart.timeRange,
+                selectedTimeRange: drawingChart.selectedTimeRange,
+                plots: chart.plots.filter {
+                    state.enabledPlotId.contains($0.identifier)
+                })
+
+        if toShow {
+            drawingChart = newDrawingChart
         }
+
+        let startValue = ChartViewAnimator.Value(valueRange: oldDrawingChart.valueRange, alpha: toShow ? 0 : 1)
+        let endValue = ChartViewAnimator.Value(valueRange: newDrawingChart.valueRange, alpha: toShow ? 1 : 0)
+        let animator = ChartViewAnimator(identifier: identifier, animationDuration: 0.3, startValue: startValue, endValue: endValue)
+        animator.callback = { (finished, value) in
+            self.reloadData()
+            if finished {
+                self.animator = nil
+                self.drawingChart = newDrawingChart
+            }
+        }
+        self.animator = animator
+        animator.startAnimation()
     }
 
     @objc
     private func handleValueChanged() {
-        guard let chart = self.chart else {
+        guard let chart = self.drawingChart else {
             return
         }
         let newChart = chart.changeSelectedTimeRange(miniChartView.selectedTimeRange)
-        self.chart = newChart
+        self.drawingChart = newChart
         reloadData()
         delegate?.chartTableViewCell(self, didChangeSelectedTimeRange: newChart.selectedTimeRange)
     }
@@ -85,20 +131,6 @@ public class ChartTableViewCell: UITableViewCell {
     private func reloadData() {
         chartView.reloadData()
         miniChartView.reloadData()
-    }
-
-    private func animatedDisplay(chart: DrawingChart, prevChart: DrawingChart) {
-//        let startValue = ChartViewAnimator.Value(valueRange: prevChart.valueRange, alpha: 1)
-//        let endValue = ChartViewAnimator.Value(valueRange: chart.valueRange, alpha: 1)
-//        let animator = ChartViewAnimator(animationDuration: 0.3, startValue: startValue, endValue: endValue)
-//        animator.callback = { (finished, value) in
-//            self.reloadData()
-//            if finished {
-//                self.animator = nil
-//            }
-//        }
-//        self.animator = animator
-//        animator.startAnimation()
     }
 
     private class MiniChartDataSource: ChartViewDataSource {
@@ -109,31 +141,40 @@ public class ChartTableViewCell: UITableViewCell {
         }
 
         func numberOfPlots(chartView: ChartViewProtocol) -> Int {
-            return this.chart.plots.count
+            return this.drawingChart.plots.count
         }
 
         func chartView(_ chartView: ChartViewProtocol, plotDataAt idx: Int) -> (plot: Chart.Plot, alpha: CGFloat) {
-            return (this.chart.plots[idx], 1)
+            let plot = this.drawingChart.plots[idx]
+            if let animator = this.animator, plot.identifier == animator.identifier {
+                return (plot, animator.currentValue.alpha)
+            } else {
+                return (plot, 1)
+            }
         }
 
         func timestamps(chartView: ChartViewProtocol) -> [Int64] {
-            return this.chart.timestamps
+            return this.drawingChart.timestamps
         }
 
         func indexRange(chartView: ChartViewProtocol) -> TimeIndexRange {
-            return TimeIndexRange(length: this.chart.timestamps.count)
+            return TimeIndexRange(length: this.drawingChart.timestamps.count)
         }
 
         func timeRange(chartView: ChartViewProtocol) -> TimeRange {
-            return this.chart.timeRange
+            return this.drawingChart.timeRange
         }
 
         func selectedTimeRange(chartView: ChartViewProtocol) -> TimeRange {
-            return this.chart.selectedTimeRange
+            return this.drawingChart.selectedTimeRange
         }
 
         func valueRange(chartView: ChartViewProtocol) -> ValueRange {
-            return this.chart.valueRange
+            if let animator = this.animator {
+                return animator.currentValue.valueRange
+            } else {
+                return this.drawingChart.valueRange
+            }
         }
     }
 
@@ -145,31 +186,40 @@ public class ChartTableViewCell: UITableViewCell {
         }
 
         func numberOfPlots(chartView: ChartViewProtocol) -> Int {
-            return this.chart.plots.count
+            return this.drawingChart.plots.count
         }
 
         func chartView(_ chartView: ChartViewProtocol, plotDataAt idx: Int) -> (plot: Chart.Plot, alpha: CGFloat) {
-            return (this.chart.plots[idx], 1)
+            let plot = this.drawingChart.plots[idx]
+            if let animator = this.animator, plot.identifier == animator.identifier {
+                return (plot, animator.currentValue.alpha)
+            } else {
+                return (plot, 1)
+            }
         }
 
         func timestamps(chartView: ChartViewProtocol) -> [Int64] {
-            return this.chart.timestamps
+            return this.drawingChart.timestamps
         }
 
         func indexRange(chartView: ChartViewProtocol) -> TimeIndexRange {
-            return this.chart.timeIndexRange
+            return this.drawingChart.timeIndexRange
         }
 
         func timeRange(chartView: ChartViewProtocol) -> TimeRange {
-            return this.chart.timeRange
+            return this.drawingChart.timeRange
         }
 
         func selectedTimeRange(chartView: ChartViewProtocol) -> TimeRange {
-            return this.chart.selectedTimeRange
+            return this.drawingChart.selectedTimeRange
         }
 
         func valueRange(chartView: ChartViewProtocol) -> ValueRange {
-            return this.chart.selectedValueRange
+            if let animator = this.animator {
+                return animator.currentValue.valueRange
+            } else {
+                return this.drawingChart.valueRange
+            }
         }
     }
 }
