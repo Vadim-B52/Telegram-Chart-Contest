@@ -5,24 +5,12 @@
 
 import UIKit
 
-public class MiniChartView: UIControl {
+public class MiniChartView: UIControl, ChartViewProtocol {
 
     private let timeSelector = MiniChartTimeSelectorView()
-
-    public var chart: DrawingChart? = nil {
-        didSet {
-            timeSelector.timeRange = chart?.timeRange
-            setNeedsDisplay()
-        }
-    }
-
+    public weak var dataSource: ChartViewDataSource?
     public var selectedTimeRange: TimeRange? {
-        get {
-            return timeSelector.selectedTimeRange
-        }
-        set {
-            timeSelector.selectedTimeRange = newValue
-        }
+        return timeSelector.selectedTimeRange
     }
 
     public override init(frame: CGRect) {
@@ -45,16 +33,34 @@ public class MiniChartView: UIControl {
 
     public override func draw(_ rect: CGRect) {
         super.draw(rect)
-        guard let chart = chart,
+        guard let dataSource = dataSource,
               let ctx = UIGraphicsGetCurrentContext() else {
             return
         }
         let drawingRect = bounds.inset(by: UIEdgeInsets(top: 11, left: 0, bottom: 9, right: 0))
-        let config = ChartPanel.Config(lineWidth: 1)
-        for (idx, _) in chart.plots.enumerated() {
-            let panel = ChartPanel(chart: chart, plotIndex: idx, config: config)
+        let timestamps = dataSource.timestamps(chartView: self)
+        let indexRange = dataSource.indexRange(chartView: self)
+        let timeRange = dataSource.timeRange(chartView: self)
+        let valueRange = dataSource.valueRange(chartView: self)
+        for idx in 0..<dataSource.numberOfPlots(chartView: self) {
+            let (plot, alpha) = dataSource.chartView(self, plotDataAt: idx)
+            let panel = ChartPanel(
+                    timestamps: timestamps,
+                    indexRange: indexRange,
+                    timeRange: timeRange,
+                    valueRange: valueRange,
+                    plot: plot,
+                    alpha: alpha,
+                    lineWidth: 1)
+            
             panel.drawInContext(ctx, rect: drawingRect)
         }
+    }
+
+    public func reloadData() {
+        timeSelector.timeRange = dataSource?.timeRange(chartView: self)
+        timeSelector.selectedTimeRange = dataSource?.selectedTimeRange(chartView: self)
+        setNeedsDisplay()
     }
 
     @objc

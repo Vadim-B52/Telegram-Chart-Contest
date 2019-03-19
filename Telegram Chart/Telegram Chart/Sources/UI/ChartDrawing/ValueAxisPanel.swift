@@ -8,11 +8,11 @@ import UIKit
 // TODO: selectedValueRange!
 public class ValueAxisPanel {
 
-    public let chart: DrawingChart
+    public let valueRange: ValueRange
     public let config: Config
 
-    public init(chart: DrawingChart, config: Config) {
-        self.chart = chart
+    public init(valueRange: ValueRange, config: Config) {
+        self.valueRange = valueRange
         self.config = config
     }
 
@@ -20,7 +20,7 @@ public class ValueAxisPanel {
         let font = UIFont.systemFont(ofSize: 11, weight: UIFont.Weight.light)
         let numberOfLines = 6
         let step = ceil((rect.maxY - rect.minY - 0) / CGFloat(numberOfLines))
-        let calculator = DrawingChart.YCalculator(valueRange: chart.valueRange)
+        let calculator = DrawingChart.YCalculator(valueRange: valueRange)
 
         var rest = rect
         let thinLineWidth = 1 / UIScreen.main.scale

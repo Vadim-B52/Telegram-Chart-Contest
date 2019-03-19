@@ -7,24 +7,21 @@ import UIKit
 
 public class TimeAxisPanel {
 
-    public let chart: DrawingChart
+    public let timeRange: TimeRange
     public let config: Config
 
-    public init(chart: DrawingChart, config: Config) {
-        self.chart = chart
+    public init(timeRange: TimeRange, config: Config) {
+        self.timeRange = timeRange
         self.config = config
     }
 
     public func drawInContext(_ ctx: CGContext, rect: CGRect) {
-        guard let firstTS = chart.timestamps.first else {
-            return
-        }
-
+        let firstTS = timeRange.min
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM\u{00a0}dd"
         let options = NSStringDrawingOptions.usesLineFragmentOrigin
         let attributes: [NSAttributedString.Key: Any]? = [NSAttributedString.Key.foregroundColor: config.textColor]
-        let calculator = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
+        let calculator = DrawingChart.XCalculator(timeRange: timeRange)
         var rest = rect
         
         let sizingDate = Date(timeIntervalSince1970: Double(firstTS) / 1000.0)

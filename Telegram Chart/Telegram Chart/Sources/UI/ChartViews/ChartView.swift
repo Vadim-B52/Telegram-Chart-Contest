@@ -5,7 +5,7 @@
 
 import UIKit
 
-public class ChartView: UIView {
+public class ChartView: UIView, ChartViewProtocol {
 
     private let timeSelector = CrosshairView()
     private var timePanelConfig: TimeAxisPanel.Config!
@@ -17,12 +17,7 @@ public class ChartView: UIView {
         }
     }
 
-    public var chart: DrawingChart? = nil {
-        didSet {
-            setNeedsDisplay()
-            timeSelector.chart = chart
-        }
-    }
+    public weak var dataSource: ChartViewDataSource?
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -48,23 +43,37 @@ public class ChartView: UIView {
 
     public override func draw(_ rect: CGRect) {
         super.draw(rect)
-        guard let chart = chart,
+        guard let dataSource = dataSource,
               let ctx = UIGraphicsGetCurrentContext() else {
             return
         }
+
+        let timestamps = dataSource.timestamps(chartView: self)
+        let indexRange = dataSource.indexRange(chartView: self)
+        let timeRange = dataSource.selectedTimeRange(chartView: self)
+        let valueRange = dataSource.valueRange(chartView: self)
+        let numberOfPlots = dataSource.numberOfPlots(chartView: self)
         
         var (timeRect, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
         chartRect = chartRect.inset(by: UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0))
 
-        let timePanel = TimeAxisPanel(chart: chart, config: timePanelConfig)
+        let timePanel = TimeAxisPanel(timeRange: timeRange, config: timePanelConfig)
         timePanel.drawInContext(ctx, rect: timeRect)
 
-        let valuePanel = ValueAxisPanel(chart: chart, config: valuePanelConfig)
+        let valuePanel = ValueAxisPanel(valueRange: valueRange, config: valuePanelConfig)
         valuePanel.drawInContext(ctx, rect: chartRect)
 
-        let config = ChartPanel.Config(lineWidth: 2)
-        for (idx, _) in chart.plots.enumerated() {
-            let panel = ChartPanel(chart: chart, plotIndex: idx, config: config)
+        for idx in 0..<numberOfPlots {
+            let (plot, alpha) = dataSource.chartView(self, plotDataAt: idx)
+            let panel = ChartPanel(
+                    timestamps: timestamps,
+                    indexRange: indexRange,
+                    timeRange: timeRange,
+                    valueRange: valueRange,
+                    plot: plot,
+                    alpha: alpha,
+                    lineWidth: 2)
+            
             panel.drawInContext(ctx, rect: chartRect)
         }
     }
@@ -73,6 +82,11 @@ public class ChartView: UIView {
         reloadTimePanelConfig()
         reloadValuePanelConfig()
         setNeedsDisplay()
+    }
+
+    public func reloadData() {
+        setNeedsDisplay()
+        // TODO: implement
     }
 
     private func reloadValuePanelConfig() {

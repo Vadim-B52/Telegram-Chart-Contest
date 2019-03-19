@@ -20,7 +20,7 @@ public class CrosshairView: UIView {
         }
     }
 
-    public var chart: DrawingChart? = nil {
+    public var state: CrosshairState? = nil {
         didSet {
             setNeedsDisplay()
             setNeedsLayout()
@@ -44,50 +44,50 @@ public class CrosshairView: UIView {
 
     public override func draw(_ rect: CGRect) {
         super.draw(rect)
-        guard let chart = chart,
+        guard let state = state,
               let idx = crosshairTimeIdx,
               let ctx = UIGraphicsGetCurrentContext() else {
             return
         }
 
-        let panel = CrosshairPanel(chart: chart, timestampIndex: idx)
+        let panel = CrosshairPanel(state: state, timestampIndex: idx)
         panel.drawInContext(ctx, rect: bounds)
     }
 
     public override func layoutSubviews() {
         super.layoutSubviews()
 
-        if let popup = popup, let idx = crosshairTimeIdx, let chart = chart  {
-            var frame = CGRect.zero
-            frame.size = popup.systemLayoutSizeFitting(.zero)
-            let timestamp: Int64 = chart.timestamps[idx]
-            let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
-            let x = calc.x(in: bounds, timestamp: timestamp)
-            frame.origin.x = x - frame.size.width / 2
-
-            for plot in chart.plots {
-                let yCalc = DrawingChart.YCalculator(valueRange: chart.valueRange)
-                let y = yCalc.y(in: bounds, value: plot.values[idx])
-                if frame.contains(CGPoint(x: x, y: y)) {
-                    var frame1 = frame
-                    frame1.origin.x = x - frame.size.width - 10
-                    if bounds.contains(frame1) {
-                        frame = frame1
-                        break
-                    }
-                    frame.origin.x = x + 10
-                    break
-                }
-            }
-
-            if frame.minX < bounds.minX {
-                frame.origin.x = bounds.minX
-            } else if frame.maxX > bounds.maxX {
-                frame.origin.x = bounds.maxX - frame.size.width
-            }
-            popup.frame = frame
-            popup.alpha = bounds.minX <= x && x <= bounds.maxX ? 1 : 0
-        }
+//        if let popup = popup, let idx = crosshairTimeIdx, let chart = chart  {
+//            var frame = CGRect.zero
+//            frame.size = popup.systemLayoutSizeFitting(.zero)
+//            let timestamp: Int64 = chart.timestamps[idx]
+//            let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
+//            let x = calc.x(in: bounds, timestamp: timestamp)
+//            frame.origin.x = x - frame.size.width / 2
+//
+//            for plot in chart.plots {
+//                let yCalc = DrawingChart.YCalculator(valueRange: chart.valueRange)
+//                let y = yCalc.y(in: bounds, value: plot.values[idx])
+//                if frame.contains(CGPoint(x: x, y: y)) {
+//                    var frame1 = frame
+//                    frame1.origin.x = x - frame.size.width - 10
+//                    if bounds.contains(frame1) {
+//                        frame = frame1
+//                        break
+//                    }
+//                    frame.origin.x = x + 10
+//                    break
+//                }
+//            }
+//
+//            if frame.minX < bounds.minX {
+//                frame.origin.x = bounds.minX
+//            } else if frame.maxX > bounds.maxX {
+//                frame.origin.x = bounds.maxX - frame.size.width
+//            }
+//            popup.frame = frame
+//            popup.alpha = bounds.minX <= x && x <= bounds.maxX ? 1 : 0
+//        }
     }
 
     @objc
@@ -105,24 +105,24 @@ public class CrosshairView: UIView {
     }
 
     private func updateCrosshair(point: CGPoint) {
-        guard let chart = chart else {
-            return
-        }
-        let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
-        let ts = calc.timestampAt(x: point.x, rect: bounds)
-        crosshairTimeIdx = chart.closestIdxTo(timestamp: ts)
+//        guard let state = state else {
+//            return
+//        }
+//        let calc = DrawingChart.XCalculator(timeRange: state.selectedTimeRange)
+//        let ts = calc.timestampAt(x: point.x, rect: bounds)
+//        crosshairTimeIdx = state.closestIdxTo(timestamp: ts)
     }
 
     private func updateWithCrosshairIdx() {
-        guard let chart = chart else {
+        guard let state = state else {
 // TODO: fatal error
             return
         }
         if let idx = crosshairTimeIdx {
             let popup = ensurePopupView()
-            let timestamp: Int64 = chart.timestamps[idx]
+            let timestamp: Int64 = state.timestamps[idx]
             popup.timeLabel.attributedText = formatter.popupDateText(timestamp: timestamp)
-            popup.valueLabel.attributedText = formatter.popupValueText(index: idx, plots: chart.plots)
+            popup.valueLabel.attributedText = formatter.popupValueText(index: idx, plots: state.plots)
             setNeedsLayout()
 //            let options: UIView.AnimationOptions = [.beginFromCurrentState, .curveLinear]
 //            UIView.animate(withDuration: 0.05, delay: 0, options: options, animations: {
@@ -192,3 +192,11 @@ public class CrosshairView: UIView {
         }
     }
 }
+
+public struct CrosshairState {
+    public let valueRange: ValueRange
+    public let timeRange: TimeRange
+    public let plots: [Chart.Plot]
+    public let timestamps: [Int64]
+}
+
