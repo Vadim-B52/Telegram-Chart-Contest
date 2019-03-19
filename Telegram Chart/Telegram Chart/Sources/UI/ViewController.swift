@@ -60,7 +60,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
-        guard isChartSection(indexPath.section) else {
+        let section: Int = indexPath.section
+        guard isChartSection(section) else {
             model.switchMode()
             updateSkin()
             return
@@ -69,14 +70,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             return
         }
         let plotIdx = indexPath.row - 1
-        guard model.canChangeVisibilityForChartAt(indexPath.section, plotIndex: plotIdx) else {
+        guard model.canChangeVisibilityForChartAt(section, plotIndex: plotIdx) else {
             UIAlertView(title: "Cannot change", message: "Enable other plot before", delegate: nil, cancelButtonTitle: "Ok").show()
             return
         }
-        model.changeVisibilityForChartAt(indexPath.section, plotIndex: plotIdx)
-        let chartIndexPath = IndexPath(row: 0, section: indexPath.section)
+        model.changeVisibilityForChartAt(section, plotIndex: plotIdx)
+        let chartIndexPath = IndexPath(row: 0, section: section)
         if let chartCell = tableView.cellForRow(at: chartIndexPath) as? ChartTableViewCell {
-            let (chart, state) = model.dataAt(plotIdx)
+            let (chart, state) = model.dataAt(indexPath.section)
             let plotId = chart.plots[plotIdx].identifier
             if state.enabledPlotId.contains(plotId) {
                 chartCell.showPlot(plotId: plotId)

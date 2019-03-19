@@ -5,7 +5,7 @@
 
 import UIKit
 
-public protocol ChartViewProtocol {
+public protocol ChartViewProtocol: AnyObject {
     var delegate: ChartViewDelegate? { get }
 }
 
