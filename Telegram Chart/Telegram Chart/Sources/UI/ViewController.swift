@@ -159,7 +159,7 @@ fileprivate extension ViewController {
         cell.backgroundColor = skin.cellBackgroundColor
         cell.backgroundView?.backgroundColor = skin.cellBackgroundColor
         cell.delegate = self
-        cell.miniChartTimeSelectorViewColorSource = self
+        cell.timeSelectorViewColorSource = self
         cell.chartViewColorSource = self
         let (chart, state) = model.dataAt(indexPath.section)
         cell.display(chart: chart, state: state)

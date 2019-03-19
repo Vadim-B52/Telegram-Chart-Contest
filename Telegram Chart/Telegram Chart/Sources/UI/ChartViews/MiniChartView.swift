@@ -7,38 +7,22 @@ import UIKit
 
 public class MiniChartView: UIControl, ChartViewProtocol {
 
-    private let timeSelector = MiniChartTimeSelectorView()
-
     public weak var delegate: ChartViewDelegate?
 
     public var chart: DrawingChart? {
         didSet {
-            timeSelector.timeRange = chart?.timeRange
-            timeSelector.selectedTimeRange = chart?.selectedTimeRange
             setNeedsDisplay()
         }
-    }
-
-    public var selectedTimeRange: TimeRange? {
-        return timeSelector.selectedTimeRange
     }
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
         contentMode = .redraw
         isOpaque = true
-        addSubview(timeSelector)
-
-        timeSelector.addTarget(self, action: #selector(handleValueChanged), for: .valueChanged)
     }
 
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-    }
-
-    public override func layoutSubviews() {
-        super.layoutSubviews()
-        timeSelector.frame = bounds
     }
 
     public override func draw(_ rect: CGRect) {
@@ -60,22 +44,6 @@ public class MiniChartView: UIControl, ChartViewProtocol {
                     lineWidth: 1)
             
             panel.drawInContext(ctx, rect: drawingRect)
-        }
-    }
-
-    @objc
-    private func handleValueChanged() {
-        sendActions(for: .valueChanged)
-    }
-}
-
-public extension MiniChartView {
-    public weak var miniChartTimeSelectorViewColorSource: MiniChartTimeSelectorViewColorSource? {
-        get {
-            return timeSelector.colorSource
-        }
-        set {
-            timeSelector.colorSource = newValue
         }
     }
 }

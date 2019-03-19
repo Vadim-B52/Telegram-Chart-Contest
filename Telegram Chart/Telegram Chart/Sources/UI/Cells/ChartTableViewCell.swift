@@ -16,6 +16,8 @@ public class ChartTableViewCell: UITableViewCell {
 
     private let chartView = ChartView()
     private let miniChartView = MiniChartView()
+    private let timeSelector = MiniChartTimeSelectorView()
+
     private var chartAnimator: ChartViewAnimator?
     private var miniChartAnimator: ChartViewAnimator?
     private var chart: Chart?
@@ -42,8 +44,10 @@ public class ChartTableViewCell: UITableViewCell {
 
         chartView.translatesAutoresizingMaskIntoConstraints = false
         miniChartView.translatesAutoresizingMaskIntoConstraints = false
+        timeSelector.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(chartView)
         contentView.addSubview(miniChartView)
+        addSubview(timeSelector)
 
         let views = ["chartView": chartView, "miniChartView": miniChartView]
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "V:|[chartView][miniChartView(==60)]|",
@@ -52,8 +56,14 @@ public class ChartTableViewCell: UITableViewCell {
                 options: [], metrics: nil, views: views))
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "H:|-15-[miniChartView]-15-|",
                 options: [], metrics: nil, views: views))
+        NSLayoutConstraint.activate([
+            timeSelector.topAnchor.constraint(equalTo: miniChartView.topAnchor),
+            timeSelector.leadingAnchor.constraint(equalTo: miniChartView.leadingAnchor),
+            timeSelector.bottomAnchor.constraint(equalTo: miniChartView.bottomAnchor),
+            timeSelector.trailingAnchor.constraint(equalTo: miniChartView.trailingAnchor),
+        ])
 
-        miniChartView.addTarget(self, action: #selector(handleValueChanged), for: .valueChanged)
+        timeSelector.addTarget(self, action: #selector(handleValueChanged), for: .valueChanged)
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -63,6 +73,9 @@ public class ChartTableViewCell: UITableViewCell {
     public func display(chart: Chart, state: ChartState) {
         self.chart = chart
         self.state = state
+
+        timeSelector.timeRange = chart.timeRange
+        timeSelector.selectedTimeRange = state.selectedTimeRange
 
         updateChartView()
         updateMiniChartView()
@@ -108,7 +121,7 @@ public class ChartTableViewCell: UITableViewCell {
 
     @objc
     private func handleValueChanged() {
-        guard let selectedTimeRange = miniChartView.selectedTimeRange else {
+        guard let selectedTimeRange = timeSelector.selectedTimeRange else {
             return
         }
         state = state?.byChanging(selectedTimeRange: selectedTimeRange)
@@ -142,18 +155,17 @@ public class ChartTableViewCell: UITableViewCell {
                 plots: plots,
                 timestamps: chart.timestamps,
                 timeRange: chart.timeRange,
-                selectedTimeRange: state.selectedTimeRange,
                 valueRangeCalculation: FullValueRangeCalculation())
     }
 }
 
 public extension ChartTableViewCell {
-    public weak var miniChartTimeSelectorViewColorSource: MiniChartTimeSelectorViewColorSource? {
+    public weak var timeSelectorViewColorSource: MiniChartTimeSelectorViewColorSource? {
         get {
-            return miniChartView.miniChartTimeSelectorViewColorSource
+            return timeSelector.colorSource
         }
         set {
-            miniChartView.miniChartTimeSelectorViewColorSource = newValue
+            timeSelector.colorSource = newValue
         }
     }
 }
