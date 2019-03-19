@@ -7,22 +7,26 @@ import UIKit
 
 public class DrawingChart {
 
+    public let plots: [Chart.Plot]
     public let timestamps: [Int64]
     public let timeRange: TimeRange
     public let selectedTimeRange: TimeRange
-    public let plots: [Chart.Plot]
+    public let valueRangeCalculation: ValueRangeCalculation
 
-    public init(timestamps: [Int64],
+    public init(plots: [Chart.Plot],
+                timestamps: [Int64],
                 timeRange: TimeRange,
                 selectedTimeRange: TimeRange? = nil,
-                plots: [Chart.Plot]) {
+                valueRangeCalculation: ValueRangeCalculation) {
+
+        self.plots = plots
         self.timestamps = timestamps
         self.timeRange = timeRange
         self.selectedTimeRange = selectedTimeRange ?? timeRange
-        self.plots = plots
+        self.valueRangeCalculation = valueRangeCalculation
     }
 
-    public private(set) lazy var timeIndexRange: TimeIndexRange = {
+    public private(set) lazy var indexRange: TimeIndexRange = {
         if selectedTimeRange != timeRange {
             return TimeIndexRange(timestamps: timestamps, timeRange: selectedTimeRange)
         } else {
@@ -31,27 +35,18 @@ public class DrawingChart {
     }()
 
     public private(set) lazy var valueRange: ValueRange = {
-        return ValueRange(ranges: plots.map{ $0.valueRange })
+        return self.valueRangeCalculation.valueRange(plots: plots, indexRange: indexRange)
     }()
-
-    public private(set) lazy var selectedValueRange: ValueRange = {
-        let ranges = plots.map { $0.valueRange(indexRange: timeIndexRange) }
-        return ValueRange(ranges: ranges)
-    }()
-
-    public func changeSelectedTimeRange(_ range: TimeRange?) -> DrawingChart {
-        return DrawingChart(timestamps: timestamps, timeRange: timeRange, selectedTimeRange: range, plots: plots)
-    }
 
     public func closestIdxTo(timestamp: Int64) -> Int {
         if timestamp <= selectedTimeRange.min {
-            return timeIndexRange.startIdx
+            return indexRange.startIdx
         }
         if timestamp >= selectedTimeRange.max {
-            return timeIndexRange.endIdx
+            return indexRange.endIdx
         }
-        var low = timeIndexRange.startIdx
-        var high = timeIndexRange.endIdx
+        var low = indexRange.startIdx
+        var high = indexRange.endIdx
         while low != high {
             let mid = low + (high - low) / 2
             if timestamps[mid] <= timestamp && timestamp <= timestamps[mid + 1] {
@@ -141,3 +136,29 @@ public class DrawingChart {
         }
     }
 }
+
+public protocol ValueRangeCalculation {
+    func valueRange(plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange
+}
+
+public struct StaticValueRangeCalculation: ValueRangeCalculation {
+    public let valueRange: ValueRange
+
+    public func valueRange(plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
+        return valueRange
+    }
+}
+
+public struct FullValueRangeCalculation: ValueRangeCalculation {
+    public func valueRange(plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
+        return ValueRange(ranges: plots.map { $0.valueRange })
+    }
+}
+
+public struct SelectedValueRangeCalculation: ValueRangeCalculation {
+    public func valueRange(plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
+        let ranges = plots.map { $0.valueRange(indexRange: indexRange) }
+        return ValueRange(ranges: ranges)
+    }
+}
+

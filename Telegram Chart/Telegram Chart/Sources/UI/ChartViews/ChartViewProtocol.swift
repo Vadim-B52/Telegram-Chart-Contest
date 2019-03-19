@@ -6,16 +6,9 @@
 import UIKit
 
 public protocol ChartViewProtocol {
-    var dataSource: ChartViewDataSource? { get }
-    func reloadData()
+    var delegate: ChartViewDelegate? { get }
 }
 
-public protocol ChartViewDataSource: AnyObject {
-    func numberOfPlots(chartView: ChartViewProtocol) -> Int
-    func chartView(_ chartView: ChartViewProtocol, plotDataAt idx: Int) -> (plot: Chart.Plot, alpha: CGFloat)
-    func timestamps(chartView: ChartViewProtocol) -> [Int64]
-    func indexRange(chartView: ChartViewProtocol) -> TimeIndexRange
-    func timeRange(chartView: ChartViewProtocol) -> TimeRange
-    func selectedTimeRange(chartView: ChartViewProtocol) -> TimeRange
-    func valueRange(chartView: ChartViewProtocol) -> ValueRange
+public protocol ChartViewDelegate: AnyObject {
+    func chartView(_ chartView: ChartViewProtocol, alphaForPlot plot: Chart.Plot) -> CGFloat
 }

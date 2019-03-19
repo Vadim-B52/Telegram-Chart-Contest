@@ -8,7 +8,17 @@ import UIKit
 public class MiniChartView: UIControl, ChartViewProtocol {
 
     private let timeSelector = MiniChartTimeSelectorView()
-    public weak var dataSource: ChartViewDataSource?
+
+    public weak var delegate: ChartViewDelegate?
+
+    public var chart: DrawingChart? {
+        didSet {
+            timeSelector.timeRange = chart?.timeRange
+            timeSelector.selectedTimeRange = chart?.selectedTimeRange
+            setNeedsDisplay()
+        }
+    }
+
     public var selectedTimeRange: TimeRange? {
         return timeSelector.selectedTimeRange
     }
@@ -33,34 +43,24 @@ public class MiniChartView: UIControl, ChartViewProtocol {
 
     public override func draw(_ rect: CGRect) {
         super.draw(rect)
-        guard let dataSource = dataSource,
+        guard let chart = chart,
               let ctx = UIGraphicsGetCurrentContext() else {
             return
         }
         let drawingRect = bounds.inset(by: UIEdgeInsets(top: 11, left: 0, bottom: 9, right: 0))
-        let timestamps = dataSource.timestamps(chartView: self)
-        let indexRange = dataSource.indexRange(chartView: self)
-        let timeRange = dataSource.timeRange(chartView: self)
-        let valueRange = dataSource.valueRange(chartView: self)
-        for idx in 0..<dataSource.numberOfPlots(chartView: self) {
-            let (plot, alpha) = dataSource.chartView(self, plotDataAt: idx)
+        for plot in chart.plots {
+            let alpha: CGFloat = delegate?.chartView(self, alphaForPlot: plot) ?? 1
             let panel = ChartPanel(
-                    timestamps: timestamps,
-                    indexRange: indexRange,
-                    timeRange: timeRange,
-                    valueRange: valueRange,
+                    timestamps: chart.timestamps,
+                    indexRange: chart.indexRange,
+                    timeRange: chart.timeRange,
+                    valueRange: chart.valueRange,
                     plot: plot,
                     alpha: alpha,
                     lineWidth: 1)
             
             panel.drawInContext(ctx, rect: drawingRect)
         }
-    }
-
-    public func reloadData() {
-        timeSelector.timeRange = dataSource?.timeRange(chartView: self)
-        timeSelector.selectedTimeRange = dataSource?.selectedTimeRange(chartView: self)
-        setNeedsDisplay()
     }
 
     @objc

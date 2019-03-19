@@ -17,7 +17,14 @@ public class ChartView: UIView, ChartViewProtocol {
         }
     }
 
-    public weak var dataSource: ChartViewDataSource?
+    public weak var delegate: ChartViewDelegate?
+
+    public var chart: DrawingChart? {
+        didSet {
+//          TODO: timeSelector.
+            setNeedsDisplay()
+        }
+    }
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -43,33 +50,27 @@ public class ChartView: UIView, ChartViewProtocol {
 
     public override func draw(_ rect: CGRect) {
         super.draw(rect)
-        guard let dataSource = dataSource,
+        guard let chart = chart,
               let ctx = UIGraphicsGetCurrentContext() else {
             return
         }
-
-        let timestamps = dataSource.timestamps(chartView: self)
-        let indexRange = dataSource.indexRange(chartView: self)
-        let timeRange = dataSource.selectedTimeRange(chartView: self)
-        let valueRange = dataSource.valueRange(chartView: self)
-        let numberOfPlots = dataSource.numberOfPlots(chartView: self)
         
         var (timeRect, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
         chartRect = chartRect.inset(by: UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0))
 
-        let timePanel = TimeAxisPanel(timeRange: timeRange, config: timePanelConfig)
+        let timePanel = TimeAxisPanel(timeRange: chart.selectedTimeRange, config: timePanelConfig)
         timePanel.drawInContext(ctx, rect: timeRect)
 
-        let valuePanel = ValueAxisPanel(valueRange: valueRange, config: valuePanelConfig)
+        let valuePanel = ValueAxisPanel(valueRange: chart.valueRange, config: valuePanelConfig)
         valuePanel.drawInContext(ctx, rect: chartRect)
 
-        for idx in 0..<numberOfPlots {
-            let (plot, alpha) = dataSource.chartView(self, plotDataAt: idx)
+        for plot in chart.plots {
+            let alpha: CGFloat = delegate?.chartView(self, alphaForPlot: plot) ?? 1
             let panel = ChartPanel(
-                    timestamps: timestamps,
-                    indexRange: indexRange,
-                    timeRange: timeRange,
-                    valueRange: valueRange,
+                    timestamps: chart.timestamps,
+                    indexRange: chart.indexRange,
+                    timeRange: chart.selectedTimeRange,
+                    valueRange: chart.valueRange,
                     plot: plot,
                     alpha: alpha,
                     lineWidth: 2)
@@ -82,11 +83,6 @@ public class ChartView: UIView, ChartViewProtocol {
         reloadTimePanelConfig()
         reloadValuePanelConfig()
         setNeedsDisplay()
-    }
-
-    public func reloadData() {
-        setNeedsDisplay()
-        // TODO: implement
     }
 
     private func reloadValuePanelConfig() {
