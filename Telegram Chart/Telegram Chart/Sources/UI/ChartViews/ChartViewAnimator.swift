@@ -8,23 +8,24 @@ import UIKit
 public class ChartViewAnimator {
     private weak var displayLink: CADisplayLink?
     private var startTime: CFTimeInterval!
-    public let identifier: String
+    private var applicationObserver: Any?
     public let animationDuration: CFTimeInterval
     public let startValue: Value
     public let endValue: Value
     public private(set) var currentValue: Value
-    public  var callback: ((Bool, Value) -> Void)?
+    public var callback: ((Bool, Value) -> Void)?
 
     deinit {
         displayLink?.invalidate()
+        if let applicationObserver = applicationObserver {
+            NotificationCenter.default.removeObserver(applicationObserver)
+        }
     }
 
-    public init(identifier: String,
-                animationDuration: TimeInterval,
+    public init(animationDuration: TimeInterval,
                 startValue: Value,
                 endValue: Value) {
 
-        self.identifier = identifier
         self.animationDuration = animationDuration
         self.startValue = startValue
         self.endValue = endValue
@@ -32,16 +33,31 @@ public class ChartViewAnimator {
     }
 
     public func startAnimation() {
+        guard self.displayLink == nil else {
+            return
+        }
         let displayLink = CADisplayLink(target: self, selector: #selector(onRenderTime))
-        displayLink.preferredFramesPerSecond = 25
+        displayLink.preferredFramesPerSecond = 30
         displayLink.add(to: RunLoop.main, forMode: .common) // TODO: validate
         self.displayLink = displayLink
         self.startTime = CACurrentMediaTime()
+        applicationObserver = NotificationCenter.default.addObserver(
+                forName: UIApplication.didEnterBackgroundNotification,
+                object: nil,
+                queue: nil
+        ) { [unowned self] _ in
+            self.callback?(true, self.endValue)
+            self.endAnimation()
+        }
     }
 
     public func endAnimation() {
+        guard self.displayLink != nil else {
+            return
+        }
         displayLink?.invalidate()
         displayLink = nil
+        NotificationCenter.default.removeObserver(applicationObserver!)
     }
 
     @objc

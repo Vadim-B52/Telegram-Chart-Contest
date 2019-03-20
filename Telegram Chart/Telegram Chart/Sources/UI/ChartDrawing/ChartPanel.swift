@@ -12,7 +12,6 @@ public class ChartPanel {
     public let timeRange: TimeRange
     public let valueRange: ValueRange
     public let plot: Chart.Plot
-    public let alpha: CGFloat
     public let lineWidth: CGFloat
 
     public init(timestamps: [Int64],
@@ -20,7 +19,6 @@ public class ChartPanel {
                 timeRange: TimeRange,
                 valueRange: ValueRange,
                 plot: Chart.Plot,
-                alpha: CGFloat,
                 lineWidth: CGFloat) {
 
         self.timestamps = timestamps
@@ -28,12 +26,11 @@ public class ChartPanel {
         self.timeRange = timeRange
         self.valueRange = valueRange
         self.plot = plot
-        self.alpha = alpha
         self.lineWidth = lineWidth
     }
 
     public func drawInContext(_ ctx: CGContext, rect: CGRect) {
-        plot.color.withAlphaComponent(alpha).setStroke()
+        plot.color.setStroke()
         ctx.setLineWidth(lineWidth)
 
         let values = plot.values

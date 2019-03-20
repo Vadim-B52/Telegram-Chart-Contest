@@ -6,9 +6,7 @@
 import UIKit
 
 public class MiniChartView: UIControl, ChartViewProtocol {
-
-    public weak var delegate: ChartViewDelegate?
-
+    
     public var chart: DrawingChart? {
         didSet {
             setNeedsDisplay()
@@ -33,14 +31,12 @@ public class MiniChartView: UIControl, ChartViewProtocol {
         }
         let drawingRect = bounds.inset(by: UIEdgeInsets(top: 11, left: 0, bottom: 9, right: 0))
         for plot in chart.plots {
-            let alpha: CGFloat = delegate?.chartView(self, alphaForPlot: plot) ?? 1
             let panel = ChartPanel(
                     timestamps: chart.timestamps,
                     indexRange: chart.indexRange,
                     timeRange: chart.timeRange,
                     valueRange: chart.valueRange,
                     plot: plot,
-                    alpha: alpha,
                     lineWidth: 1)
             
             panel.drawInContext(ctx, rect: drawingRect)

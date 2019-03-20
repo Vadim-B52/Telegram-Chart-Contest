@@ -17,8 +17,6 @@ public class ChartView: UIView, ChartViewProtocol {
         }
     }
 
-    public weak var delegate: ChartViewDelegate?
-
     public var chart: DrawingChart? {
         didSet {
             timeSelector.chart = chart
@@ -65,14 +63,12 @@ public class ChartView: UIView, ChartViewProtocol {
         valuePanel.drawInContext(ctx, rect: chartRect)
 
         for plot in chart.plots {
-            let alpha: CGFloat = delegate?.chartView(self, alphaForPlot: plot) ?? 1
             let panel = ChartPanel(
                     timestamps: chart.timestamps,
                     indexRange: chart.indexRange,
                     timeRange: chart.selectedTimeRange,
                     valueRange: chart.valueRange,
                     plot: plot,
-                    alpha: alpha,
                     lineWidth: 2)
             
             panel.drawInContext(ctx, rect: chartRect)

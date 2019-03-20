@@ -7,9 +7,4 @@ import UIKit
 
 public protocol ChartViewProtocol: AnyObject {
     var chart: DrawingChart? { get set }
-    var delegate: ChartViewDelegate? { get }
-}
-
-public protocol ChartViewDelegate: AnyObject {
-    func chartView(_ chartView: ChartViewProtocol, alphaForPlot plot: Chart.Plot) -> CGFloat
 }
