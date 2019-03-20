@@ -86,26 +86,20 @@ public class ChartTableViewCell: UITableViewCell, ChartViewDelegate {
             return
         }
         let oldChart = chartViewDrawingChart()!
+        let oldMiniChart = miniChartViewDrawingChart()!
         self.state = state.byDisablingPlotWith(identifier: plotId)
         let newChart = chartViewDrawingChart()!
+        let newMiniChart = miniChartViewDrawingChart()!
 
-        let startValue = ChartViewAnimator.Value(valueRange: oldChart.valueRange, alpha: 1)
-        let endValue = ChartViewAnimator.Value(valueRange: newChart.valueRange, alpha: 0)
-        let animator = ChartViewAnimator(identifier: plotId, animationDuration: 0.3, startValue: startValue, endValue: endValue)
-        animator.callback = { (finished, value) in
-            self.chartView.chart = DrawingChart(
-                    plots: oldChart.plots,
-                    timestamps: oldChart.timestamps,
-                    timeRange: oldChart.timeRange,
-                    valueRangeCalculation: StaticValueRangeCalculation(valueRange: value.valueRange))
-
-            if finished {
-                self.chartAnimator = nil
-                self.chartView.chart = newChart
-            }
+        chartAnimator = hideAnimator(chartView: chartView, oldChart: oldChart, newChart: newChart, plotId: plotId) {
+            self.chartAnimator = nil
         }
-        self.chartAnimator = animator
-        animator.startAnimation()
+        chartAnimator?.startAnimation()
+
+        miniChartAnimator = hideAnimator(chartView: miniChartView, oldChart: oldMiniChart, newChart: newMiniChart, plotId: plotId) {
+            self.miniChartAnimator = nil
+        }
+        miniChartAnimator?.startAnimation()
     }
 
     public func showPlot(plotId: String) {
@@ -113,26 +107,20 @@ public class ChartTableViewCell: UITableViewCell, ChartViewDelegate {
             return
         }
         let oldChart = chartViewDrawingChart()!
+        let oldMiniChart = miniChartViewDrawingChart()!
         self.state = state.byEnablingPlotWith(identifier: plotId)
         let newChart = chartViewDrawingChart()!
+        let newMiniChart = miniChartViewDrawingChart()!
 
-        let startValue = ChartViewAnimator.Value(valueRange: oldChart.valueRange, alpha: 0)
-        let endValue = ChartViewAnimator.Value(valueRange: newChart.valueRange, alpha: 1)
-        let animator = ChartViewAnimator(identifier: plotId, animationDuration: 0.3, startValue: startValue, endValue: endValue)
-        animator.callback = { (finished, value) in
-            self.chartView.chart = DrawingChart(
-                    plots: newChart.plots,
-                    timestamps: newChart.timestamps,
-                    timeRange: newChart.timeRange,
-                    valueRangeCalculation: StaticValueRangeCalculation(valueRange: value.valueRange))
-
-            if finished {
-                self.chartAnimator = nil
-                self.chartView.chart = newChart
-            }
+        chartAnimator = showAnimator(chartView: chartView, oldChart: oldChart, newChart: newChart, plotId: plotId) {
+            self.chartAnimator = nil
         }
-        self.chartAnimator = animator
-        animator.startAnimation()
+        chartAnimator?.startAnimation()
+
+        miniChartAnimator = showAnimator(chartView: miniChartView, oldChart: oldMiniChart, newChart: newMiniChart, plotId: plotId) {
+            self.miniChartAnimator = nil
+        }
+        miniChartAnimator?.startAnimation()
     }
 
     @objc
@@ -172,6 +160,54 @@ public class ChartTableViewCell: UITableViewCell, ChartViewDelegate {
                 timestamps: chart.timestamps,
                 timeRange: chart.timeRange,
                 valueRangeCalculation: FullValueRangeCalculation())
+    }
+
+    private func showAnimator(chartView: ChartViewProtocol,
+                              oldChart: DrawingChart,
+                              newChart: DrawingChart,
+                              plotId: String,
+                              completion: @escaping (() -> Void)) -> ChartViewAnimator {
+        let startValue = ChartViewAnimator.Value(valueRange: oldChart.valueRange, alpha: 0)
+        let endValue = ChartViewAnimator.Value(valueRange: newChart.valueRange, alpha: 1)
+        let animator = ChartViewAnimator(identifier: plotId, animationDuration: 0.3, startValue: startValue, endValue: endValue)
+        animator.callback = { (finished, value) in
+            chartView.chart = DrawingChart(
+                    plots: newChart.plots,
+                    timestamps: newChart.timestamps,
+                    timeRange: newChart.timeRange,
+                    selectedTimeRange: newChart.selectedTimeRange,
+                    valueRangeCalculation: StaticValueRangeCalculation(valueRange: value.valueRange))
+
+            if finished {
+                chartView.chart = newChart
+                completion()
+            }
+        }
+        return animator
+    }
+
+    private func hideAnimator(chartView: ChartViewProtocol,
+                              oldChart: DrawingChart,
+                              newChart: DrawingChart,
+                              plotId: String,
+                              completion: @escaping (() -> Void)) -> ChartViewAnimator {
+        let startValue = ChartViewAnimator.Value(valueRange: oldChart.valueRange, alpha: 1)
+        let endValue = ChartViewAnimator.Value(valueRange: newChart.valueRange, alpha: 0)
+        let animator = ChartViewAnimator(identifier: plotId, animationDuration: 0.3, startValue: startValue, endValue: endValue)
+        animator.callback = { (finished, value) in
+            chartView.chart = DrawingChart(
+                    plots: oldChart.plots,
+                    timestamps: oldChart.timestamps,
+                    timeRange: oldChart.timeRange,
+                    selectedTimeRange: oldChart.selectedTimeRange,
+                    valueRangeCalculation: StaticValueRangeCalculation(valueRange: value.valueRange))
+
+            if finished {
+                chartView.chart = newChart
+                completion()
+            }
+        }
+        return animator
     }
 
     public func chartView(_ chartView: ChartViewProtocol, alphaForPlot plot: Chart.Plot) -> CGFloat {

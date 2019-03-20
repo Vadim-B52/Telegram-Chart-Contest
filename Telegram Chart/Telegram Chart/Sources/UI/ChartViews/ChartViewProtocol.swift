@@ -6,6 +6,7 @@
 import UIKit
 
 public protocol ChartViewProtocol: AnyObject {
+    var chart: DrawingChart? { get set }
     var delegate: ChartViewDelegate? { get }
 }
 
