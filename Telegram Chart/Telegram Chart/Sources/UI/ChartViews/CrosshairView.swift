@@ -68,14 +68,14 @@ public class CrosshairView: UIView {
             let timestamp: Int64 = chart.timestamps[idx]
             let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
             let x = calc.x(in: bounds, timestamp: timestamp)
-            frame.origin.x = x - frame.size.width / 2
+            frame.origin.x = x - frame.width / 2
 
             for plot in chart.plots {
                 let yCalc = DrawingChart.YCalculator(valueRange: chart.valueRange)
                 let y = yCalc.y(in: bounds, value: plot.values[idx])
                 if frame.contains(CGPoint(x: x, y: y)) {
                     var frame1 = frame
-                    frame1.origin.x = x - frame.size.width - 10
+                    frame1.origin.x = x - frame.width - 10
                     if bounds.contains(frame1) {
                         frame = frame1
                         break
@@ -88,7 +88,7 @@ public class CrosshairView: UIView {
             if frame.minX < bounds.minX {
                 frame.origin.x = bounds.minX
             } else if frame.maxX > bounds.maxX {
-                frame.origin.x = bounds.maxX - frame.size.width
+                frame.origin.x = bounds.maxX - frame.width
             }
             popup.frame = frame
             popup.alpha = bounds.minX <= x && x <= bounds.maxX ? 1 : 0

@@ -29,7 +29,7 @@ public class TimeAxisPanel {
         let dateSize = sizingStr.boundingRect(with: rest.size, options: options, attributes: attributes, context: nil)
 
         var slice: CGRect
-        while rest.size.width >= dateSize.width {
+        while rest.width >= dateSize.width {
             (slice, rest) = rest.divided(atDistance: ceil(dateSize.width), from: .minXEdge)
             let timestamp = calculator.timestampAt(x: slice.midX, rect: rect)
             let date = Date(timeIntervalSince1970: Double(timestamp) / 1000.0)

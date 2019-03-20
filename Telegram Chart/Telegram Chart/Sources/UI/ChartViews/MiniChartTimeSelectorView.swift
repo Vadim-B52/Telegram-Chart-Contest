@@ -154,7 +154,7 @@ public class MiniChartTimeSelectorView: UIControl {
                 leftRect.origin.x = bounds.minX
             }
             if leftRect.maxX + 20 > rightRect.minX {
-                leftRect.origin.x = rightRect.minX - 20 - leftRect.size.width
+                leftRect.origin.x = rightRect.minX - 20 - leftRect.width
             }
         } else if actionView == rightControl {
             rightRect = rightRect.offsetBy(dx: dx, dy: 0)
@@ -167,6 +167,14 @@ public class MiniChartTimeSelectorView: UIControl {
         } else if actionView == self {
             leftRect = leftRect.offsetBy(dx: dx, dy: 0)
             rightRect = rightRect.offsetBy(dx: dx, dy: 0)
+            let d = rightRect.minX - leftRect.maxX
+            if leftRect.minX < bounds.minX {
+                leftRect.origin.x = bounds.minX
+                rightRect.origin.x = leftRect.maxX + d
+            } else if rightRect.maxX > bounds.maxX {
+                rightRect.origin.x = bounds.maxX - rightRect.width
+                leftRect.origin.x = rightRect.minX - d - leftRect.width
+            }
         }
         
     // TODO: corners

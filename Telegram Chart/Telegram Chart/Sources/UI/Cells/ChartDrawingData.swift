@@ -70,12 +70,12 @@ public class DrawingChart {
 
         public func x(in rect: CGRect, timestamp: Int64) -> CGFloat {
             let t = CGFloat(timestamp - timeRange.min) / CGFloat(timeRange.size)
-            let x = rect.minX + rect.size.width * t
+            let x = rect.minX + rect.width * t
             return x
         }
 
         public func timestampAt(x: CGFloat, rect: CGRect) -> Int64 {
-            let d = (x - rect.minX) / rect.size.width
+            let d = (x - rect.minX) / rect.width
             let timestamp = CGFloat(timeRange.min) + CGFloat(timeRange.size) * d
             return Int64(timestamp)
         }
