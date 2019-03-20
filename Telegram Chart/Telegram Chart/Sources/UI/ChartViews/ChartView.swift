@@ -21,7 +21,7 @@ public class ChartView: UIView, ChartViewProtocol {
 
     public var chart: DrawingChart? {
         didSet {
-//          TODO: timeSelector.
+            timeSelector.chart = chart
             setNeedsDisplay()
         }
     }
