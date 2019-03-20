@@ -22,6 +22,11 @@ public class CrosshairView: UIView {
 
     public var chart: DrawingChart? = nil {
         didSet {
+            if chart == nil {
+                crosshairTimeIdx = nil
+                popup?.removeFromSuperview()
+                popup = nil
+            }
             setNeedsDisplay()
             setNeedsLayout()
         }

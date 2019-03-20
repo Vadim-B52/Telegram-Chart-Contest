@@ -144,6 +144,7 @@ public struct TimeIndexRange {
         for i in 0..<timestamps.count - 1 {
             if timestamps[i] == timeRange.min || (timestamps[i] < timeRange.min && timeRange.min < timestamps[i + 1]) {
                 startIdx = i
+                length = 1
                 break
             }
         }

@@ -72,6 +72,14 @@ public class ChartTableViewCell: UITableViewCell, ChartViewDelegate {
         fatalError("init(coder:) has not been implemented")
     }
 
+    public override func prepareForReuse() {
+        super.prepareForReuse()
+        chartView.chart = nil
+        miniChartView.chart = nil
+        timeSelector.timeRange = nil
+        timeSelector.selectedTimeRange = nil
+    }
+
     public func display(chart: Chart, state: ChartState) {
         self.chart = chart
         self.state = state
