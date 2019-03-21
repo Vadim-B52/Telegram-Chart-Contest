@@ -24,8 +24,7 @@ public class ChartTableViewCell: UITableViewCell {
     public weak var delegate: ChartTableViewCellDelegate?
     public weak var chartViewColorSource: ChartViewColorSource? {
         didSet {
-            chartViewContainer.chartView1.colorSource = chartViewColorSource
-            chartViewContainer.chartView2.colorSource = chartViewColorSource
+            chartViewContainer.chartViews.forEach { $0.colorSource = chartViewColorSource }
         }
     }
     public weak var timeSelectorViewColorSource: MiniChartTimeSelectorViewColorSource? {

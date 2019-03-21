@@ -73,14 +73,22 @@ public class MiniChartTimeSelectorView: UIControl {
         var (slice0, rest0) = rect.divided(atDistance: calculator.x(in: rect, timestamp: leftRange.max), from: .minXEdge)
         leftDimming.frame = slice0.insetBy(dx: 0, dy: 2)
         (slice0, rest0) = rest0.divided(atDistance: 11, from: .minXEdge)
+        let updateLeftControlCorners = leftControl.bounds.size != slice0.size
         leftControl.frame = slice0
+        if updateLeftControlCorners {
+            updateRoundedCorners(control: leftControl)
+        }
 
         var (slice1, rest1) = rect.divided(atDistance: calculator.x(in: rect, timestamp: rightRange.min), from: .minXEdge)
         rightDimming.frame = rest1.insetBy(dx: 0, dy: 2)
 
         var rest = rest0.intersection(slice1)
         (slice1, rest) = rest.divided(atDistance: 11, from: .maxXEdge)
+        let updateRightControlCorners: Bool = rightControl.bounds.size != slice1.size
         rightControl.frame = slice1
+        if updateRightControlCorners {
+            updateRoundedCorners(control: rightControl)
+        }
 
         (slice0, rest) = rest.divided(atDistance: 1, from: .minYEdge)
         (slice1, rest) = rest.divided(atDistance: 1, from: .maxYEdge)
@@ -102,11 +110,21 @@ public class MiniChartTimeSelectorView: UIControl {
     }
 
     private func prepareControl(_ control: UILabel) {
-        control.layer.cornerRadius = 2
-        control.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
         control.text = "\u{203A}"
         control.textAlignment = .center
         control.clipsToBounds = true
+    }
+
+    private func updateRoundedCorners(control: UIView) {
+        let path = UIBezierPath(
+                roundedRect: control.bounds,
+                byRoundingCorners: [.topRight, .bottomRight],
+                cornerRadii: CGSize(width: 2, height: 2))
+
+        let maskLayer = CAShapeLayer()
+        maskLayer.frame = control.bounds
+        maskLayer.path = path.cgPath
+        control.layer.mask = maskLayer
     }
 
     @objc

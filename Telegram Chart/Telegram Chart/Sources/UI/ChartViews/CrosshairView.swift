@@ -37,7 +37,7 @@ public class CrosshairView: UIView {
         backgroundColor = .clear
         contentMode = .redraw
         isOpaque = true
-        longPress.minimumPressDuration = 0.3
+        longPress.minimumPressDuration = 0.125
         longPress.addTarget(self, action: #selector(handleLongPress))
         addGestureRecognizer(longPress)
     }

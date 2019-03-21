@@ -7,8 +7,8 @@ import UIKit
 
 public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIView, CAAnimationDelegate {
 
-    public let chartView1: ChartViewType
-    public let chartView2: ChartViewType
+    private let chartView1: ChartViewType
+    private let chartView2: ChartViewType
     private var chart: DrawingChart?
     private var transitionState: TransitionState<ChartViewType>? {
         didSet {
@@ -17,6 +17,8 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
             }
         }
     }
+
+    public var chartViews: [ChartViewType] { return [chartView1, chartView2] }
 
     public init(_ factory: @autoclosure () -> ChartViewType) {
         chartView1 = factory()
