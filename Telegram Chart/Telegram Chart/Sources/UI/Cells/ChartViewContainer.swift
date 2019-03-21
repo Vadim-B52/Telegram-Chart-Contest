@@ -121,26 +121,29 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
             return
         }
         let elapsed = state.formula(opacity)
+        let yAxisCalculation = state.endChart.yAxisCalculation
 
         let minD = state.endChart.valueRange.min - state.beginChart.valueRange.min
         let maxD = state.endChart.valueRange.max - state.beginChart.valueRange.max
-        let valueRange = ValueRange(
+        let valueRange = yAxisCalculation.yAxis(valueRange:  ValueRange(
                 min: state.beginChart.valueRange.min + Int64(elapsed * Float(minD)),
-                max: state.beginChart.valueRange.max + Int64(elapsed * Float(maxD)))
+                max: state.beginChart.valueRange.max + Int64(elapsed * Float(maxD)))).valueRange
 
         state.beginChartReceiver.chart = DrawingChart(
                 plots: state.beginChart.plots,
                 timestamps: state.beginChart.timestamps,
                 timeRange: state.beginChart.timeRange,
                 selectedTimeRange: state.beginChart.selectedTimeRange,
-                valueRangeCalculation: StaticDrawingValuesCalculation(valueRange: valueRange))
+                valueRangeCalculation: StaticValueRangeCalculation(valueRange: valueRange),
+                yAxisCalculation: yAxisCalculation)
 
         state.endChartReceiver.chart = DrawingChart(
                 plots: state.endChart.plots,
                 timestamps: state.endChart.timestamps,
                 timeRange: state.endChart.timeRange,
                 selectedTimeRange: state.endChart.selectedTimeRange,
-                valueRangeCalculation: StaticDrawingValuesCalculation(valueRange: valueRange))
+                valueRangeCalculation: StaticValueRangeCalculation(valueRange: valueRange),
+                yAxisCalculation: yAxisCalculation)
     }
 
     private struct TransitionState<T> {
