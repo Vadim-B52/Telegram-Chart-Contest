@@ -71,7 +71,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         let plotIdx = indexPath.row - 1
         guard model.canChangeVisibilityForChartAt(section, plotIndex: plotIdx) else {
-            UIAlertView(title: "Cannot change", message: "Enable other plot before", delegate: nil, cancelButtonTitle: "Ok").show()
+            let title = "Cannot change"
+            let msg = "Enable other plot before"
+            let alert = UIAlertController(title: title, message: msg, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Ok", style: .default))
+            present(alert, animated: true)
             return
         }
         model.changeVisibilityForChartAt(section, plotIndex: plotIdx)
