@@ -59,7 +59,7 @@ public class ChartView: UIView, ChartViewProtocol {
         let timePanel = TimeAxisPanel(timeRange: chart.selectedTimeRange, config: timePanelConfig)
         timePanel.drawInContext(ctx, rect: timeRect)
 
-        let valuePanel = ValueAxisPanel(valueRange: chart.valueRange, config: valuePanelConfig)
+        let valuePanel = ValueAxisPanel(chart: chart, config: valuePanelConfig)
         valuePanel.drawInContext(ctx, rect: chartRect)
 
         for plot in chart.plots {

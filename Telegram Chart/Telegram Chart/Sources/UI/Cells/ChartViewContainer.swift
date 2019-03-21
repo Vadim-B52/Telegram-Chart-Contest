@@ -133,14 +133,14 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
                 timestamps: state.beginChart.timestamps,
                 timeRange: state.beginChart.timeRange,
                 selectedTimeRange: state.beginChart.selectedTimeRange,
-                valueRangeCalculation: StaticValueRangeCalculation(valueRange: valueRange))
+                valueRangeCalculation: StaticDrawingValuesCalculation(valueRange: valueRange))
 
         state.endChartReceiver.chart = DrawingChart(
                 plots: state.endChart.plots,
                 timestamps: state.endChart.timestamps,
                 timeRange: state.endChart.timeRange,
                 selectedTimeRange: state.endChart.selectedTimeRange,
-                valueRangeCalculation: StaticValueRangeCalculation(valueRange: valueRange))
+                valueRangeCalculation: StaticDrawingValuesCalculation(valueRange: valueRange))
     }
 
     private struct TransitionState<T> {

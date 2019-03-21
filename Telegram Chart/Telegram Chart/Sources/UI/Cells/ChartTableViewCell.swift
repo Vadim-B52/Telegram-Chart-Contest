@@ -121,7 +121,7 @@ public class ChartTableViewCell: UITableViewCell {
                 timestamps: chart.timestamps,
                 timeRange: chart.timeRange,
                 selectedTimeRange: state.selectedTimeRange,
-                valueRangeCalculation: SelectedValueRangeCalculation())
+                valueRangeCalculation: SelectedDrawingValuesCalculation())
     }
 
     private func miniChartViewDrawingChart() -> DrawingChart? {
@@ -135,6 +135,6 @@ public class ChartTableViewCell: UITableViewCell {
                 plots: plots,
                 timestamps: chart.timestamps,
                 timeRange: chart.timeRange,
-                valueRangeCalculation: FullValueRangeCalculation())
+                valueRangeCalculation: FullDrawingValuesCalculation())
     }
 }

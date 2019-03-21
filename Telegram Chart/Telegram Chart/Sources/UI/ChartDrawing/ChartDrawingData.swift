@@ -11,13 +11,13 @@ public class DrawingChart {
     public let timestamps: [Int64]
     public let timeRange: TimeRange
     public let selectedTimeRange: TimeRange
-    public let valueRangeCalculation: ValueRangeCalculation
+    public let valueRangeCalculation: DrawingValuesCalculation
 
     public init(plots: [Chart.Plot],
                 timestamps: [Int64],
                 timeRange: TimeRange,
                 selectedTimeRange: TimeRange? = nil,
-                valueRangeCalculation: ValueRangeCalculation) {
+                valueRangeCalculation: DrawingValuesCalculation) {
 
         self.plots = plots
         self.timestamps = timestamps
@@ -34,8 +34,11 @@ public class DrawingChart {
         }
     }()
 
-    public private(set) lazy var valueRange: ValueRange = {
-        return self.valueRangeCalculation.valueRange(plots: plots, indexRange: indexRange)
+    public private(set) lazy var valueRange: ValueRange = yAxis.valueRange
+    public private(set) lazy var yAxisValues: [Int64] = yAxis.axisValues
+
+    private lazy var yAxis: DrawingValuesCalculationResult = {
+        return self.valueRangeCalculation.drawingValues(plots: plots, indexRange: indexRange)
     }()
 
     public func closestIdxTo(timestamp: Int64) -> Int {
@@ -137,28 +140,73 @@ public class DrawingChart {
     }
 }
 
-public protocol ValueRangeCalculation {
-    func valueRange(plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange
+public protocol DrawingValuesCalculation {
+    func drawingValues(plots: [Chart.Plot], indexRange: TimeIndexRange) -> DrawingValuesCalculationResult
 }
 
-public struct StaticValueRangeCalculation: ValueRangeCalculation {
+public struct DrawingValuesCalculationResult {
+    let valueRange: ValueRange
+    let axisValues: [Int64]
+
+    private static let pows = [
+        1,
+        1_0,
+        1_00,
+        1_000,
+        1_000_0,
+        1_000_00,
+        1_000_000,
+        1_000_000_0,
+        1_000_000_00,
+        1_000_000_000,
+    ]
+
+    // TODO: draft implementation!
+    public init(valueRange: ValueRange) {
+        var values = [Int64]()
+        let sz = valueRange.size
+        var p = 0
+        let n: Int64 = 5
+        let ds = sz / n
+        let pows = DrawingValuesCalculationResult.pows
+        while ds > pows[p] {
+            p += 1
+        }
+        let step: Int64
+        if p > 1 {
+            let t = pow(10.0, Double(p - 1))
+            step = Int64(round(Double(ds) / t) * t)
+        } else {
+            step = 1
+        }
+        let zero = valueRange.min / step * step
+        for i in 0...n {
+            values.append(zero + i * step)
+        }
+
+        self.valueRange = ValueRange(min: min(valueRange.min, zero), max: max(valueRange.max, values.last!))
+        self.axisValues = values
+    }
+}
+
+public struct StaticDrawingValuesCalculation: DrawingValuesCalculation {
     public let valueRange: ValueRange
 
-    public func valueRange(plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
-        return valueRange
+    public func drawingValues(plots: [Chart.Plot], indexRange: TimeIndexRange) -> DrawingValuesCalculationResult {
+        return DrawingValuesCalculationResult(valueRange: valueRange)
     }
 }
 
-public struct FullValueRangeCalculation: ValueRangeCalculation {
-    public func valueRange(plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
-        return ValueRange(ranges: plots.map { $0.valueRange })
+public struct FullDrawingValuesCalculation: DrawingValuesCalculation {
+    public func drawingValues(plots: [Chart.Plot], indexRange: TimeIndexRange) -> DrawingValuesCalculationResult {
+        return DrawingValuesCalculationResult(valueRange: ValueRange(ranges: plots.map { $0.valueRange }))
     }
 }
 
-public struct SelectedValueRangeCalculation: ValueRangeCalculation {
-    public func valueRange(plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
+public struct SelectedDrawingValuesCalculation: DrawingValuesCalculation {
+    public func drawingValues(plots: [Chart.Plot], indexRange: TimeIndexRange) -> DrawingValuesCalculationResult {
         let ranges = plots.map { $0.valueRange(indexRange: indexRange) }
-        return ValueRange(ranges: ranges)
+        return DrawingValuesCalculationResult(valueRange: ValueRange(ranges: ranges))
     }
 }
 

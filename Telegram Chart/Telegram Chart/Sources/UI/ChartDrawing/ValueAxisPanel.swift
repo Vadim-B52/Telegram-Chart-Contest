@@ -8,48 +8,34 @@ import UIKit
 // TODO: selectedValueRange!
 public class ValueAxisPanel {
 
-    public let valueRange: ValueRange
+    public let chart: DrawingChart
     public let config: Config
 
-    public init(valueRange: ValueRange, config: Config) {
-        self.valueRange = valueRange
+    public init(chart: DrawingChart, config: Config) {
+        self.chart = chart
         self.config = config
     }
 
     public func drawInContext(_ ctx: CGContext, rect: CGRect) {
         let font = UIFont.systemFont(ofSize: 11, weight: UIFont.Weight.light)
-        let numberOfLines = 6
-        let step = ceil((rect.maxY - rect.minY - 0) / CGFloat(numberOfLines))
-        let calculator = DrawingChart.YCalculator(valueRange: valueRange)
+        let calculator = DrawingChart.YCalculator(valueRange: chart.valueRange)
 
         var rest = rect
         let thinLineWidth = 1 / UIScreen.main.scale
         let options = NSStringDrawingOptions.usesLineFragmentOrigin
         let attributes: [NSAttributedString.Key: Any]? = [NSAttributedString.Key.foregroundColor: config.textColor]
 
-        config.zeroAxisColor.setFill()
-
-        var slice, line: CGRect
-        (slice, rest) = rest.divided(atDistance: step, from: .maxYEdge)
-        (line, _) = slice.divided(atDistance: thinLineWidth, from: .maxYEdge)
-        ctx.fill(line)
-
-        (slice, _) = slice.divided(atDistance: font.lineHeight, from: .maxYEdge)
-        let value = calculator.valueAt(y: line.minY, rect: rect)
-        let str = "\(value)"
-        str.draw(with: slice, options: options, attributes: attributes, context: nil)
-
-        config.axisColor.setFill()
-        for _ in 1..<numberOfLines {
-            var slice, line: CGRect
-            (slice, rest) = rest.divided(atDistance: step, from: .maxYEdge)
-            (line, _) = slice.divided(atDistance: thinLineWidth, from: .maxYEdge)
+        for (idx, val) in chart.yAxisValues.enumerated() {
+            if idx == 0 {
+                config.zeroAxisColor.setFill()
+            } else {
+                config.axisColor.setFill()
+            }
+            let y = calculator.y(in: rect, value: val)
+            let line = CGRect(x: rect.minX, y: y, width: rect.width, height: thinLineWidth)
+            let textRect = CGRect(x: rect.minX, y: y - font.lineHeight, width: rect.width, height: font.lineHeight)
             ctx.fill(line)
-
-            (slice, _) = slice.divided(atDistance: font.lineHeight, from: .maxYEdge)
-            let value = calculator.valueAt(y: line.minY, rect: rect)
-            let str = "\(value)"
-            str.draw(with: slice, options: options, attributes: attributes, context: nil)
+            "\(val)".draw(with: textRect, options: options, attributes: attributes, context: nil)
         }
     }
 
