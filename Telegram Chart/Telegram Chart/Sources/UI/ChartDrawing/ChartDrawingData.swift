@@ -40,9 +40,12 @@ public class DrawingChart {
     public private(set) lazy var valueRange: ValueRange = yAxis.valueRange
     public private(set) lazy var yAxisValues: [Int64] = yAxis.axisValues
 
+    public private(set) lazy var rawValueRange: ValueRange = {
+        return valueRangeCalculation.valueRange(plots: plots, indexRange: indexRange)
+    }()
+
     private lazy var yAxis: YAxisCalculationResult = {
-        let valueRange = valueRangeCalculation.valueRange(plots: plots, indexRange: indexRange)
-        return yAxisCalculation.yAxis(valueRange: valueRange)
+        return yAxisCalculation.yAxis(valueRange: rawValueRange)
     }()
 
     public func closestIdxTo(timestamp: Int64) -> Int {
