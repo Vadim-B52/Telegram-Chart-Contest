@@ -5,16 +5,16 @@
 
 import UIKit
 
-public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIView {
+public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIView, CAAnimationDelegate {
 
-    let chartView: ChartViewType
-    let transitioningChartView: ChartViewType
-    private var animator: ChartViewAnimator?
+    public let chartView: ChartViewType
+    public let animatableChartView: ChartViewType
     private var chart: DrawingChart?
+    private var transitionState: TransitionState?
 
     public init(_ factory: @autoclosure () -> ChartViewType) {
         chartView = factory()
-        transitioningChartView = factory()
+        animatableChartView = factory()
         super.init(frame: .zero)
 
         chartView.backgroundColor = .clear
@@ -22,10 +22,10 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
         chartView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         addSubview(chartView)
 
-        transitioningChartView.backgroundColor = .clear
-        transitioningChartView.frame = .zero
-        transitioningChartView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        addSubview(transitioningChartView)
+        animatableChartView.backgroundColor = .clear
+        animatableChartView.frame = .zero
+        animatableChartView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        addSubview(animatableChartView)
     }
 
     @available(*, unavailable)
@@ -37,63 +37,101 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
         defer {
             self.chart = chart0
         }
-        guard animated, let chart = chart0, let prevChart = self.chart, animator == nil else {
-            animator?.endAnimation()
+        guard animated, transitionState == nil, let chart = chart0, let prevChart = self.chart else {
             performDeadTransitionToChart(chart0)
             return
         }
-        performAnimatedTransitionToChart(chart, oldChart: prevChart)
+        performAnimatedTransitionToChart(chart, previousChart: prevChart)
     }
 
     private func performDeadTransitionToChart(_ chart: DrawingChart?) {
-        animator = nil
-        chartView.alpha = 1
         chartView.chart = chart
-        transitioningChartView.isHidden = true
-        transitioningChartView.chart = nil
+        animatableChartView.chart = nil
+        animatableChartView.layer.opacity = 0
+        transitionState = nil
+        animatableChartView.layer.removeAllAnimations()
     }
 
-    private func performAnimatedTransitionToChart(_ newChart: DrawingChart, oldChart: DrawingChart) {
-        let startValue = ChartViewAnimator.Value(valueRange: oldChart.valueRange, alpha: 0)
-        let endValue = ChartViewAnimator.Value(valueRange: newChart.valueRange, alpha: 1)
-        let toShow = oldChart.plots.count < newChart.plots.count
+    private func performAnimatedTransitionToChart(_ chart: DrawingChart, previousChart: DrawingChart) {
+        let link = CADisplayLink(target: self, selector: #selector(onRenderTime))
+        link.preferredFramesPerSecond = 30
+        link.add(to: .main, forMode: .common)
 
-        transitioningChartView.alpha = 1
-        transitioningChartView.isHidden = false
-        transitioningChartView.chart = oldChart
+        let animation = CABasicAnimation(keyPath: "opacity")
+        animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        animation.duration = 0.3
+        animation.delegate = self
+        animation.isRemovedOnCompletion = false
 
-        let animator = ChartViewAnimator(animationDuration: 0.3, startValue: startValue, endValue: endValue)
-        animator.callback = { [weak self] (finished, value) in
-            guard let self = self else {
-                return
-            }
-
-            // TODO: remove bool
-            if toShow {
-                self.chartView.alpha = value.alpha
-            } else {
-                self.transitioningChartView.alpha = 1 - value.alpha
-            }
-
-            self.chartView.chart = DrawingChart(
-                    plots: newChart.plots,
-                    timestamps: newChart.timestamps,
-                    timeRange: newChart.timeRange,
-                    selectedTimeRange: newChart.selectedTimeRange,
-                    valueRangeCalculation: StaticValueRangeCalculation(valueRange: value.valueRange))
-
-            self.transitioningChartView.chart = DrawingChart(
-                    plots: oldChart.plots,
-                    timestamps: oldChart.timestamps,
-                    timeRange: oldChart.timeRange,
-                    selectedTimeRange: oldChart.selectedTimeRange,
-                    valueRangeCalculation: StaticValueRangeCalculation(valueRange: value.valueRange))
-
-            if finished {
-                self.performDeadTransitionToChart(newChart)
-            }
+        let toShowPlot = previousChart.plots.count < chart.plots.count
+        if toShowPlot {
+            animatableChartView.layer.opacity = 0
+            animation.fromValue = 0
+            animation.toValue = 1
+            transitionState = TransitionState(
+                    displayLink: link,
+                    formula: { $0 },
+                    beginChart: previousChart,
+                    endChart: chart,
+                    beginChartReceiver: chartView,
+                    endChartReceiver: animatableChartView)
+        } else {
+            animatableChartView.layer.opacity = 1
+            animation.fromValue = 1
+            animation.toValue = 0
+            transitionState = TransitionState(
+                    displayLink: link,
+                    formula: { 1 - $0 },
+                    beginChart: previousChart,
+                    endChart: chart,
+                    beginChartReceiver: animatableChartView,
+                    endChartReceiver: chartView)
         }
-        self.animator = animator
-        animator.startAnimation()
+        animatableChartView.layer.add(animation, forKey: "opacityAnimation")
+    }
+
+    public func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
+        guard let state = transitionState else {
+            return
+        }
+        state.displayLink.invalidate()
+        performDeadTransitionToChart(state.endChart)
+    }
+
+    @objc
+    private func onRenderTime() {
+        guard let state = transitionState, let opacity = animatableChartView.layer.presentation()?.opacity else {
+            return
+        }
+        let elapsed = state.formula(opacity)
+
+        let minD = state.endChart.valueRange.min - state.beginChart.valueRange.min
+        let maxD = state.endChart.valueRange.max - state.beginChart.valueRange.max
+        let valueRange = ValueRange(
+                min: state.beginChart.valueRange.min + Int64(elapsed * Float(minD)),
+                max: state.beginChart.valueRange.max + Int64(elapsed * Float(maxD)))
+
+        state.beginChartReceiver.chart = DrawingChart(
+                plots: state.beginChart.plots,
+                timestamps: state.beginChart.timestamps,
+                timeRange: state.beginChart.timeRange,
+                selectedTimeRange: state.beginChart.selectedTimeRange,
+                valueRangeCalculation: StaticValueRangeCalculation(valueRange: valueRange))
+
+        state.endChartReceiver.chart = DrawingChart(
+                plots: state.endChart.plots,
+                timestamps: state.endChart.timestamps,
+                timeRange: state.endChart.timeRange,
+                selectedTimeRange: state.endChart.selectedTimeRange,
+                valueRangeCalculation: StaticValueRangeCalculation(valueRange: valueRange))
+    }
+
+    private struct TransitionState {
+        let displayLink: CADisplayLink
+        let formula: ((Float) -> Float)
+        let beginChart: DrawingChart
+        let endChart: DrawingChart
+        let beginChartReceiver: ChartViewProtocol
+        let endChartReceiver: ChartViewProtocol
     }
 }

@@ -25,7 +25,7 @@ public class ChartTableViewCell: UITableViewCell {
     public weak var chartViewColorSource: ChartViewColorSource? {
         didSet {
             chartViewContainer.chartView.colorSource = chartViewColorSource
-            chartViewContainer.transitioningChartView.colorSource = chartViewColorSource
+            chartViewContainer.animatableChartView.colorSource = chartViewColorSource
         }
     }
     public weak var timeSelectorViewColorSource: MiniChartTimeSelectorViewColorSource? {
