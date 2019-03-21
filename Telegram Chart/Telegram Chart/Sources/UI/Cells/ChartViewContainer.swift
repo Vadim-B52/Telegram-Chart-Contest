@@ -7,25 +7,31 @@ import UIKit
 
 public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIView, CAAnimationDelegate {
 
-    public let chartView: ChartViewType
-    public let animatableChartView: ChartViewType
+    public let chartView1: ChartViewType
+    public let chartView2: ChartViewType
     private var chart: DrawingChart?
-    private var transitionState: TransitionState?
+    private var transitionState: TransitionState<ChartViewType>? {
+        didSet {
+            if let oldValue = oldValue {
+                oldValue.displayLink.invalidate()
+            }
+        }
+    }
 
     public init(_ factory: @autoclosure () -> ChartViewType) {
-        chartView = factory()
-        animatableChartView = factory()
+        chartView1 = factory()
+        chartView2 = factory()
         super.init(frame: .zero)
 
-        chartView.backgroundColor = .clear
-        chartView.frame = .zero
-        chartView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        addSubview(chartView)
+        chartView1.backgroundColor = .clear
+        chartView1.frame = .zero
+        chartView1.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        addSubview(chartView1)
 
-        animatableChartView.backgroundColor = .clear
-        animatableChartView.frame = .zero
-        animatableChartView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        addSubview(animatableChartView)
+        chartView2.backgroundColor = .clear
+        chartView2.frame = .zero
+        chartView2.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        addSubview(chartView2)
     }
 
     @available(*, unavailable)
@@ -45,14 +51,21 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
     }
 
     private func performDeadTransitionToChart(_ chart: DrawingChart?) {
-        chartView.chart = chart
-        animatableChartView.chart = nil
-        animatableChartView.layer.opacity = 0
         transitionState = nil
-        animatableChartView.layer.removeAllAnimations()
+        chartView1.chart = chart
+        chartView2.chart = nil
+        chartView1.layer.opacity = 1
+        chartView2.layer.opacity = 0
+        chartView1.layer.removeAllAnimations()
+        chartView2.layer.removeAllAnimations()
     }
 
     private func performAnimatedTransitionToChart(_ chart: DrawingChart, previousChart: DrawingChart) {
+        chartView1.chart = previousChart
+        chartView2.chart = previousChart
+        chartView1.layer.opacity = 1
+        chartView2.layer.opacity = 1
+
         let link = CADisplayLink(target: self, selector: #selector(onRenderTime))
         link.preferredFramesPerSecond = 30
         link.add(to: .main, forMode: .common)
@@ -61,11 +74,10 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
         animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
         animation.duration = 0.3
         animation.delegate = self
-        animation.isRemovedOnCompletion = false
 
         let toShowPlot = previousChart.plots.count < chart.plots.count
         if toShowPlot {
-            animatableChartView.layer.opacity = 0
+            chartView2.layer.opacity = 1
             animation.fromValue = 0
             animation.toValue = 1
             transitionState = TransitionState(
@@ -73,10 +85,10 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
                     formula: { $0 },
                     beginChart: previousChart,
                     endChart: chart,
-                    beginChartReceiver: chartView,
-                    endChartReceiver: animatableChartView)
+                    beginChartReceiver: chartView1,
+                    endChartReceiver: chartView2)
         } else {
-            animatableChartView.layer.opacity = 1
+            chartView2.layer.opacity = 0
             animation.fromValue = 1
             animation.toValue = 0
             transitionState = TransitionState(
@@ -84,23 +96,26 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
                     formula: { 1 - $0 },
                     beginChart: previousChart,
                     endChart: chart,
-                    beginChartReceiver: animatableChartView,
-                    endChartReceiver: chartView)
+                    beginChartReceiver: chartView2,
+                    endChartReceiver: chartView1)
         }
-        animatableChartView.layer.add(animation, forKey: "opacityAnimation")
+        chartView2.layer.add(animation, forKey: "opacityAnimation")
     }
 
     public func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         guard let state = transitionState else {
             return
         }
-        state.displayLink.invalidate()
-        performDeadTransitionToChart(state.endChart)
+        transitionState = nil
+        state.endChartReceiver.chart = chart
+        state.beginChartReceiver.chart = nil
+        state.endChartReceiver.layer.opacity = 1
+        state.beginChartReceiver.layer.opacity = 0
     }
 
     @objc
     private func onRenderTime() {
-        guard let state = transitionState, let opacity = animatableChartView.layer.presentation()?.opacity else {
+        guard let state = transitionState, let opacity = chartView2.layer.presentation()?.opacity else {
             return
         }
         let elapsed = state.formula(opacity)
@@ -126,12 +141,12 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
                 valueRangeCalculation: StaticValueRangeCalculation(valueRange: valueRange))
     }
 
-    private struct TransitionState {
+    private struct TransitionState<T> {
         let displayLink: CADisplayLink
         let formula: ((Float) -> Float)
         let beginChart: DrawingChart
         let endChart: DrawingChart
-        let beginChartReceiver: ChartViewProtocol
-        let endChartReceiver: ChartViewProtocol
+        let beginChartReceiver: T
+        let endChartReceiver: T
     }
 }
