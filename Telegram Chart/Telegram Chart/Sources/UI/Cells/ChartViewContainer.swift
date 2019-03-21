@@ -69,7 +69,6 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
         chartView2.layer.opacity = 1
 
         let link = CADisplayLink(target: self, selector: #selector(onRenderTime))
-        link.preferredFramesPerSecond = 30
         link.add(to: .main, forMode: .common)
 
         let animation = CABasicAnimation(keyPath: "opacity")

@@ -181,6 +181,7 @@ public struct ValueRangeHasYAxis: YAxisCalculation {
         1_000_000_000,
     ]
 
+    // TODO: fix draft IMPL
     public func yAxis(valueRange: ValueRange) -> YAxisCalculationResult {
         var values = [Int64]()
         let sz = valueRange.size
@@ -196,7 +197,7 @@ public struct ValueRangeHasYAxis: YAxisCalculation {
             let t = pow(10.0, Double(p - 1))
             step = Int64(round(Double(ds) / t) * t)
         } else {
-            step = 1
+            step = max(1, sz / n)
         }
         let zero = valueRange.min / step * step
         for i in 0...n {
