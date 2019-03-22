@@ -7,7 +7,7 @@ import UIKit
 
 public class ChartView: UIView, ChartViewProtocol {
 
-    private let timeSelector = CrosshairView()
+    private let crosshairView = CrosshairView()
     private var timePanelConfig: TimeAxisPanel.Config!
     private var valuePanelConfig: ValueAxisPanel.Config!
 
@@ -19,7 +19,7 @@ public class ChartView: UIView, ChartViewProtocol {
 
     public var chart: DrawingChart? {
         didSet {
-            timeSelector.chart = chart
+            crosshairView.chart = chart
             setNeedsDisplay()
         }
     }
@@ -28,14 +28,15 @@ public class ChartView: UIView, ChartViewProtocol {
         super.init(frame: frame)
         contentMode = .redraw
         isOpaque = true
-        
-        timeSelector.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(timeSelector)
+
+        crosshairView.colorSource = self
+        crosshairView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(crosshairView)
         NSLayoutConstraint.activate([
-            timeSelector.topAnchor.constraint(equalTo: topAnchor, constant: 20),
-            timeSelector.leadingAnchor.constraint(equalTo: leadingAnchor),
-            timeSelector.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24),
-            timeSelector.trailingAnchor.constraint(equalTo: trailingAnchor),
+            crosshairView.topAnchor.constraint(equalTo: topAnchor, constant: 20),
+            crosshairView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            crosshairView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24),
+            crosshairView.trailingAnchor.constraint(equalTo: trailingAnchor),
         ])
         
         reloadColors()
@@ -76,6 +77,7 @@ public class ChartView: UIView, ChartViewProtocol {
     }
 
     public func reloadColors() {
+        crosshairView.reloadColors()
         reloadTimePanelConfig()
         reloadValuePanelConfig()
         setNeedsDisplay()
@@ -105,10 +107,21 @@ public class ChartView: UIView, ChartViewProtocol {
     }
 }
 
+extension ChartView: CrosshairViewColorSource {
+    public func pointFillColor(crosshairView: CrosshairView) -> UIColor {
+        return colorSource?.backgroundColor(chartView: self) ?? UIColor.white
+    }
+
+    public func lineColor(crosshairView: CrosshairView) -> UIColor {
+        return colorSource?.zeroValueAxisColor(chartView: self) ?? UIColor.gray
+    }
+}
+
 public protocol ChartViewColorSource: AnyObject {
     func valueAxisColor(chartView: ChartView) -> UIColor
     func zeroValueAxisColor(chartView: ChartView) -> UIColor
     func chartAxisLabelColor(chartView: ChartView) -> UIColor
     func popupBackgroundColor(chartView: ChartView) -> UIColor
     func popupLabelColor(chartView: ChartView) -> UIColor
+    func backgroundColor(chartView: ChartView) -> UIColor
 }

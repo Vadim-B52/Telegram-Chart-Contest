@@ -20,6 +20,14 @@ public class CrosshairView: UIView {
         }
     }
 
+    private var crosshairConfig = CrosshairPanel.Config(pointFillColor: .clear, lineColor: .gray)
+
+    public weak var colorSource: CrosshairViewColorSource? {
+        didSet {
+            reloadColors()
+        }
+    }
+
     public var chart: DrawingChart? = nil {
         didSet {
             if chart == nil {
@@ -55,7 +63,7 @@ public class CrosshairView: UIView {
             return
         }
 
-        let panel = CrosshairPanel(chart: chart, timestampIndex: idx)
+        let panel = CrosshairPanel(chart: chart, timestampIndex: idx, config: crosshairConfig)
         panel.drawInContext(ctx, rect: bounds)
     }
 
@@ -93,6 +101,17 @@ public class CrosshairView: UIView {
             popup.frame = frame
             popup.alpha = bounds.minX <= x && x <= bounds.maxX ? 1 : 0
         }
+    }
+
+    public func reloadColors() {
+        guard let colorSource = colorSource else {
+            return
+        }
+        crosshairConfig = CrosshairPanel.Config(
+                pointFillColor: colorSource.pointFillColor(crosshairView: self),
+                lineColor: colorSource.lineColor(crosshairView: self))
+
+        setNeedsDisplay()
     }
 
     @objc
@@ -196,4 +215,9 @@ public class CrosshairView: UIView {
             fatalError("init(coder:) has not been implemented")
         }
     }
+}
+
+public protocol CrosshairViewColorSource: AnyObject {
+    func pointFillColor(crosshairView: CrosshairView) -> UIColor
+    func lineColor(crosshairView: CrosshairView) -> UIColor
 }

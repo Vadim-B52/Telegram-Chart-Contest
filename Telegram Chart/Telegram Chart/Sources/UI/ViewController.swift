@@ -229,6 +229,10 @@ extension ViewController: ChartViewColorSource {
     public func popupLabelColor(chartView: ChartView) -> UIColor {
         return skin.popupLabelColor
     }
+
+    public func backgroundColor(chartView: ChartView) -> UIColor {
+        return skin.cellBackgroundColor
+    }
 }
 
 extension ViewController: ChartTableViewCellDelegate {

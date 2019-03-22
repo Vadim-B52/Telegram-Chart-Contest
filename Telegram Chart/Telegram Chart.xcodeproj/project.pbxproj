@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		6AC710D129DADD88ED4B4E25 /* ChartClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71E1470CB6775F9CA41BA /* ChartClient.swift */; };
 		6AC713A923BFECA23488860A /* CrosshairView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC715096E2D394D012B9201 /* CrosshairView.swift */; };
+		6AC713C9F6AFFE68F4AA6B0D /* ScreenHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC713A024D7DADDC16C0CA3 /* ScreenHelper.swift */; };
 		6AC714191C0737A814D1A877 /* ChartTimeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71FCB29C5626EA888BBDE /* ChartTimeSelectorView.swift */; };
 		6AC7150428B2635F24CD07F3 /* ValueAxisPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC7172228330B7244FC78BC /* ValueAxisPanel.swift */; };
 		6AC7166DAA209E433B4D861C /* ChartViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71ABE093B2186770EDD25 /* ChartViewContainer.swift */; };
@@ -52,6 +53,7 @@
 		6AC7120BA3BC285553BA4F18 /* CrosshairPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrosshairPanel.swift; sourceTree = "<group>"; };
 		6AC712480BA5369ECEAD436E /* ChartDrawingData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartDrawingData.swift; sourceTree = "<group>"; };
 		6AC712854E421161A8F67D8C /* ChartViewProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartViewProtocol.swift; sourceTree = "<group>"; };
+		6AC713A024D7DADDC16C0CA3 /* ScreenHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenHelper.swift; sourceTree = "<group>"; };
 		6AC715096E2D394D012B9201 /* CrosshairView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrosshairView.swift; sourceTree = "<group>"; };
 		6AC715D6F57BFF6CEAC49574 /* Chart.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chart.swift; sourceTree = "<group>"; };
 		6AC7172228330B7244FC78BC /* ValueAxisPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValueAxisPanel.swift; sourceTree = "<group>"; };
@@ -139,6 +141,7 @@
 				6AC7172228330B7244FC78BC /* ValueAxisPanel.swift */,
 				6AC7120BA3BC285553BA4F18 /* CrosshairPanel.swift */,
 				6AC712480BA5369ECEAD436E /* ChartDrawingData.swift */,
+				6AC713A024D7DADDC16C0CA3 /* ScreenHelper.swift */,
 			);
 			path = ChartDrawing;
 			sourceTree = "<group>";
@@ -367,6 +370,7 @@
 				6AC7197FE8F0D2A196ECA129 /* ChartTableViewCell.swift in Sources */,
 				6AC71ECAE35E6F18EE7D5411 /* ChartDrawingData.swift in Sources */,
 				6AC7166DAA209E433B4D861C /* ChartViewContainer.swift in Sources */,
+				6AC713C9F6AFFE68F4AA6B0D /* ScreenHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
