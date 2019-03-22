@@ -115,6 +115,14 @@ extension ChartView: CrosshairViewColorSource {
     public func lineColor(crosshairView: CrosshairView) -> UIColor {
         return colorSource?.zeroValueAxisColor(chartView: self) ?? UIColor.gray
     }
+
+    public func popupBackgroundColor(crosshairView: CrosshairView) -> UIColor {
+        return colorSource?.popupBackgroundColor(chartView: self) ?? UIColor.gray
+    }
+
+    public func popupTextColor(crosshairView: CrosshairView) -> UIColor {
+        return colorSource?.popupLabelColor(chartView: self) ?? UIColor.white
+    }
 }
 
 public protocol ChartViewColorSource: AnyObject {

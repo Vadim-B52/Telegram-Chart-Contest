@@ -107,9 +107,13 @@ public class CrosshairView: UIView {
         guard let colorSource = colorSource else {
             return
         }
+
         crosshairConfig = CrosshairPanel.Config(
                 pointFillColor: colorSource.pointFillColor(crosshairView: self),
                 lineColor: colorSource.lineColor(crosshairView: self))
+
+        popup?.backgroundColor = colorSource.popupBackgroundColor(crosshairView: self)
+        popup?.timeLabel.textColor = colorSource.popupTextColor(crosshairView: self)
 
         setNeedsDisplay()
     }
@@ -168,9 +172,15 @@ public class CrosshairView: UIView {
         view.translatesAutoresizingMaskIntoConstraints = false
         addSubview(view)
         popup = view
+        if let colorSource = colorSource {
+            view.backgroundColor = colorSource.popupBackgroundColor(crosshairView: self)
+            view.timeLabel.textColor = colorSource.popupTextColor(crosshairView: self)
+        }
         return view
     }
+}
 
+fileprivate extension CrosshairView {
     private class PopupView: UIView {
 
         let timeLabel = UILabel()
@@ -183,7 +193,7 @@ public class CrosshairView: UIView {
             backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
             layer.cornerRadius = 4
 
-            let font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.semibold)
+            let font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.bold)
             timeLabel.numberOfLines = 0
             timeLabel.font = font
             valueLabel.numberOfLines = 0
@@ -220,4 +230,6 @@ public class CrosshairView: UIView {
 public protocol CrosshairViewColorSource: AnyObject {
     func pointFillColor(crosshairView: CrosshairView) -> UIColor
     func lineColor(crosshairView: CrosshairView) -> UIColor
+    func popupBackgroundColor(crosshairView: CrosshairView) -> UIColor
+    func popupTextColor(crosshairView: CrosshairView) -> UIColor
 }
