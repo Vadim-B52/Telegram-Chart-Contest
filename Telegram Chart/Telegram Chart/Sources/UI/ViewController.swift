@@ -240,6 +240,6 @@ extension ViewController: ChartTableViewCellDelegate {
         guard let indexPath = tableView.indexPath(for: cell) else {
             return
         }
-        model.updateSelectedTimeRange(timeRange, at: indexPath.row)
+        model.updateSelectedTimeRange(timeRange, at: indexPath.section)
     }
 }
