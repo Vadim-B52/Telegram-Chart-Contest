@@ -72,6 +72,7 @@ public class CrosshairView: UIView {
 
         if let popup = popup, let idx = crosshairTimeIdx, let chart = chart  {
             var frame = CGRect.zero
+            frame.origin.y = 6
             frame.size = popup.systemLayoutSizeFitting(.zero)
             let timestamp: Int64 = chart.timestamps[idx]
             let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
