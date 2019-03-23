@@ -17,23 +17,19 @@ public class TimeAxisPanel {
 
     public func drawInContext(_ ctx: CGContext, rect: CGRect) {
         let firstTS = timeRange.min
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM\u{00a0}dd"
+        let formatter = ChartTextFormatter.shared
         let options = NSStringDrawingOptions.usesLineFragmentOrigin
         let attributes: [NSAttributedString.Key: Any]? = [NSAttributedString.Key.foregroundColor: config.textColor]
         let calculator = DrawingChart.XCalculator(timeRange: timeRange)
         var rest = rect
-        
-        let sizingDate = Date(timeIntervalSince1970: Double(firstTS) / 1000.0)
-        let sizingStr = formatter.string(from: sizingDate)
+        let sizingStr = formatter.axisDateText(timestamp: firstTS)
         let dateSize = sizingStr.boundingRect(with: rest.size, options: options, attributes: attributes, context: nil)
 
         var slice: CGRect
         while rest.width >= dateSize.width {
             (slice, rest) = rest.divided(atDistance: ceil(dateSize.width), from: .minXEdge)
             let timestamp = calculator.timestampAt(x: slice.midX, rect: rect)
-            let date = Date(timeIntervalSince1970: Double(timestamp) / 1000.0)
-            let str = formatter.string(from: date)
+            let str = formatter.axisDateText(timestamp: timestamp)
             slice.origin.y = rest.origin.y + floor((rest.size.height - dateSize.height) / 2)
             slice.size.height = ceil(dateSize.size.height)
             str.draw(with: slice, options: options, attributes: attributes, context: nil)

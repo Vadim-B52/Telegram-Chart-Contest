@@ -9,7 +9,6 @@ public class CrosshairView: UIView {
 
     private let longPress = UILongPressGestureRecognizer()
     private var popup: PopupView?
-    private lazy var formatter = DrawingChart.Formatter()
 
     private var crosshairTimeIdx: Int? {
         didSet {
@@ -150,6 +149,7 @@ public class CrosshairView: UIView {
         if let idx = crosshairTimeIdx {
             let popup = ensurePopupView()
             let timestamp: Int64 = chart.timestamps[idx]
+            let formatter = ChartTextFormatter.shared
             popup.timeLabel.attributedText = formatter.popupDateText(timestamp: timestamp)
             popup.valueLabel.attributedText = formatter.popupValueText(index: idx, plots: chart.plots)
             setNeedsLayout()
@@ -211,11 +211,11 @@ fileprivate extension CrosshairView {
                     metrics: nil,
                     views: views))
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
-                    withVisualFormat: "V:|-9-[time]->=9-|",
+                    withVisualFormat: "V:|-5-[time]->=5-|",
                     metrics: nil,
                     views: views))
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
-                    withVisualFormat: "V:|-9-[value]-9@249-|",
+                    withVisualFormat: "V:|-5-[value]-5@249-|",
                     metrics: nil,
                     views: views))
         }

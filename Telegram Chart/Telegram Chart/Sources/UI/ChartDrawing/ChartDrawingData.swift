@@ -120,43 +120,6 @@ public class DrawingChart {
             return CGPoint(x: x, y: y)
         }
     }
-
-    public class Formatter {
-
-        private lazy var popupFormatter: DateFormatter = {
-            let formatter = DateFormatter()
-            formatter.dateStyle = .medium
-            return formatter
-        }()
-
-        func popupDateText(timestamp: Int64) -> NSAttributedString {
-            let date = Date(timeIntervalSince1970: TimeInterval(timestamp / 1000))
-            let string = popupFormatter.string(from: date)
-            let style = paragraphStyle(alignment: .left)
-            return NSAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle: style])
-        }
-
-        func popupValueText(index idx: Int, plots: [Chart.Plot]) -> NSAttributedString {
-            let str = NSMutableAttributedString()
-            for plot in plots {
-                let attrs = [NSAttributedString.Key.foregroundColor: plot.color]
-                let value = NSAttributedString(string: "\(plot.values[idx])\n", attributes: attrs)
-                str.append(value)
-            }
-            let fullRange = NSRange(location: 0, length: str.length)
-            let style = paragraphStyle(alignment: .right)
-            str.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: fullRange)
-            str.replaceCharacters(in: NSRange(location: str.length - 1, length: 1), with: "")
-            return str
-        }
-
-        private func paragraphStyle(alignment: NSTextAlignment) -> NSMutableParagraphStyle {
-            let paragraph = NSMutableParagraphStyle()
-            paragraph.lineSpacing = 3
-            paragraph.alignment = alignment
-            return paragraph
-        }
-    }
 }
 
 public protocol ValueRangeCalculation {
