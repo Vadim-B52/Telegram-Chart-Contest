@@ -8,7 +8,8 @@ import UIKit
 public class ChartView: UIView, ChartViewProtocol {
 
     private let crosshairView = CrosshairView()
-    private var timePanelConfig: TimeAxisPanel.Config!
+    private let timeAxisView = TimeAxisView()
+//    private var timePanelConfig: TimeAxisPanel.Config!
     private var valuePanelConfig: ValueAxisPanel.Config!
 
     public weak var timeAxisDelegate: ChartViewTimeAxisDelegate?
@@ -30,6 +31,7 @@ public class ChartView: UIView, ChartViewProtocol {
     public var chart: DrawingChart? {
         didSet {
             crosshairView.chart = chart
+            timeAxisView.chart = chart
             setNeedsDisplay()
         }
     }
@@ -39,14 +41,23 @@ public class ChartView: UIView, ChartViewProtocol {
         contentMode = .redraw
         isOpaque = true
 
+        timeAxisView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(timeAxisView)
+
         crosshairView.colorSource = self
         crosshairView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(crosshairView)
+
         NSLayoutConstraint.activate([
             crosshairView.topAnchor.constraint(equalTo: topAnchor),
             crosshairView.leadingAnchor.constraint(equalTo: leadingAnchor),
             crosshairView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24),
             crosshairView.trailingAnchor.constraint(equalTo: trailingAnchor),
+
+            timeAxisView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            timeAxisView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            timeAxisView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            timeAxisView.heightAnchor.constraint(equalToConstant: 24)
         ])
         
         reloadColors()
@@ -78,11 +89,11 @@ public class ChartView: UIView, ChartViewProtocol {
         let bounds = integralBounds
         let (timeRect, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
         let oldTimeAxisDescription = self.timeAxisDescription
-        let timePanel = TimeAxisPanel(chart: chart, description: oldTimeAxisDescription, config: timePanelConfig)
-        let timeAxisDescription = timePanel.drawInContext(ctx, rect: timeRect)
-        if timeAxisDescription != oldTimeAxisDescription {
-            self.timeAxisDescription = timeAxisDescription
-        }
+//        let timePanel = TimeAxisPanel(chart: chart, description: oldTimeAxisDescription, config: timePanelConfig)
+//        let timeAxisDescription = timePanel.drawInContext(ctx, rect: timeRect)
+//        if timeAxisDescription != oldTimeAxisDescription {
+//            self.timeAxisDescription = timeAxisDescription
+//        }
 
         let valuePanel = ValueAxisPanel(chart: chart, config: valuePanelConfig)
         valuePanel.drawInContext(ctx, rect: chartRect)
@@ -102,7 +113,7 @@ public class ChartView: UIView, ChartViewProtocol {
 
     public func reloadColors() {
         crosshairView.reloadColors()
-        reloadTimePanelConfig()
+//        reloadTimePanelConfig()
         reloadValuePanelConfig()
         setNeedsDisplay()
     }
@@ -121,14 +132,14 @@ public class ChartView: UIView, ChartViewProtocol {
                 textColor: colorSource.chartAxisLabelColor(chartView: self))
     }
 
-    private func reloadTimePanelConfig() {
-        guard let colorSource = colorSource else {
-            timePanelConfig = TimeAxisPanel.Config(textColor: .gray)
-            return
-        }
-        timePanelConfig = TimeAxisPanel.Config(textColor: colorSource.chartAxisLabelColor(chartView: self))
-
-    }
+//    private func reloadTimePanelConfig() {
+//        guard let colorSource = colorSource else {
+//            timePanelConfig = TimeAxisPanel.Config(textColor: .gray)
+//            return
+//        }
+//        timePanelConfig = TimeAxisPanel.Config(textColor: colorSource.chartAxisLabelColor(chartView: self))
+//
+//    }
 }
 
 extension ChartView: CrosshairViewColorSource {
