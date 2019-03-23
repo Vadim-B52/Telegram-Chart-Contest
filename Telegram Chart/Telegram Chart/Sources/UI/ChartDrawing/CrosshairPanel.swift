@@ -16,7 +16,7 @@ public struct CrosshairPanel {
 
         let xCalc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
         let timestamp = chart.timestamps[timestampIndex]
-        let x = xCalc.x(in: rect, timestamp: timestamp)
+        let x = floor(xCalc.x(in: rect, timestamp: timestamp))
         var line = rect
         line.origin.x = x
         line.size.width = thinLineWidth

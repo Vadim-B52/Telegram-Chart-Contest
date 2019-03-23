@@ -29,6 +29,7 @@ public class MiniChartView: UIControl, ChartViewProtocol {
               let ctx = UIGraphicsGetCurrentContext() else {
             return
         }
+        let bounds = integralBounds
         let drawingRect = bounds.inset(by: UIEdgeInsets(top: 11, left: 0, bottom: 9, right: 0))
         for plot in chart.plots {
             let panel = ChartPanel(

@@ -78,7 +78,7 @@ public class ChartView: UIView, ChartViewProtocol {
               let ctx = UIGraphicsGetCurrentContext() else {
             return
         }
-        
+        let bounds = integralBounds
         let (timeRect, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
         let oldTimeAxisDescription = self.timeAxisDescription
         let timePanel = TimeAxisPanel(chart: chart, description: oldTimeAxisDescription, config: timePanelConfig)
@@ -119,7 +119,7 @@ public class ChartView: UIView, ChartViewProtocol {
             return
         }
         valuePanelConfig = ValueAxisPanel.Config(
-                axisColor: colorSource.zeroValueAxisColor(chartView: self),
+                axisColor: colorSource.valueAxisColor(chartView: self),
                 zeroAxisColor: colorSource.zeroValueAxisColor(chartView: self),
                 textColor: colorSource.chartAxisLabelColor(chartView: self))
     }
