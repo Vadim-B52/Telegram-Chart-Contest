@@ -8,14 +8,14 @@ import UIKit
 public class DrawingChart {
 
     public let plots: [Chart.Plot]
-    public let timestamps: [Int64]
+    public let timestamps: [Chart.Time]
     public let timeRange: TimeRange
     public let selectedTimeRange: TimeRange
     public let valueRangeCalculation: ValueRangeCalculation
     public let yAxisCalculation: YAxisCalculation
 
     public init(plots: [Chart.Plot],
-                timestamps: [Int64],
+                timestamps: [Chart.Time],
                 timeRange: TimeRange,
                 selectedTimeRange: TimeRange? = nil,
                 valueRangeCalculation: ValueRangeCalculation,

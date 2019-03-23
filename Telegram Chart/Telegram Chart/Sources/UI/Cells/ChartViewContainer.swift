@@ -125,8 +125,8 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
         let minD = state.endChart.rawValueRange.min - state.beginChart.rawValueRange.min
         let maxD = state.endChart.rawValueRange.max - state.beginChart.rawValueRange.max
         let valueRange = ValueRange(
-                min: state.beginChart.rawValueRange.min + Int64(elapsed * Float(minD)),
-                max: state.beginChart.rawValueRange.max + Int64(elapsed * Float(maxD)))
+                min: state.beginChart.rawValueRange.min + Chart.Value(elapsed * Float(minD)),
+                max: state.beginChart.rawValueRange.max + Chart.Value(elapsed * Float(maxD)))
 
         state.beginChartReceiver.chart = DrawingChart(
                 plots: state.beginChart.plots,

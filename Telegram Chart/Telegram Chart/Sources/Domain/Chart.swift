@@ -8,8 +8,12 @@ import UIKit
 // TODO: add validation
 public class Chart {
 
+    // TODO: create types for all data
+    public typealias Time = Int64
+    public typealias Value = Int64
+
     public let plots: [Plot]
-    public let timestamps: [Int64]
+    public let timestamps: [Chart.Time]
 
     public init(timestamps: [Int64], plots: [Plot]) {
         self.timestamps = timestamps
@@ -28,7 +32,7 @@ public class Chart {
         public let identifier: String
         public let name: String
         public let color: UIColor
-        public let values: [Int64]
+        public let values: [Chart.Value]
 
         public init(identifier: String,
                          name: String,
@@ -53,23 +57,23 @@ public class Chart {
 }
 
 public struct ValueRange {
-    public var min: Int64
-    public var max: Int64
-    public var size: Int64
+    public var min: Chart.Value
+    public var max: Chart.Value
+    public var size: Chart.Value
 
-    public init(min: Int64, max: Int64) {
+    public init(min: Chart.Value, max: Chart.Value) {
         self.min = min
         self.max = max
         size = max - min
     }
 
-    public init(value: Int64, idx: Int) {
+    public init(value: Chart.Value) {
         min = value
         max = value
         size = 0
     }
 
-    fileprivate init(values: [Int64], indexRange: TimeIndexRange? = nil) {
+    fileprivate init(values: [Chart.Value], indexRange: TimeIndexRange? = nil) {
         guard values.count > 1 else {
             fatalError("Invalid plot")
         }
@@ -106,21 +110,21 @@ public struct ValueRange {
 }
 
 public struct TimeRange: Equatable {
-    public let min: Int64
-    public let max: Int64
-    public let size: Int64
+    public let min: Chart.Time
+    public let max: Chart.Time
+    public let size: Chart.Time
 
-    public init(min: Int64, max: Int64) {
+    public init(min: Chart.Time, max: Chart.Time) {
         self.min = min
         self.max = max
         size = max - min
     }
 
-    public func beforeTimestamp(_ timestamp: Int64) -> TimeRange {
+    public func beforeTimestamp(_ timestamp: Chart.Time) -> TimeRange {
         return TimeRange(min: min, max: timestamp)
     }
 
-    public func afterTimestamp(_ timestamp: Int64) -> TimeRange {
+    public func afterTimestamp(_ timestamp: Chart.Time) -> TimeRange {
         return TimeRange(min: timestamp, max: max)
     }
 }
@@ -137,7 +141,7 @@ public struct TimeIndexRange {
         self.length = length
     }
 
-    public init(timestamps: [Int64], timeRange: TimeRange) {
+    public init(timestamps: [Chart.Time], timeRange: TimeRange) {
         var startIdx = 0
         var length = 0
 
