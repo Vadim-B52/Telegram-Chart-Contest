@@ -72,8 +72,7 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
         link.add(to: .main, forMode: .common)
 
         let animation = CABasicAnimation(keyPath: "opacity")
-        animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-        animation.duration = 0.3
+        animation.duration = 0.4
         animation.delegate = self
 
         let toShowPlot = previousChart.plots.count < chart.plots.count
@@ -81,6 +80,7 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
             chartView2.layer.opacity = 1
             animation.fromValue = 0
             animation.toValue = 1
+            animation.timingFunction = CAMediaTimingFunction(name: .easeIn)
             transitionState = TransitionState(
                     displayLink: link,
                     formula: { $0 },
@@ -92,6 +92,7 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
             chartView2.layer.opacity = 0
             animation.fromValue = 1
             animation.toValue = 0
+            animation.timingFunction = CAMediaTimingFunction(name: .easeOut)
             transitionState = TransitionState(
                     displayLink: link,
                     formula: { 1 - $0 },
