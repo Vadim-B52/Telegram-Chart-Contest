@@ -38,7 +38,7 @@ public class DrawingChart {
     }()
 
     public private(set) lazy var valueRange: ValueRange = yAxis.valueRange
-    public private(set) lazy var yAxisValues: [Int64] = yAxis.axisValues
+    public private(set) lazy var axisValues: YAxisValues = yAxis.yAxisValues
 
     public private(set) lazy var rawValueRange: ValueRange = {
         return valueRangeCalculation.valueRange(plots: plots, indexRange: indexRange)
@@ -169,12 +169,19 @@ public protocol YAxisCalculation {
 
 public struct YAxisCalculationResult {
     let valueRange: ValueRange
-    let axisValues: [Int64]
+    let yAxisValues: YAxisValues
+}
+
+public struct YAxisValues {
+    public let zero: Int64
+    public let step: Int64
+
+    public static let no = YAxisValues(zero: -1, step: -1)
 }
 
 public struct ValueRangeNoYAxisStrategy: YAxisCalculation {
     public func yAxis(valueRange: ValueRange) -> YAxisCalculationResult {
-        return YAxisCalculationResult(valueRange: valueRange, axisValues: [])
+        return YAxisCalculationResult(valueRange: valueRange, yAxisValues: .no)
     }
 }
 
@@ -195,7 +202,6 @@ public struct ValueRangeHasYAxis: YAxisCalculation {
 
     // TODO: fix draft IMPL
     public func yAxis(valueRange: ValueRange) -> YAxisCalculationResult {
-        var values = [Int64]()
         let sz = valueRange.size
         var p = 0
         let n = 5
@@ -212,14 +218,9 @@ public struct ValueRangeHasYAxis: YAxisCalculation {
             step = max(1, sz / Int64(n))
         }
         let zero = valueRange.min / step * step
-        for i: Int64 in 0...Int64(n) {
-            values.append(zero + i * step)
-        }
-
-        let maxAxisValue: Int64 = values[n]
         return YAxisCalculationResult(
-                valueRange: ValueRange(min: min(valueRange.min, zero), max: max(valueRange.max, maxAxisValue) + step / 2),
-                axisValues: values)
+                valueRange: ValueRange(min: min(valueRange.min, zero), max: valueRange.max + step / 2),
+                yAxisValues: YAxisValues(zero: zero, step: step))
     }
 }
 

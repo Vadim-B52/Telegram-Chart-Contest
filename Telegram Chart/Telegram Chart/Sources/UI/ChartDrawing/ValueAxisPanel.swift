@@ -5,11 +5,15 @@
 
 import UIKit
 
-// TODO: selectedValueRange!
 public class ValueAxisPanel {
-
     public let chart: DrawingChart
     public let config: Config
+
+    private lazy var calculator: DrawingChart.YCalculator = DrawingChart.YCalculator(valueRange: chart.valueRange)
+    private lazy var font: UIFont = UIFont.systemFont(ofSize: 11, weight: UIFont.Weight.light)
+    private lazy var  thinLineWidth = ScreenHelper.thinLineWidth
+    private lazy var  options = NSStringDrawingOptions.usesLineFragmentOrigin
+    private lazy var  attributes: [NSAttributedString.Key: Any]? = [NSAttributedString.Key.foregroundColor: config.textColor]
 
     public init(chart: DrawingChart, config: Config) {
         self.chart = chart
@@ -17,25 +21,27 @@ public class ValueAxisPanel {
     }
 
     public func drawInContext(_ ctx: CGContext, rect: CGRect) {
-        let font = UIFont.systemFont(ofSize: 11, weight: UIFont.Weight.light)
-        let calculator = DrawingChart.YCalculator(valueRange: chart.valueRange)
-
-        let thinLineWidth = ScreenHelper.thinLineWidth
-        let options = NSStringDrawingOptions.usesLineFragmentOrigin
-        let attributes: [NSAttributedString.Key: Any]? = [NSAttributedString.Key.foregroundColor: config.textColor]
-
-        for (idx, val) in chart.yAxisValues.enumerated() {
-            if idx == 0 {
-                config.zeroAxisColor.setFill()
-            } else {
-                config.axisColor.setFill()
-            }
-            let y = calculator.y(in: rect, value: val)
-            let line = CGRect(x: rect.minX, y: y, width: rect.width, height: thinLineWidth)
-            let textRect = CGRect(x: rect.minX, y: y - font.lineHeight, width: rect.width, height: font.lineHeight)
-            ctx.fill(line)
-            "\(val)".draw(with: textRect, options: options, attributes: attributes, context: nil)
+        let yAxisValues = chart.axisValues
+        config.zeroAxisColor.setFill()
+        _ = drawLineInContext(ctx, atValue: yAxisValues.zero, rect: rect)
+        config.axisColor.setFill()
+        var i: Int64 = 1
+        while drawLineInContext(ctx, atValue: yAxisValues.zero + i * yAxisValues.step, rect: rect) {
+            i += 1
         }
+    }
+
+    private func drawLineInContext(_ ctx: CGContext, atValue val: Int64, rect: CGRect) -> Bool {
+        let y = calculator.y(in: rect, value: val)
+        let textHeight = font.lineHeight
+        guard y - textHeight >= rect.minY else {
+            return false
+        }
+        let line = CGRect(x: rect.minX, y: y, width: rect.width, height: thinLineWidth)
+        let textRect = CGRect(x: rect.minX, y: y - textHeight, width: rect.width, height: textHeight)
+        ctx.fill(line)
+        "\(val)".draw(with: textRect, options: options, attributes: attributes, context: nil)
+        return true
     }
 
     public struct Config {
