@@ -29,9 +29,6 @@ public class ChartView: UIView, ChartViewProtocol {
 
     public var chart: DrawingChart? {
         didSet {
-            if oldValue?.timeRange != chart?.timeRange {
-                timeAxisDescription = nil
-            }
             crosshairView.chart = chart
             setNeedsDisplay()
         }
