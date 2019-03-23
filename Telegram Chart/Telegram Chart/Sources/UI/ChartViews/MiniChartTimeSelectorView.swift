@@ -143,9 +143,9 @@ public class MiniChartTimeSelectorView: UIControl {
 
     private func updateActionView(point: CGPoint) {
         panPoint = point
-        if leftControl.frame.insetBy(dx: -10, dy: 0).contains(point) {
+        if leftControl.frame.inset(by: UIEdgeInsets(top: 0, left: -10, bottom: 0, right: -5)).contains(point) {
             actionView = leftControl
-        } else if rightControl.frame.insetBy(dx: -10, dy: 0).contains(point) {
+        } else if rightControl.frame.inset(by: UIEdgeInsets(top: 0, left: -5, bottom: 0, right: -10)).contains(point) {
             actionView = rightControl
         } else if point.x > leftControl.center.x && point.x < rightControl.center.x {
             actionView = self
