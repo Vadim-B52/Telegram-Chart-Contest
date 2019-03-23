@@ -6,6 +6,17 @@
 import UIKit
 
 public class ScreenHelper {
+    public private(set) static var lightLineWidth : CGFloat =  {
+        let scale = UIScreen.main.scale
+        if scale < 2 {
+            return 1
+        }
+        if scale < 3 {
+            return 0.5
+        }
+        return 1 / UIScreen.main.scale * 2
+    }()
+    
     public private(set) static var thinLineWidth =  1 / UIScreen.main.scale
 }
 

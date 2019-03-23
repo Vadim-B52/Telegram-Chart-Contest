@@ -11,7 +11,7 @@ public class ValueAxisPanel {
 
     private lazy var calculator: DrawingChart.YCalculator = DrawingChart.YCalculator(valueRange: chart.valueRange)
     private lazy var font: UIFont = UIFont.systemFont(ofSize: 11, weight: UIFont.Weight.light)
-    private lazy var  thinLineWidth = ScreenHelper.thinLineWidth
+    private lazy var  thinLineWidth = ScreenHelper.lightLineWidth
     private lazy var  options = NSStringDrawingOptions.usesLineFragmentOrigin
     private lazy var  attributes: [NSAttributedString.Key: Any]? = [NSAttributedString.Key.foregroundColor: config.textColor]
 

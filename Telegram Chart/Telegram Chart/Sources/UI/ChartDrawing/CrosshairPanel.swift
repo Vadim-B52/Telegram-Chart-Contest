@@ -12,7 +12,7 @@ public struct CrosshairPanel {
     public let config: Config
 
     public func drawInContext(_ ctx: CGContext, rect: CGRect) {
-        let thinLineWidth = ScreenHelper.thinLineWidth
+        let thinLineWidth = ScreenHelper.lightLineWidth
 
         let xCalc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
         let timestamp = chart.timestamps[timestampIndex]
