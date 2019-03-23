@@ -33,7 +33,7 @@ public class ChartView: UIView, ChartViewProtocol {
         crosshairView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(crosshairView)
         NSLayoutConstraint.activate([
-            crosshairView.topAnchor.constraint(equalTo: topAnchor, constant: 20),
+            crosshairView.topAnchor.constraint(equalTo: topAnchor),
             crosshairView.leadingAnchor.constraint(equalTo: leadingAnchor),
             crosshairView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24),
             crosshairView.trailingAnchor.constraint(equalTo: trailingAnchor),
@@ -54,9 +54,7 @@ public class ChartView: UIView, ChartViewProtocol {
             return
         }
         
-        var (timeRect, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
-        chartRect = chartRect.inset(by: UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0))
-
+        let (timeRect, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
         let timePanel = TimeAxisPanel(timeRange: chart.selectedTimeRange, config: timePanelConfig)
         timePanel.drawInContext(ctx, rect: timeRect)
 

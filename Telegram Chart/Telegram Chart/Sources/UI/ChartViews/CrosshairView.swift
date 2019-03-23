@@ -193,12 +193,11 @@ fileprivate extension CrosshairView {
             backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
             layer.cornerRadius = 4
 
-            let font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.bold)
             timeLabel.numberOfLines = 0
-            timeLabel.font = font
+            timeLabel.font = UIFont.systemFont(ofSize: 11, weight: UIFont.Weight.bold)
             valueLabel.numberOfLines = 0
             valueLabel.textAlignment = .right
-            valueLabel.font = font
+            valueLabel.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.semibold)
 
             timeLabel.translatesAutoresizingMaskIntoConstraints = false
             valueLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -207,15 +206,15 @@ fileprivate extension CrosshairView {
 
             let views = ["time": timeLabel, "value": valueLabel]
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
-                    withVisualFormat: "H:|-10-[time]-20@750-[value]-10-|",
+                    withVisualFormat: "H:|-9-[time]-20@750-[value]-9-|",
                     metrics: nil,
                     views: views))
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
-                    withVisualFormat: "V:|-10-[time]->=10-|",
+                    withVisualFormat: "V:|-9-[time]->=9-|",
                     metrics: nil,
                     views: views))
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
-                    withVisualFormat: "V:|-10-[value]-10@249-|",
+                    withVisualFormat: "V:|-9-[value]-9@249-|",
                     metrics: nil,
                     views: views))
         }

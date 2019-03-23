@@ -131,7 +131,9 @@ public class DrawingChart {
 
         func popupDateText(timestamp: Int64) -> NSAttributedString {
             let date = Date(timeIntervalSince1970: TimeInterval(timestamp / 1000))
-            return NSAttributedString(string: popupFormatter.string(from: date))
+            let string = popupFormatter.string(from: date)
+            let style = paragraphStyle(alignment: .left)
+            return NSAttributedString(string: string, attributes: [NSAttributedString.Key.paragraphStyle: style])
         }
 
         func popupValueText(index idx: Int, plots: [Chart.Plot]) -> NSAttributedString {
@@ -141,8 +143,18 @@ public class DrawingChart {
                 let value = NSAttributedString(string: "\(plot.values[idx])\n", attributes: attrs)
                 str.append(value)
             }
+            let fullRange = NSRange(location: 0, length: str.length)
+            let style = paragraphStyle(alignment: .right)
+            str.addAttribute(NSAttributedString.Key.paragraphStyle, value: style, range: fullRange)
             str.replaceCharacters(in: NSRange(location: str.length - 1, length: 1), with: "")
             return str
+        }
+
+        private func paragraphStyle(alignment: NSTextAlignment) -> NSMutableParagraphStyle {
+            let paragraph = NSMutableParagraphStyle()
+            paragraph.lineSpacing = 3
+            paragraph.alignment = alignment
+            return paragraph
         }
     }
 }
@@ -186,8 +198,8 @@ public struct ValueRangeHasYAxis: YAxisCalculation {
         var values = [Int64]()
         let sz = valueRange.size
         var p = 0
-        let n: Int64 = 5
-        let ds = sz / n
+        let n = 5
+        let ds = sz / Int64(n)
         let pows = ValueRangeHasYAxis.pows
         while ds > pows[p] {
             p += 1
@@ -197,15 +209,16 @@ public struct ValueRangeHasYAxis: YAxisCalculation {
             let t = pow(10.0, Double(p - 1))
             step = Int64(round(Double(ds) / t) * t)
         } else {
-            step = max(1, sz / n)
+            step = max(1, sz / Int64(n))
         }
         let zero = valueRange.min / step * step
-        for i in 0...n {
+        for i: Int64 in 0...Int64(n) {
             values.append(zero + i * step)
         }
 
+        let maxAxisValue: Int64 = values[n]
         return YAxisCalculationResult(
-                valueRange: ValueRange(min: min(valueRange.min, zero), max: max(valueRange.max, values.last!)),
+                valueRange: ValueRange(min: min(valueRange.min, zero), max: max(valueRange.max, maxAxisValue) + step / 2),
                 axisValues: values)
     }
 }
