@@ -142,7 +142,7 @@ public struct YAxisValues {
     public static let no = YAxisValues(zero: -1, step: -1)
 }
 
-public struct TimeAxisDescription {
+public struct TimeAxisDescription: Equatable {
     public var zeroIdx: Int
     public var step: Int
 }

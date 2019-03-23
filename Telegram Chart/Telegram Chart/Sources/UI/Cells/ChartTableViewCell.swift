@@ -20,6 +20,7 @@ public class ChartTableViewCell: UITableViewCell {
 
     private var chart: Chart?
     private var state: ChartState?
+    fileprivate var timeAxisDescription: TimeAxisDescription?
 
     public weak var delegate: ChartTableViewCellDelegate?
     public weak var chartViewColorSource: ChartViewColorSource? {
@@ -35,6 +36,8 @@ public class ChartTableViewCell: UITableViewCell {
 
     public override init(style: CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+
+        chartViewContainer.chartViews.forEach { $0.timeAxisDelegate = self }
 
         chartViewContainer.translatesAutoresizingMaskIntoConstraints = false
         miniChartViewContainer.translatesAutoresizingMaskIntoConstraints = false
@@ -73,6 +76,7 @@ public class ChartTableViewCell: UITableViewCell {
     }
 
     public func display(chart: Chart, state: ChartState) {
+        self.timeAxisDescription = nil
         self.chart = chart
         self.state = state
         timeSelector.timeRange = chart.timeRange
@@ -138,5 +142,16 @@ public class ChartTableViewCell: UITableViewCell {
                 timeRange: chart.timeRange,
                 valueRangeCalculation: FullValueRangeCalculation(),
                 yAxisCalculation: ValueRangeNoYAxisStrategy())
+    }
+}
+
+extension ChartTableViewCell: ChartViewTimeAxisDelegate {
+
+    public func chartView(_ chartView: ChartView, didChangeTimeAxisDescription description: TimeAxisDescription?) {
+        self.timeAxisDescription = description
+    }
+
+    public func timeAxisDescription(_ chartView: ChartView) -> TimeAxisDescription? {
+        return timeAxisDescription
     }
 }

@@ -10,7 +10,16 @@ public class ChartView: UIView, ChartViewProtocol {
     private let crosshairView = CrosshairView()
     private var timePanelConfig: TimeAxisPanel.Config!
     private var valuePanelConfig: ValueAxisPanel.Config!
-    private var timeAxisDescription: TimeAxisDescription?
+
+    public weak var timeAxisDelegate: ChartViewTimeAxisDelegate?
+    private var timeAxisDescription: TimeAxisDescription? {
+        get {
+            return timeAxisDelegate?.timeAxisDescription(self)
+        }
+        set {
+            timeAxisDelegate?.chartView(self, didChangeTimeAxisDescription: newValue)
+        }
+    }
 
     public weak var colorSource: ChartViewColorSource? {
         didSet {
@@ -71,8 +80,12 @@ public class ChartView: UIView, ChartViewProtocol {
         }
         
         let (timeRect, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
-        let timePanel = TimeAxisPanel(chart: chart, description: timeAxisDescription, config: timePanelConfig)
-        timeAxisDescription = timePanel.drawInContext(ctx, rect: timeRect)
+        let oldTimeAxisDescription = self.timeAxisDescription
+        let timePanel = TimeAxisPanel(chart: chart, description: oldTimeAxisDescription, config: timePanelConfig)
+        let timeAxisDescription = timePanel.drawInContext(ctx, rect: timeRect)
+        if timeAxisDescription != oldTimeAxisDescription {
+            self.timeAxisDescription = timeAxisDescription
+        }
 
         let valuePanel = ValueAxisPanel(chart: chart, config: valuePanelConfig)
         valuePanel.drawInContext(ctx, rect: chartRect)
@@ -137,6 +150,11 @@ extension ChartView: CrosshairViewColorSource {
     public func popupTextColor(crosshairView: CrosshairView) -> UIColor {
         return colorSource?.popupLabelColor(chartView: self) ?? UIColor.white
     }
+}
+
+public protocol ChartViewTimeAxisDelegate: AnyObject {
+    func chartView(_ chartView: ChartView, didChangeTimeAxisDescription description: TimeAxisDescription?)
+    func timeAxisDescription(_ chartView: ChartView) -> TimeAxisDescription?
 }
 
 public protocol ChartViewColorSource: AnyObject {
