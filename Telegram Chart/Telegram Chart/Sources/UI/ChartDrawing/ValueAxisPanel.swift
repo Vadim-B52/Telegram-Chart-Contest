@@ -32,8 +32,8 @@ public class ValueAxisPanel {
     }
 
     private func drawLineInContext(_ ctx: CGContext, atValue val: Int64, rect: CGRect) -> Bool {
-        let y = floor(calculator.y(in: rect, value: val))
-        let textHeight = floor(font.lineHeight)
+        let y = calculator.y(in: rect, value: val).screenScaledFloor
+        let textHeight = font.lineHeight.screenScaledFloor
         guard y - textHeight >= rect.minY else {
             return false
         }

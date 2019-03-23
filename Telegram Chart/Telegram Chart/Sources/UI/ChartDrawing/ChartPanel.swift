@@ -32,17 +32,19 @@ public class ChartPanel {
     public func drawInContext(_ ctx: CGContext, rect: CGRect) {
         plot.color.setStroke()
         ctx.setLineWidth(lineWidth)
+        ctx.setLineJoin(.round)
 
         let values = plot.values
         let calc = DrawingChart.Calculator(timeRange: timeRange, valueRange: valueRange)
         let startIdx = indexRange.startIdx
-        let startPoint = calc.pointAtTimestamp(timestamps[startIdx], value: values[startIdx], rect: rect)
+        let startPoint = calc.pointAtTimestamp(timestamps[startIdx], value: values[startIdx], rect: rect).screenScaledFloor
         ctx.move(to: startPoint)
 
         for i in (startIdx + 1)...indexRange.endIdx {
             let time = timestamps[i]
             let value = values[i]
-            ctx.addLine(to: calc.pointAtTimestamp(time, value: value, rect: rect))
+            let point = calc.pointAtTimestamp(time, value: value, rect: rect).screenScaledFloor
+            ctx.addLine(to: point)
         }
 
         ctx.strokePath()

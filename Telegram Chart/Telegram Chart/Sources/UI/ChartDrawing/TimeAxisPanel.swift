@@ -77,8 +77,8 @@ public class TimeAxisPanel {
                     context: nil)
 
             let frame = CGRect(
-                    x: floor(calculator.x(in: rect, timestamp: timestamp) - size.width / 2),
-                    y: rect.origin.y + floor((rect.size.height - size.height) / 2),
+                    x: (calculator.x(in: rect, timestamp: timestamp) - size.width / 2).screenScaledFloor,
+                    y: (rect.origin.y + (rect.size.height - size.height) / 2).screenScaledFloor,
                     width: ceil(size.width),
                     height: ceil(size.size.height))
 
