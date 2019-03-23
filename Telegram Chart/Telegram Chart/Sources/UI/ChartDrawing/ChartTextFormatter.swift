@@ -7,11 +7,13 @@ import UIKit
 
 public final class ChartTextFormatter {
 
+    public static let shared = ChartTextFormatter()
+    public let sizingString = "MMM\u{00a0}dd"
+
     private let valueFont = UIFont.systemFont(ofSize: 11, weight: UIFont.Weight.semibold)
     private let dateFont = UIFont.systemFont(ofSize: 11, weight: UIFont.Weight.semibold)
     private let yearFont = UIFont.systemFont(ofSize: 11, weight: UIFont.Weight.regular)
 
-    public static let shared = ChartTextFormatter()
     private init() {
     }
 

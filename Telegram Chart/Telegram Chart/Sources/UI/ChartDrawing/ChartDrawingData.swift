@@ -136,10 +136,15 @@ public struct YAxisCalculationResult {
 }
 
 public struct YAxisValues {
-    public let zero: Int64
-    public let step: Int64
+    public let zero: Chart.Value
+    public let step: Chart.Value
 
     public static let no = YAxisValues(zero: -1, step: -1)
+}
+
+public struct TimeAxisDescription {
+    public var zeroIdx: Int
+    public var step: Int
 }
 
 public struct ValueRangeNoYAxisStrategy: YAxisCalculation {

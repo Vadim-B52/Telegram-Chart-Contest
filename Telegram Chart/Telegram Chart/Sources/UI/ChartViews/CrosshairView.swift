@@ -153,6 +153,7 @@ public class CrosshairView: UIView {
             popup.timeLabel.attributedText = formatter.popupDateText(timestamp: timestamp)
             popup.valueLabel.attributedText = formatter.popupValueText(index: idx, plots: chart.plots)
             setNeedsLayout()
+//            TODO: animated if needed
 //            let options: UIView.AnimationOptions = [.beginFromCurrentState, .curveLinear]
 //            UIView.animate(withDuration: 0.05, delay: 0, options: options, animations: {
 //                self.layoutIfNeeded()
@@ -190,7 +191,6 @@ fileprivate extension CrosshairView {
         public override init(frame: CGRect) {
             super.init(frame: frame)
 
-            // TODO: color
             backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
             layer.cornerRadius = 4
 

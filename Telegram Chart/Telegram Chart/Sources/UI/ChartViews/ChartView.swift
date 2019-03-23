@@ -10,6 +10,7 @@ public class ChartView: UIView, ChartViewProtocol {
     private let crosshairView = CrosshairView()
     private var timePanelConfig: TimeAxisPanel.Config!
     private var valuePanelConfig: ValueAxisPanel.Config!
+    private var timeAxisDescription: TimeAxisDescription?
 
     public weak var colorSource: ChartViewColorSource? {
         didSet {
@@ -19,6 +20,9 @@ public class ChartView: UIView, ChartViewProtocol {
 
     public var chart: DrawingChart? {
         didSet {
+            if oldValue?.timeRange != chart?.timeRange {
+                timeAxisDescription = nil
+            }
             crosshairView.chart = chart
             setNeedsDisplay()
         }
@@ -47,6 +51,18 @@ public class ChartView: UIView, ChartViewProtocol {
         fatalError("init(coder:) has not been implemented")
     }
 
+    public override var bounds: CGRect {
+        get {
+            return super.bounds
+        }
+        set {
+            if newValue != super.bounds {
+                timeAxisDescription = nil
+            }
+            super.bounds = newValue
+        }
+    }
+
     public override func draw(_ rect: CGRect) {
         super.draw(rect)
         guard let chart = chart,
@@ -55,8 +71,8 @@ public class ChartView: UIView, ChartViewProtocol {
         }
         
         let (timeRect, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
-        let timePanel = TimeAxisPanel(timeRange: chart.selectedTimeRange, config: timePanelConfig)
-        timePanel.drawInContext(ctx, rect: timeRect)
+        let timePanel = TimeAxisPanel(chart: chart, description: timeAxisDescription, config: timePanelConfig)
+        timeAxisDescription = timePanel.drawInContext(ctx, rect: timeRect)
 
         let valuePanel = ValueAxisPanel(chart: chart, config: valuePanelConfig)
         valuePanel.drawInContext(ctx, rect: chartRect)
