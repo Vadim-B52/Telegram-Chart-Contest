@@ -71,11 +71,11 @@ public class NightSkin: Skin {
     }
 
     public var valueAxisColor: UIColor {
-        return UIColor(red: 0.11, green: 0.16, blue: 0.21, alpha: 1)
+        return UIColor(red: 0.09, green: 0.14, blue: 0.19, alpha: 1)
     }
 
     public var zeroValueAxisColor: UIColor {
-        return UIColor(red: 0.09, green: 0.13, blue: 0.16, alpha: 1)
+        return UIColor(red: 0.07, green: 0.12, blue: 0.14, alpha: 1)
     }
 
     public var chartAxisLabelColor: UIColor {
