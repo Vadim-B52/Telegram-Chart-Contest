@@ -122,11 +122,11 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
         }
         let elapsed = state.formula(opacity)
 
-        let minD = state.endChart.rawValueRange.min - state.beginChart.rawValueRange.min
-        let maxD = state.endChart.rawValueRange.max - state.beginChart.rawValueRange.max
+        let minD = state.endChart.valueRange.min - state.beginChart.valueRange.min
+        let maxD = state.endChart.valueRange.max - state.beginChart.valueRange.max
         let valueRange = ValueRange(
-                min: state.beginChart.rawValueRange.min + Chart.Value(elapsed * Float(minD)),
-                max: state.beginChart.rawValueRange.max + Chart.Value(elapsed * Float(maxD)))
+                min: state.beginChart.valueRange.min + Chart.Value(elapsed * Float(minD)),
+                max: state.beginChart.valueRange.max + Chart.Value(elapsed * Float(maxD)))
 
         state.beginChartReceiver.chart = DrawingChart(
                 plots: state.beginChart.plots,
@@ -134,7 +134,7 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
                 timeRange: state.beginChart.timeRange,
                 selectedTimeRange: state.beginChart.selectedTimeRange,
                 valueRangeCalculation: StaticValueRangeCalculation(valueRange: valueRange),
-                yAxisCalculation: state.beginChart.yAxisCalculation)
+                yAxisCalculation: ValueRangeHasStaticYAxis(valueRange: valueRange, yAxisValues: state.beginChart.axisValues))
 
         state.endChartReceiver.chart = DrawingChart(
                 plots: state.endChart.plots,
@@ -142,7 +142,7 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
                 timeRange: state.endChart.timeRange,
                 selectedTimeRange: state.endChart.selectedTimeRange,
                 valueRangeCalculation: StaticValueRangeCalculation(valueRange: valueRange),
-                yAxisCalculation: state.endChart.yAxisCalculation)
+                yAxisCalculation: ValueRangeHasStaticYAxis(valueRange: valueRange, yAxisValues: state.endChart.axisValues))
     }
 
     private struct TransitionState<T> {

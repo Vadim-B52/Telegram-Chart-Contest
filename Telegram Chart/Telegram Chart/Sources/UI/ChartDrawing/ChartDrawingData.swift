@@ -153,6 +153,15 @@ public struct ValueRangeNoYAxisStrategy: YAxisCalculation {
     }
 }
 
+public struct ValueRangeHasStaticYAxis: YAxisCalculation {
+    public let valueRange: ValueRange
+    public let yAxisValues: YAxisValues
+    
+    public func yAxis(valueRange: ValueRange) -> YAxisCalculationResult {
+        return YAxisCalculationResult(valueRange: valueRange, yAxisValues: yAxisValues)
+    }
+}
+
 public struct ValueRangeHasYAxis: YAxisCalculation {
 
     private static let pows = [

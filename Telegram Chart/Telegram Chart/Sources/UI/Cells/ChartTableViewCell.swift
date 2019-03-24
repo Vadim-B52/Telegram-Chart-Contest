@@ -91,7 +91,7 @@ public class ChartTableViewCell: UITableViewCell {
         }
         self.state = state.byDisablingPlotWith(identifier: plotId)
         chartViewContainer.displayChart(chartViewDrawingChart(), animated: true)
-        miniChartViewContainer.displayChart(miniChartViewDrawingChart(), animated: true)
+//        miniChartViewContainer.displayChart(miniChartViewDrawingChart(), animated: true)
     }
 
     public func showPlot(plotId: String) {
@@ -100,7 +100,7 @@ public class ChartTableViewCell: UITableViewCell {
         }
         self.state = state.byEnablingPlotWith(identifier: plotId)
         chartViewContainer.displayChart(chartViewDrawingChart(), animated: true)
-        miniChartViewContainer.displayChart(miniChartViewDrawingChart(), animated: true)
+//        miniChartViewContainer.displayChart(miniChartViewDrawingChart(), animated: true)
     }
 
     @objc
