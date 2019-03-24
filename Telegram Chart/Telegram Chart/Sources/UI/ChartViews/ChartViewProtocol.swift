@@ -7,4 +7,11 @@ import UIKit
 
 public protocol ChartViewProtocol: AnyObject {
     var chart: DrawingChart? { get set }
+
+    // TODO: not common - remove
+    var animationProgressDataSource: ChartViewAnimationProgressDataSource? { get set }
+}
+
+public protocol ChartViewAnimationProgressDataSource: AnyObject {
+    func animationProgressAlpha(chartView: ChartViewProtocol) -> CGFloat?
 }

@@ -37,7 +37,10 @@ public class ChartTableViewCell: UITableViewCell {
     public override init(style: CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 
-        chartViewContainer.chartViews.forEach { $0.timeAxisDelegate = self }
+        chartViewContainer.chartViews.forEach { view in
+            view.timeAxisDelegate = self
+            view.animationProgressDataSource = chartViewContainer
+        }
 
         chartViewContainer.translatesAutoresizingMaskIntoConstraints = false
         miniChartViewContainer.translatesAutoresizingMaskIntoConstraints = false

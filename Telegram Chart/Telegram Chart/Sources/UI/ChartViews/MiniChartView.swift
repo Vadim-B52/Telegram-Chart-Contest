@@ -6,7 +6,9 @@
 import UIKit
 
 public class MiniChartView: UIControl, ChartViewProtocol {
-    
+
+    public weak var animationProgressDataSource: ChartViewAnimationProgressDataSource?
+
     public var chart: DrawingChart? {
         didSet {
             setNeedsDisplay()

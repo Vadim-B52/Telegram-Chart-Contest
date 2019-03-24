@@ -10,6 +10,7 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
     private let chartView1: ChartViewType
     private let chartView2: ChartViewType
     private var chart: DrawingChart?
+    private var transitionProgress: Float = 0
     private var transitionState: TransitionState<ChartViewType>? {
         didSet {
             if let oldValue = oldValue {
@@ -120,13 +121,13 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
         guard let state = transitionState, let opacity = chartView2.layer.presentation()?.opacity else {
             return
         }
-        let elapsed = state.formula(opacity)
+        transitionProgress = state.formula(opacity)
 
         let minD = state.endChart.valueRange.min - state.beginChart.valueRange.min
         let maxD = state.endChart.valueRange.max - state.beginChart.valueRange.max
         let valueRange = ValueRange(
-                min: state.beginChart.valueRange.min + Chart.Value(elapsed * Float(minD)),
-                max: state.beginChart.valueRange.max + Chart.Value(elapsed * Float(maxD)))
+                min: state.beginChart.valueRange.min + Chart.Value(transitionProgress * Float(minD)),
+                max: state.beginChart.valueRange.max + Chart.Value(transitionProgress * Float(maxD)))
 
         state.beginChartReceiver.chart = DrawingChart(
                 plots: state.beginChart.plots,
@@ -144,7 +145,21 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
                 valueRangeCalculation: StaticValueRangeCalculation(valueRange: valueRange),
                 yAxisCalculation: ValueRangeHasStaticYAxis(valueRange: valueRange, yAxisValues: state.endChart.axisValues))
     }
+}
 
+extension ChartViewContainer: ChartViewAnimationProgressDataSource {
+    public func animationProgressAlpha(chartView: ChartViewProtocol) -> CGFloat? {
+        guard let state = transitionState else {
+            return nil
+        }
+        if chartView as! ChartViewType == state.beginChartReceiver {
+            return CGFloat(1 - transitionProgress)
+        }
+        return CGFloat(transitionProgress)
+    }
+}
+
+fileprivate extension ChartViewContainer {
     private struct TransitionState<T> {
         let displayLink: CADisplayLink
         let formula: ((Float) -> Float)

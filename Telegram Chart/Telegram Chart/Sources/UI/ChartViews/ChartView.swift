@@ -27,6 +27,8 @@ public class ChartView: UIView, ChartViewProtocol {
         }
     }
 
+    public weak var animationProgressDataSource: ChartViewAnimationProgressDataSource?
+
     public var chart: DrawingChart? {
         didSet {
             crosshairView.chart = chart
@@ -94,6 +96,10 @@ public class ChartView: UIView, ChartViewProtocol {
         let bounds = integralBounds
         let (_, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
 
+        var valuePanelConfig = self.valuePanelConfig!
+        if let animationProgress = animationProgressDataSource?.animationProgressAlpha(chartView: self) {
+            valuePanelConfig = valuePanelConfig.configByApplyingAlpha(animationProgress)
+        }
         let valuePanel = ValueAxisPanel(chart: chart, config: valuePanelConfig)
         valuePanel.drawInContext(ctx, rect: chartRect)
 
@@ -112,7 +118,6 @@ public class ChartView: UIView, ChartViewProtocol {
 
     public func reloadColors() {
         crosshairView.reloadColors()
-//        reloadTimePanelConfig()
         reloadValuePanelConfig()
         setNeedsDisplay()
     }
