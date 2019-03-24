@@ -64,6 +64,8 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
     }
 
     private func performAnimatedTransitionToChart(_ chart: DrawingChart, previousChart: DrawingChart) {
+        chartView1.chart = nil
+        chartView2.chart = nil
         chartView1.chart = previousChart
         chartView2.chart = previousChart
         chartView1.layer.opacity = 1

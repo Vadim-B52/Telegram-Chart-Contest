@@ -14,7 +14,7 @@ public class ChartView: UIView, ChartViewProtocol {
     public weak var timeAxisDelegate: ChartViewTimeAxisDelegate?
     fileprivate var timeAxisDescription: TimeAxisDescription? {
         get {
-            return timeAxisDelegate?.timeAxisDescription(self)
+            return timeAxisDelegate?.timeAxisDescription(chartView: self)
         }
         set {
             timeAxisDelegate?.chartView(self, didChangeTimeAxisDescription: newValue)
@@ -165,7 +165,7 @@ extension ChartView: TimeAxisViewDelegate {
 
 public protocol ChartViewTimeAxisDelegate: AnyObject {
     func chartView(_ chartView: ChartView, didChangeTimeAxisDescription description: TimeAxisDescription?)
-    func timeAxisDescription(_ chartView: ChartView) -> TimeAxisDescription?
+    func timeAxisDescription(chartView: ChartView) -> TimeAxisDescription?
 }
 
 public protocol ChartViewColorSource: AnyObject {

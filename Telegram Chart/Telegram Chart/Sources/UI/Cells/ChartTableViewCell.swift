@@ -154,7 +154,7 @@ extension ChartTableViewCell: ChartViewTimeAxisDelegate {
         self.timeAxisDescription = description
     }
 
-    public func timeAxisDescription(_ chartView: ChartView) -> TimeAxisDescription? {
+    public func timeAxisDescription(chartView: ChartView) -> TimeAxisDescription? {
         return timeAxisDescription
     }
 }
