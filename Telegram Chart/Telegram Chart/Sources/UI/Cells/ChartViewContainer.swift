@@ -26,15 +26,15 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
         chartView2 = factory()
         super.init(frame: .zero)
 
-        chartView1.backgroundColor = .clear
-        chartView1.frame = .zero
-        chartView1.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        addSubview(chartView1)
-
         chartView2.backgroundColor = .clear
         chartView2.frame = .zero
         chartView2.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         addSubview(chartView2)
+
+        chartView1.backgroundColor = .clear
+        chartView1.frame = .zero
+        chartView1.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        addSubview(chartView1)
     }
 
     @available(*, unavailable)
@@ -150,6 +150,9 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
 extension ChartViewContainer: ChartViewAnimationProgressDataSource {
     public func animationProgressAlpha(chartView: ChartViewProtocol) -> CGFloat? {
         guard let state = transitionState else {
+            return nil
+        }
+        if state.endChart.valueRange == state.beginChart.valueRange {
             return nil
         }
         if chartView as! ChartViewType == state.beginChartReceiver {

@@ -56,7 +56,7 @@ public class Chart {
     }
 }
 
-public struct ValueRange {
+public struct ValueRange: Equatable {
     public var min: Chart.Value
     public var max: Chart.Value
     public var size: Chart.Value
