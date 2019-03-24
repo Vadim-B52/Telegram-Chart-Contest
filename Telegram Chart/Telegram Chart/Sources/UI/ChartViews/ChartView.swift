@@ -12,7 +12,7 @@ public class ChartView: UIView, ChartViewProtocol {
     private var valuePanelConfig: ValueAxisPanel.Config!
 
     public weak var timeAxisDelegate: ChartViewTimeAxisDelegate?
-    private var timeAxisDescription: TimeAxisDescription? {
+    fileprivate var timeAxisDescription: TimeAxisDescription? {
         get {
             return timeAxisDelegate?.timeAxisDescription(self)
         }
@@ -32,13 +32,7 @@ public class ChartView: UIView, ChartViewProtocol {
     public var chart: DrawingChart? {
         didSet {
             crosshairView.chart = chart
-
-            let oldTimeAxisDescription = self.timeAxisDescription
-            let timeAxisDescription = timeAxisView.displayChart(chart: chart, timeAxisDescription: oldTimeAxisDescription)
-            if timeAxisDescription != oldTimeAxisDescription {
-                self.timeAxisDescription = timeAxisDescription
-            }
-
+            timeAxisView.displayChart(chart: chart, timeAxisDescription: self.timeAxisDescription)
             setNeedsDisplay()
         }
     }
@@ -49,6 +43,7 @@ public class ChartView: UIView, ChartViewProtocol {
         isOpaque = true
 
         timeAxisView.translatesAutoresizingMaskIntoConstraints = false
+        timeAxisView.delegate = self
         addSubview(timeAxisView)
 
         crosshairView.colorSource = self
@@ -153,6 +148,14 @@ extension ChartView: CrosshairViewColorSource {
 
     public func popupTextColor(crosshairView: CrosshairView) -> UIColor {
         return colorSource?.popupLabelColor(chartView: self) ?? UIColor.white
+    }
+}
+
+extension ChartView: TimeAxisViewDelegate {
+    public func timeAxisView(_ view: TimeAxisView, didUpdateTimeAxisDescription descr: TimeAxisDescription) {
+        if descr != timeAxisDescription {
+            timeAxisDescription = descr
+        }
     }
 }
 

@@ -10,7 +10,13 @@ public class TimeAxisView: UIView {
     private var labels = [Int: UILabel]()
     private var removingLabels = [Int: UILabel]()
 
-    private var timeAxisDescription: TimeAxisDescription?
+    private var timeAxisDescription: TimeAxisDescription? {
+        didSet {
+            if let descr = timeAxisDescription {
+                delegate?.timeAxisView(self, didUpdateTimeAxisDescription: descr)
+            }
+        }
+    }
     private var chart: DrawingChart?
 
     private lazy var formatter = ChartTextFormatter.shared
@@ -19,6 +25,8 @@ public class TimeAxisView: UIView {
         label.sizeToFit()
         return label.bounds.size
     }()
+    
+    public weak var delegate: TimeAxisViewDelegate?
 
     public var textColor: UIColor? {
         didSet {
@@ -40,7 +48,7 @@ public class TimeAxisView: UIView {
         }
     }
 
-    public func displayChart(chart: DrawingChart?, timeAxisDescription: TimeAxisDescription?) -> TimeAxisDescription? {
+    public func displayChart(chart: DrawingChart?, timeAxisDescription: TimeAxisDescription?) {
         let prevChart = self.chart
         self.chart = chart
         self.timeAxisDescription = timeAxisDescription
@@ -54,7 +62,6 @@ public class TimeAxisView: UIView {
             labels.removeAll()
             removingLabels.removeAll()
         }
-        return self.timeAxisDescription
     }
 
     public override func layoutSubviews() {
@@ -180,4 +187,8 @@ public class TimeAxisView: UIView {
         label.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.regular)
         return label
     }
+}
+
+public protocol TimeAxisViewDelegate: AnyObject {
+    func timeAxisView(_ view: TimeAxisView, didUpdateTimeAxisDescription descr: TimeAxisDescription)
 }
