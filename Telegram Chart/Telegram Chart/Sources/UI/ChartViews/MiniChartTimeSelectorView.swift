@@ -132,20 +132,28 @@ public class MiniChartTimeSelectorView: UIControl {
         switch longPress.state {
         case .began:
             updateActionView(point: longPress.location(in: self))
+            setHighlighted(actionView != nil)
             break
         case .changed:
             handleTranslation(point: longPress.location(in: self))
             break
         default:
+            setHighlighted(false)
             break
+        }
+    }
+
+    private func setHighlighted(_ flag: Bool) {
+        [leftControl, rightControl, topBalk, bottomBalk].forEach {
+            $0.alpha = flag ? 0.7 : 1
         }
     }
 
     private func updateActionView(point: CGPoint) {
         panPoint = point
-        if leftControl.frame.inset(by: UIEdgeInsets(top: 0, left: -10, bottom: 0, right: -5)).contains(point) {
+        if leftControl.frame.inset(by: UIEdgeInsets(top: 0, left: -10, bottom: 0, right: -10)).contains(point) {
             actionView = leftControl
-        } else if rightControl.frame.inset(by: UIEdgeInsets(top: 0, left: -5, bottom: 0, right: -10)).contains(point) {
+        } else if rightControl.frame.inset(by: UIEdgeInsets(top: 0, left: -10, bottom: 0, right: -10)).contains(point) {
             actionView = rightControl
         } else if point.x > leftControl.center.x && point.x < rightControl.center.x {
             actionView = self
@@ -166,21 +174,22 @@ public class MiniChartTimeSelectorView: UIControl {
         var leftRect = leftControl.frame
         var rightRect = rightControl.frame
 
+        let distance: CGFloat = 30
         if actionView == leftControl {
             leftRect = leftRect.offsetBy(dx: dx, dy: 0)
             if leftRect.minX < bounds.minX {
                 leftRect.origin.x = bounds.minX
             }
-            if leftRect.maxX + 20 > rightRect.minX {
-                leftRect.origin.x = rightRect.minX - 20 - leftRect.width
+            if leftRect.maxX + distance > rightRect.minX {
+                leftRect.origin.x = rightRect.minX - distance - leftRect.width
             }
         } else if actionView == rightControl {
             rightRect = rightRect.offsetBy(dx: dx, dy: 0)
             if rightRect.maxX > bounds.maxX {
                 rightRect.origin.x = bounds.maxX - rightRect.width
             }
-            if leftRect.maxX + 20 > rightRect.minX {
-                rightRect.origin.x = leftRect.maxX + 20
+            if leftRect.maxX + distance > rightRect.minX {
+                rightRect.origin.x = leftRect.maxX + distance
             }
         } else if actionView == self {
             leftRect = leftRect.offsetBy(dx: dx, dy: 0)
