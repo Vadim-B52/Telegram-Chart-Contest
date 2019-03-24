@@ -26,15 +26,15 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
         chartView2 = factory()
         super.init(frame: .zero)
 
-        chartView2.backgroundColor = .clear
-        chartView2.frame = .zero
-        chartView2.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        addSubview(chartView2)
-
         chartView1.backgroundColor = .clear
         chartView1.frame = .zero
         chartView1.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         addSubview(chartView1)
+
+        chartView2.backgroundColor = .clear
+        chartView2.frame = .zero
+        chartView2.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        addSubview(chartView2)
     }
 
     @available(*, unavailable)
