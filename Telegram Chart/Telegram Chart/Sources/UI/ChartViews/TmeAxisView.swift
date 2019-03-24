@@ -33,19 +33,26 @@ public class TimeAxisView: UIView {
         }
         set {
             super.bounds = newValue
-            let description = timeAxisDescription
-            updateDescription()
-            rebuildLabels(description)
+            if let chart = self.chart {
+                updateDescription(chart: chart)
+                rebuildLabels()
+            }
         }
     }
 
     public func displayChart(chart: DrawingChart?, timeAxisDescription: TimeAxisDescription?) -> TimeAxisDescription? {
-        let description = self.timeAxisDescription
         self.chart = chart
         self.timeAxisDescription = timeAxisDescription
-        updateDescription()
-        rebuildLabels(description)
-        setNeedsLayout()
+        if let chart = chart {
+            updateDescription(chart: chart)
+            rebuildLabels()
+            setNeedsLayout()
+        } else {
+            remove(labels: labels)
+            remove(labels: removingLabels)
+            labels.removeAll()
+            removingLabels.removeAll()
+        }
         return self.timeAxisDescription
     }
 
@@ -54,29 +61,27 @@ public class TimeAxisView: UIView {
         guard let chart = chart else {
             return
         }
+        updatePosition(labels: labels, chart: chart)
+        updatePosition(labels: removingLabels, chart: chart)
+    }
+
+    private func remove(labels: [Int: UILabel]) {
+        labels.forEach {
+            $0.value.removeFromSuperview()
+        }
+    }
+
+    private func updatePosition(labels: [Int: UILabel], chart: DrawingChart) {
         let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
         for (timeIdx, label) in labels {
             let timestamp = chart.timestamps[timeIdx]
             label.sizeToFit()
             label.center = CGPoint(x: calc.x(in: bounds, timestamp: timestamp), y: bounds.midY)
         }
-        for (timeIdx, label) in removingLabels {
-            let timestamp = chart.timestamps[timeIdx]
-            label.sizeToFit()
-            label.center = CGPoint(x: calc.x(in: bounds, timestamp: timestamp), y: bounds.midY)
-        }
     }
 
-    private func updatePosition(label: UILabel, idx: Int, chart: DrawingChart) {
-        label.sizeToFit()
-        let calculator = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
-        let x = calculator.x(in: bounds, timestamp: chart.timestamps[idx])
-        let y = bounds.midY
-        label.center = CGPoint(x: x, y: y)
-    }
-
-    private func rebuildLabels(_ oldDescription: TimeAxisDescription?) {
-        guard !bounds.isEmpty, let chart = chart, let description = timeAxisDescription else {
+    private func rebuildLabels() {
+        guard let chart = chart, let description = timeAxisDescription else {
             return
         }
 
@@ -121,38 +126,39 @@ public class TimeAxisView: UIView {
         })
     }
 
-    private func updateDescription() {
-        guard let chart = chart, !bounds.isEmpty else {
+    private func updateDescription(chart: DrawingChart) {
+        guard !bounds.isEmpty else {
             return
         }
         let rect = bounds
         let calculator = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
         var currDescr: TimeAxisDescription
-
+        var dateSize = self.dateSize
+        dateSize.width += 10
         if let prevDescr = timeAxisDescription {
             currDescr = prevDescr
 
             let c1 = calculator.x(in: rect, timestamp: chart.timestamps[prevDescr.zeroIdx])
             let c2 = calculator.x(in: rect, timestamp: chart.timestamps[prevDescr.zeroIdx + prevDescr.step])
-            if c2 - c1 > 3 * dateSize.width {
+            if c2 - c1 > 2 * dateSize.width {
                 currDescr.step = prevDescr.step / 2
-            } else if c2 - c1 < 1.5 * dateSize.width {
+            } else if c2 - c1 < dateSize.width {
                 currDescr.step = prevDescr.step * 2
             }
 
-            var i = currDescr.zeroIdx
-            while i >= chart.indexRange.startIdx {
-                i -= currDescr.step
+            var newZero = currDescr.zeroIdx
+            while newZero >= chart.indexRange.startIdx {
+                newZero -= currDescr.step
             }
-            currDescr.zeroIdx = i + currDescr.step
+            currDescr.zeroIdx = newZero + currDescr.step
         } else {
-            let zeroIdx = chart.closestIdxTo(timestamp: calculator.timestampAt(x: 10 + dateSize.width / 2, rect: rect))
+            let zeroIdx = chart.closestIdxTo(timestamp: calculator.timestampAt(x: dateSize.width / 2, rect: rect))
             let zeroTime = chart.timestamps[zeroIdx]
             var step = 1
             while true {
                 let c1 = calculator.x(in: rect, timestamp: zeroTime)
                 let c2 = calculator.x(in: rect, timestamp: chart.timestamps[zeroIdx + step])
-                if c2 - c1 < 1.5 * dateSize.width {
+                if c2 - c1 < dateSize.width {
                     step *= 2
                 } else {
                     break
