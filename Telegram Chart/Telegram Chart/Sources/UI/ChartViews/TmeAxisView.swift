@@ -7,9 +7,8 @@ import UIKit
 
 public class TimeAxisView: UIView {
 
-    private var widerLabels = [UILabel]()
-    private var labels = [UILabel]()
-    private var closerLabels = [UILabel]()
+    private var labels = [Int: UILabel]()
+    private var removingLabels = [Int: UILabel]()
 
     private var timeAxisDescription: TimeAxisDescription?
     private var chart: DrawingChart?
@@ -23,7 +22,8 @@ public class TimeAxisView: UIView {
 
     public var textColor: UIColor? {
         didSet {
-            closerLabels.forEach { $0.textColor = textColor }
+            labels.forEach { $0.value.textColor = textColor }
+            removingLabels.forEach { $0.value.textColor = textColor }
         }
     }
 
@@ -51,51 +51,19 @@ public class TimeAxisView: UIView {
 
     public override func layoutSubviews() {
         super.layoutSubviews()
-        guard let chart = chart,
-              let description = timeAxisDescription else {
-
+        guard let chart = chart else {
             return
         }
-
         let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
-//        let x0 = calc.x(in: bounds, timestamp: chart.timestamps[description.zeroIdx])
-//        let x1 = calc.x(in: bounds, timestamp: chart.timestamps[description.zeroIdx + description.step])
-//        let halfSpacing = (x1 - x0) / 2
-        let y = bounds.midY
-
-//        var i: CGFloat = -1
-//        closerLabels.forEach { label in
-//            let x = x0 + halfSpacing * i
-//            i += 1
-//            let ts = calc.timestampAt(x: x, rect: bounds)
-//            label.text = formatter.axisDateText(timestamp: ts)
-//            label.sizeToFit()
-//            label.center = CGPoint(x: x, y: y)
-//        }
-
-        var i = description.zeroIdx
-        var j = 0
-        while i <= chart.indexRange.endIdx {
-            let timestamp = chart.timestamps[i]
-            let str = formatter.axisDateText(timestamp: timestamp)
-            labels[j].text = str
-            labels[j].sizeToFit()
-            labels[j].center = CGPoint(x: calc.x(in: bounds, timestamp: timestamp), y: y)
-//            let size = str.boundingRect(
-//                    with: rect.size,
-//                    options: options,
-//                    attributes: attributes,
-//                    context: nil)
-//
-//            let frame = CGRect(
-//                    x: (calculator.x(in: rect, timestamp: timestamp) - size.width / 2).screenScaledFloor,
-//                    y: (rect.origin.y + (rect.size.height - size.height) / 2).screenScaledFloor,
-//                    width: ceil(size.width),
-//                    height: ceil(size.size.height))
-//
-//            str.draw(with: frame, options: options, attributes: attributes, context: nil)
-            i += description.step
-            j += 1
+        for (timeIdx, label) in labels {
+            let timestamp = chart.timestamps[timeIdx]
+            label.sizeToFit()
+            label.center = CGPoint(x: calc.x(in: bounds, timestamp: timestamp), y: bounds.midY)
+        }
+        for (timeIdx, label) in removingLabels {
+            let timestamp = chart.timestamps[timeIdx]
+            label.sizeToFit()
+            label.center = CGPoint(x: calc.x(in: bounds, timestamp: timestamp), y: bounds.midY)
         }
     }
 
@@ -107,115 +75,50 @@ public class TimeAxisView: UIView {
         label.center = CGPoint(x: x, y: y)
     }
 
-    private func rebuildLabels(_ prevDescr: TimeAxisDescription?) {
+    private func rebuildLabels(_ oldDescription: TimeAxisDescription?) {
         guard !bounds.isEmpty, let chart = chart, let description = timeAxisDescription else {
             return
         }
 
-        let getLabel: () -> UILabel = {
-            let label = self.createLabel()
+        var existing = Set<Int>()
+        labels.forEach { existing.insert($0.key) }
+
+        var current = Set<Int>()
+        let n = min(chart.indexRange.endIdx, chart.timestamps.count - 1)
+        for i in stride(from: description.zeroIdx, through: n, by: description.step) {
+            current.insert(i)
+        }
+
+        let toRemove = existing.subtracting(current)
+        var toRemoveLabels = [UILabel]()
+        toRemove.forEach { timeIdx in
+            let label = labels[timeIdx]!
+            toRemoveLabels.append(label)
+            removingLabels[timeIdx] = label
+            labels[timeIdx] = nil
+        }
+
+        let toInsert = current.subtracting(existing)
+        var toInsetLabels = [UILabel]()
+        toInsert.forEach { timeIdx in
+            let label = createLabel()
+            addSubview(label)
             label.alpha = 0
-            self.addSubview(label)
-            return label
+
+            let timestamp = chart.timestamps[timeIdx]
+            let str = formatter.axisDateText(timestamp: timestamp)
+            label.text = str
+
+            labels[timeIdx] = label
+            toInsetLabels.append(label)
         }
 
-        if labels.count == 0 {
-            let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
-
-
-
-            let x1 = calc.x(in: bounds, timestamp: chart.timestamps[description.zeroIdx])
-            let x2 = calc.x(in: bounds, timestamp: chart.timestamps[description.zeroIdx + description.step])
-            let spacing = (x2 - x1)
-
-            var label = getLabel()
-            label.alpha = 0
-            closerLabels.append(label)
-
-            var i = 0
-            while true {
-                let x = x1 + CGFloat(i) * spacing
-                if x > bounds.maxX {
-                    break
-                }
-                label = getLabel()
-                labels.append(label)
-                closerLabels.append(label)
-                if i % 2 == 0 {
-                    widerLabels.append(label)
-                }
-                label = getLabel()
-                label.alpha = 0
-                closerLabels.append(label)
-                i += 1
-            }
-
-            label = getLabel()
-            label.alpha = 0
-            closerLabels.append(label)
-        }
-
-        guard let descr = prevDescr else {
-            return
-        }
-
-        if descr.step < description.step {
-            // TODO: perfomans! n^2
-            let toRemove = closerLabels.filter {
-                !widerLabels.contains($0)
-            }
-            labels = widerLabels
-            closerLabels.removeAll()
-            widerLabels.removeAll()
-
-            var newLabel = getLabel()
-            newLabel.alpha = 0
-            closerLabels.append(newLabel)
-
-            for (idx, label) in labels.enumerated() {
-                if idx % 2 == 0 {
-                    widerLabels.append(label)
-                }
-                closerLabels.append(label)
-                newLabel = getLabel()
-                newLabel.alpha = 0
-                closerLabels.append(label)
-            }
-
-            UIView.animate(withDuration: 0.3, animations: { () -> Void in
-                toRemove.forEach {
-                    $0.alpha = 0
-                }
-            }, completion: { b in
-                toRemove.forEach {
-                    $0.removeFromSuperview()
-                }
-            })
-        } else if descr.step > description.step {
-            labels = closerLabels
-            closerLabels.removeAll()
-            widerLabels.removeAll()
-
-            var newLabel = getLabel()
-            newLabel.alpha = 0
-            closerLabels.append(newLabel)
-
-            for (idx, label) in labels.enumerated() {
-                if idx % 2 == 0 {
-                    widerLabels.append(label)
-                }
-                closerLabels.append(label)
-                newLabel = getLabel()
-                newLabel.alpha = 0
-                closerLabels.append(label)
-            }
-
-            UIView.animate(withDuration: 0.3, animations: { [labels] () -> Void in
-                labels.forEach {
-                    $0.alpha = 1
-                }
-            })
-        }
+        UIView.animate(withDuration: 0.3, animations: {
+            toRemoveLabels.forEach { $0.alpha = 0 }
+            toInsetLabels.forEach { $0.alpha = 1 }
+        }, completion: { b in
+            toRemoveLabels.forEach { $0.removeFromSuperview() }
+        })
     }
 
     private func updateDescription() {
