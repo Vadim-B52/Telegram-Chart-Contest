@@ -169,3 +169,7 @@ public protocol ChartViewColorSource: AnyObject {
     func popupLabelColor(chartView: ChartView) -> UIColor
     func backgroundColor(chartView: ChartView) -> UIColor
 }
+
+public protocol ChartViewAnimationProgressDataSource: AnyObject {
+    func animationProgressAlpha(chartView: ChartViewProtocol) -> CGFloat?
+}
