@@ -9,7 +9,6 @@ public class ChartView: UIView, ChartViewProtocol {
 
     private let crosshairView = CrosshairView()
     private let timeAxisView = TimeAxisView()
-//    private var timePanelConfig: TimeAxisPanel.Config!
     private var valuePanelConfig: ValueAxisPanel.Config!
 
     public weak var timeAxisDelegate: ChartViewTimeAxisDelegate?
@@ -31,7 +30,13 @@ public class ChartView: UIView, ChartViewProtocol {
     public var chart: DrawingChart? {
         didSet {
             crosshairView.chart = chart
-            timeAxisView.chart = chart
+
+            let oldTimeAxisDescription = self.timeAxisDescription
+            let timeAxisDescription = timeAxisView.displayChart(chart: chart, timeAxisDescription: oldTimeAxisDescription)
+            if timeAxisDescription != oldTimeAxisDescription {
+                self.timeAxisDescription = timeAxisDescription
+            }
+
             setNeedsDisplay()
         }
     }
@@ -87,13 +92,7 @@ public class ChartView: UIView, ChartViewProtocol {
             return
         }
         let bounds = integralBounds
-        let (timeRect, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
-        let oldTimeAxisDescription = self.timeAxisDescription
-//        let timePanel = TimeAxisPanel(chart: chart, description: oldTimeAxisDescription, config: timePanelConfig)
-//        let timeAxisDescription = timePanel.drawInContext(ctx, rect: timeRect)
-//        if timeAxisDescription != oldTimeAxisDescription {
-//            self.timeAxisDescription = timeAxisDescription
-//        }
+        let (_, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
 
         let valuePanel = ValueAxisPanel(chart: chart, config: valuePanelConfig)
         valuePanel.drawInContext(ctx, rect: chartRect)
@@ -126,20 +125,12 @@ public class ChartView: UIView, ChartViewProtocol {
                     textColor: .gray)
             return
         }
+        timeAxisView.textColor = colorSource.chartAxisLabelColor(chartView: self)
         valuePanelConfig = ValueAxisPanel.Config(
                 axisColor: colorSource.valueAxisColor(chartView: self),
                 zeroAxisColor: colorSource.zeroValueAxisColor(chartView: self),
                 textColor: colorSource.chartAxisLabelColor(chartView: self))
     }
-
-//    private func reloadTimePanelConfig() {
-//        guard let colorSource = colorSource else {
-//            timePanelConfig = TimeAxisPanel.Config(textColor: .gray)
-//            return
-//        }
-//        timePanelConfig = TimeAxisPanel.Config(textColor: colorSource.chartAxisLabelColor(chartView: self))
-//
-//    }
 }
 
 extension ChartView: CrosshairViewColorSource {

@@ -11,10 +11,21 @@ public class TimeAxisView: UIView {
     private var labels = [UILabel]()
     private var closerLabels = [UILabel]()
 
-    public var timeAxisDescription: TimeAxisDescription?
+    private var timeAxisDescription: TimeAxisDescription?
+    private var chart: DrawingChart?
 
     private lazy var formatter = ChartTextFormatter.shared
-    private lazy var options = NSStringDrawingOptions.usesLineFragmentOrigin
+    private lazy var dateSize: CGSize = {
+        let label = createLabel()
+        label.sizeToFit()
+        return label.bounds.size
+    }()
+
+    public var textColor: UIColor? {
+        didSet {
+            closerLabels.forEach { $0.textColor = textColor }
+        }
+    }
 
     public override var bounds: CGRect {
         get {
@@ -25,18 +36,17 @@ public class TimeAxisView: UIView {
             let description = timeAxisDescription
             updateDescription()
             rebuildLabels(description)
-            updateLabelVisibility(animated: false)
         }
     }
 
-    public var chart: DrawingChart? {
-        didSet {
-            let description = timeAxisDescription
-            updateDescription()
-            rebuildLabels(description)
-            setNeedsLayout()
-//            updateLabelVisibility(animated: true)
-        }
+    public func displayChart(chart: DrawingChart?, timeAxisDescription: TimeAxisDescription?) -> TimeAxisDescription? {
+        let description = self.timeAxisDescription
+        self.chart = chart
+        self.timeAxisDescription = timeAxisDescription
+        updateDescription()
+        rebuildLabels(description)
+        setNeedsLayout()
+        return self.timeAxisDescription
     }
 
     public override func layoutSubviews() {
@@ -48,69 +58,44 @@ public class TimeAxisView: UIView {
         }
 
         let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
-
-        let x0 = calc.x(in: bounds, timestamp: chart.timestamps[description.zeroIdx])
-        let x1 = calc.x(in: bounds, timestamp: chart.timestamps[description.zeroIdx + description.step])
-        let spacing = x1 - x0
+//        let x0 = calc.x(in: bounds, timestamp: chart.timestamps[description.zeroIdx])
+//        let x1 = calc.x(in: bounds, timestamp: chart.timestamps[description.zeroIdx + description.step])
+//        let halfSpacing = (x1 - x0) / 2
         let y = bounds.midY
-        let halfSpacing = spacing / 2
-        let doubleSpacing = spacing * 2
 
-        for (idx, label) in labels.enumerated() {
-            let x = x0 + spacing * CGFloat(idx)
-            let ts = calc.timestampAt(x: x, rect: bounds)
-            label.text = formatter.axisDateText(timestamp: ts)
-            label.sizeToFit()
-            label.center = CGPoint(x: x, y: y)
-        }
+//        var i: CGFloat = -1
+//        closerLabels.forEach { label in
+//            let x = x0 + halfSpacing * i
+//            i += 1
+//            let ts = calc.timestampAt(x: x, rect: bounds)
+//            label.text = formatter.axisDateText(timestamp: ts)
+//            label.sizeToFit()
+//            label.center = CGPoint(x: x, y: y)
+//        }
 
-        for (idx, label) in widerLabels.enumerated() {
-            let x = x0 + doubleSpacing * CGFloat(idx)
-            let ts = calc.timestampAt(x: x, rect: bounds)
-            label.text = formatter.axisDateText(timestamp: ts)
-            label.sizeToFit()
-            label.center = CGPoint(x: x, y: y)
-        }
-
-        for (idx, label) in closerLabels.enumerated() {
-            let x = x0 + halfSpacing * CGFloat(idx)
-            let ts = calc.timestampAt(x: x, rect: bounds)
-            label.text = formatter.axisDateText(timestamp: ts)
-            label.sizeToFit()
-            label.center = CGPoint(x: x, y: y)
-        }
-    }
-
-    private func updateLabelVisibility(animated: Bool) {
-        guard let chart = chart,
-              let description = timeAxisDescription else {
-
-            return
-        }
-
-        let labels = self.labels
-        var visitedActiveLabels = 0
-
-        UIView.animate(withDuration: animated ? 0.3 : 0) {
-            for i in 0..<labels.count {
-                let label = labels[i]
-                let timestamps = chart.timestamps
-                let timeIdx: Int
-                if i % 2 == 0 {
-                    timeIdx = description.zeroIdx + visitedActiveLabels * description.step
-                    visitedActiveLabels += 1
-                    label.alpha = 1
-                } else {
-                    let timeIdx1 = description.zeroIdx + (visitedActiveLabels - 1) * description.step
-                    let timeIdx2 = description.zeroIdx + visitedActiveLabels * description.step
-                    timeIdx = timeIdx1 + Int(Double(timeIdx2 - timeIdx1) / 2)
-                    label.alpha = 0
-                }
-                if timeIdx >= timestamps.count {
-                    label.alpha = 0
-                    break
-                }
-            }
+        var i = description.zeroIdx
+        var j = 0
+        while i <= chart.indexRange.endIdx {
+            let timestamp = chart.timestamps[i]
+            let str = formatter.axisDateText(timestamp: timestamp)
+            labels[j].text = str
+            labels[j].sizeToFit()
+            labels[j].center = CGPoint(x: calc.x(in: bounds, timestamp: timestamp), y: y)
+//            let size = str.boundingRect(
+//                    with: rect.size,
+//                    options: options,
+//                    attributes: attributes,
+//                    context: nil)
+//
+//            let frame = CGRect(
+//                    x: (calculator.x(in: rect, timestamp: timestamp) - size.width / 2).screenScaledFloor,
+//                    y: (rect.origin.y + (rect.size.height - size.height) / 2).screenScaledFloor,
+//                    width: ceil(size.width),
+//                    height: ceil(size.size.height))
+//
+//            str.draw(with: frame, options: options, attributes: attributes, context: nil)
+            i += description.step
+            j += 1
         }
     }
 
@@ -128,80 +113,107 @@ public class TimeAxisView: UIView {
         }
 
         let getLabel: () -> UILabel = {
-            let label = UILabel()
-            label.text = "FFF 99"
+            let label = self.createLabel()
             label.alpha = 0
             self.addSubview(label)
             return label
         }
 
-        if prevDescr == nil {
+        if labels.count == 0 {
             let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
+
+
+
             let x1 = calc.x(in: bounds, timestamp: chart.timestamps[description.zeroIdx])
             let x2 = calc.x(in: bounds, timestamp: chart.timestamps[description.zeroIdx + description.step])
-            let spacing = (x2 - x1) / 2
-            let count = Int(ceil(bounds.width / spacing))
+            let spacing = (x2 - x1)
 
-            closerLabels.forEach { $0.removeFromSuperview() }
+            var label = getLabel()
+            label.alpha = 0
+            closerLabels.append(label)
 
-            closerLabels.removeAll()
-            widerLabels.removeAll()
-            labels.removeAll()
-
-            for i in 0..<count {
-                let label = getLabel()
+            var i = 0
+            while true {
+                let x = x1 + CGFloat(i) * spacing
+                if x > bounds.maxX {
+                    break
+                }
+                label = getLabel()
+                labels.append(label)
                 closerLabels.append(label)
                 if i % 2 == 0 {
-                    labels.append(label)
-                    label.alpha = 1
+                    widerLabels.append(label)
                 }
-                if i % 4 == 0 {
-                    labels.append(label)
-                }
+                label = getLabel()
+                label.alpha = 0
+                closerLabels.append(label)
+                i += 1
             }
 
+            label = getLabel()
+            label.alpha = 0
+            closerLabels.append(label)
+        }
+
+        guard let descr = prevDescr else {
             return
         }
 
-        let descr = prevDescr!
         if descr.step < description.step {
             // TODO: perfomans! n^2
-            let toRemove = closerLabels.filter { !widerLabels.contains($0) }
+            let toRemove = closerLabels.filter {
+                !widerLabels.contains($0)
+            }
             labels = widerLabels
             closerLabels.removeAll()
             widerLabels.removeAll()
 
+            var newLabel = getLabel()
+            newLabel.alpha = 0
+            closerLabels.append(newLabel)
+
             for (idx, label) in labels.enumerated() {
                 if idx % 2 == 0 {
                     widerLabels.append(label)
                 }
                 closerLabels.append(label)
-                closerLabels.append(getLabel())
+                newLabel = getLabel()
+                newLabel.alpha = 0
+                closerLabels.append(label)
             }
 
             UIView.animate(withDuration: 0.3, animations: { () -> Void in
-                toRemove.forEach { $0.alpha = 0 }
+                toRemove.forEach {
+                    $0.alpha = 0
+                }
             }, completion: { b in
-                toRemove.forEach { $0.removeFromSuperview() }
+                toRemove.forEach {
+                    $0.removeFromSuperview()
+                }
             })
         } else if descr.step > description.step {
             labels = closerLabels
-
             closerLabels.removeAll()
             widerLabels.removeAll()
+
+            var newLabel = getLabel()
+            newLabel.alpha = 0
+            closerLabels.append(newLabel)
 
             for (idx, label) in labels.enumerated() {
                 if idx % 2 == 0 {
                     widerLabels.append(label)
                 }
                 closerLabels.append(label)
-                closerLabels.append(getLabel())
+                newLabel = getLabel()
+                newLabel.alpha = 0
+                closerLabels.append(label)
             }
 
             UIView.animate(withDuration: 0.3, animations: { [labels] () -> Void in
-                labels.forEach { $0.alpha = 1 }
-            }, completion: { b in
-//                toRemove.forEach { $0.removeFromSuperview() }
+                labels.forEach {
+                    $0.alpha = 1
+                }
             })
         }
     }
@@ -210,10 +222,10 @@ public class TimeAxisView: UIView {
         guard let chart = chart, !bounds.isEmpty else {
             return
         }
-        let dateSize = self.dateSize()
         let rect = bounds
         let calculator = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
         var currDescr: TimeAxisDescription
+
         if let prevDescr = timeAxisDescription {
             currDescr = prevDescr
 
@@ -248,12 +260,11 @@ public class TimeAxisView: UIView {
         self.timeAxisDescription = currDescr
     }
 
-    private func dateSize() -> CGSize {
-        return formatter.sizingString.boundingRect(
-                with: bounds.size,
-                options: options,
-                attributes: nil,
-//                attributes: attributes,
-                context: nil).size
+    private func createLabel() -> UILabel {
+        let label = UILabel()
+        label.text = formatter.sizingString
+        label.textColor = textColor
+        label.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.regular)
+        return label
     }
 }
