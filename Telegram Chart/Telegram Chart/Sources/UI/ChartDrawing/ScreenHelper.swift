@@ -41,4 +41,14 @@ extension CGPoint {
     var screenScaledFloor: CGPoint {
         return CGPoint(x: x.screenScaledFloor, y: y.screenScaledFloor)
     }
+
+    var integralFloor: CGPoint {
+        return CGPoint(x: floor(x), y: floor(y))
+    }
+}
+
+extension CGSize {
+    var integralCeil: CGSize {
+        return CGSize(width: ceil(width), height: ceil(height))
+    }
 }

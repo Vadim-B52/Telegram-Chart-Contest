@@ -35,17 +35,18 @@ public class TimeAxisView: UIView {
             super.bounds = newValue
             if let chart = self.chart {
                 updateDescription(chart: chart)
-                rebuildLabels()
+                rebuildLabels(animated: true)
             }
         }
     }
 
     public func displayChart(chart: DrawingChart?, timeAxisDescription: TimeAxisDescription?) -> TimeAxisDescription? {
+        let prevChart = self.chart
         self.chart = chart
         self.timeAxisDescription = timeAxisDescription
         if let chart = chart {
             updateDescription(chart: chart)
-            rebuildLabels()
+            rebuildLabels(animated: prevChart != nil)
             setNeedsLayout()
         } else {
             remove(labels: labels)
@@ -75,12 +76,15 @@ public class TimeAxisView: UIView {
         let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
         for (timeIdx, label) in labels {
             let timestamp = chart.timestamps[timeIdx]
-            label.sizeToFit()
-            label.center = CGPoint(x: calc.x(in: bounds, timestamp: timestamp), y: bounds.midY)
+            let size = label.sizeThatFits(.zero).integralCeil
+            var frame = CGRect.zero
+            frame.size = size
+            label.bounds = frame
+            label.center = CGPoint(x: calc.x(in: bounds, timestamp: timestamp), y: bounds.midY).screenScaledFloor
         }
     }
 
-    private func rebuildLabels() {
+    private func rebuildLabels(animated: Bool) {
         guard let chart = chart, let description = timeAxisDescription else {
             return
         }
@@ -118,7 +122,7 @@ public class TimeAxisView: UIView {
             toInsetLabels.append(label)
         }
 
-        UIView.animate(withDuration: 0.3, animations: {
+        UIView.animate(withDuration: animated ? 0.3 : 0, animations: {
             toRemoveLabels.forEach { $0.alpha = 0 }
             toInsetLabels.forEach { $0.alpha = 1 }
         }, completion: { b in
