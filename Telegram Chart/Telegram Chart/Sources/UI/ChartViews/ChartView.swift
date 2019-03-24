@@ -93,7 +93,11 @@ public class ChartView: UIView, ChartViewProtocol {
 
         var valuePanelConfig = self.valuePanelConfig!
         if let animationProgress = animationProgressDataSource?.animationProgressAlpha(chartView: self) {
-            valuePanelConfig = valuePanelConfig.configByApplyingAlpha(animationProgress)
+            let color = valuePanelConfig.axisColor.withAlphaComponent(animationProgress)
+            valuePanelConfig = ValueAxisPanel.Config(
+                    axisColor: color,
+                    zeroAxisColor: color,
+                    textColor: valuePanelConfig.textColor.withAlphaComponent(animationProgress))
         }
         let valuePanel = ValueAxisPanel(chart: chart, config: valuePanelConfig)
         valuePanel.drawInContext(ctx, rect: chartRect)

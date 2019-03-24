@@ -48,12 +48,5 @@ public class ValueAxisPanel {
         let axisColor: UIColor
         let zeroAxisColor: UIColor
         let textColor: UIColor
-
-        func configByApplyingAlpha(_ alpha: CGFloat) -> Config {
-            return Config(
-                    axisColor: axisColor.withAlphaComponent(alpha),
-                    zeroAxisColor: zeroAxisColor.withAlphaComponent(alpha),
-                    textColor: textColor.withAlphaComponent(alpha))
-        }
     }
 }

@@ -102,6 +102,7 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
                     beginChartReceiver: chartView2,
                     endChartReceiver: chartView1)
         }
+        render(state: transitionState!, progress: 0)
         chartView2.layer.add(animation, forKey: "opacityAnimation")
     }
 
@@ -121,7 +122,11 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
         guard let state = transitionState, let opacity = chartView2.layer.presentation()?.opacity else {
             return
         }
-        transitionProgress = state.formula(opacity)
+        render(state: state, progress: state.formula(opacity))
+    }
+
+    private func render(state: TransitionState<ChartViewType>, progress: Float) {
+        transitionProgress = progress
 
         let minD = state.endChart.valueRange.min - state.beginChart.valueRange.min
         let maxD = state.endChart.valueRange.max - state.beginChart.valueRange.max
