@@ -14,7 +14,7 @@ public class MiniChartTimeSelectorView: UIControl {
     private let topBalk = UIView()
     private let bottomBalk = UIView()
 
-    private let longPress = UILongPressGestureRecognizer()
+    private let gesture = UILongPressGestureRecognizer()
     private var actionView: UIView?
     private var panPoint = CGPoint.zero
 
@@ -48,9 +48,9 @@ public class MiniChartTimeSelectorView: UIControl {
             v.isUserInteractionEnabled = false
         }
 
-        longPress.addTarget(self, action: #selector(handleLongPress))
-        longPress.minimumPressDuration = 0.125
-        addGestureRecognizer(longPress)
+        gesture.addTarget(self, action: #selector(handleGesture))
+        gesture.minimumPressDuration = 0.125
+        addGestureRecognizer(gesture)
         reloadColors()
     }
 
@@ -128,14 +128,14 @@ public class MiniChartTimeSelectorView: UIControl {
     }
 
     @objc
-    private func handleLongPress() {
-        switch longPress.state {
+    private func handleGesture() {
+        switch gesture.state {
         case .began:
-            updateActionView(point: longPress.location(in: self))
+            updateActionView(point: gesture.location(in: self))
             setHighlighted(actionView != nil)
             break
         case .changed:
-            handleTranslation(point: longPress.location(in: self))
+            handleTranslation(point: gesture.location(in: self))
             break
         default:
             setHighlighted(false)
