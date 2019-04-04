@@ -49,18 +49,6 @@ public class ChartView: UIView, ChartViewProtocol {
         crosshairView.colorSource = self
         crosshairView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(crosshairView)
-
-        NSLayoutConstraint.activate([
-            crosshairView.topAnchor.constraint(equalTo: topAnchor),
-            crosshairView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            crosshairView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -24),
-            crosshairView.trailingAnchor.constraint(equalTo: trailingAnchor),
-
-            timeAxisView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            timeAxisView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            timeAxisView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            timeAxisView.heightAnchor.constraint(equalToConstant: 24)
-        ])
         
         reloadColors()
     }
@@ -80,6 +68,12 @@ public class ChartView: UIView, ChartViewProtocol {
             }
             super.bounds = newValue
         }
+    }
+    
+    public override func layoutSubviews() {
+        let (timeFrame, crosshairFrame) = bounds.divided(atDistance: 24, from: .maxYEdge)
+        timeAxisView.frame = timeFrame
+        crosshairView.frame = crosshairFrame
     }
 
     public override func draw(_ rect: CGRect) {

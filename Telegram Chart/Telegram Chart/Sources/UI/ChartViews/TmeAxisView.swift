@@ -184,7 +184,7 @@ public class TimeAxisView: UIView {
         let label = UILabel()
         label.text = formatter.sizingString
         label.textColor = textColor
-        label.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.regular)
+        label.font = Fonts.current.regular12()
         return label
     }
 }

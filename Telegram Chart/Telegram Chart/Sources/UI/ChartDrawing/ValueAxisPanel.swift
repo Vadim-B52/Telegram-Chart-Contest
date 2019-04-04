@@ -10,7 +10,7 @@ public class ValueAxisPanel {
     public let config: Config
 
     private lazy var calculator: DrawingChart.YCalculator = DrawingChart.YCalculator(valueRange: chart.valueRange)
-    private lazy var font: UIFont = UIFont.systemFont(ofSize: 11, weight: UIFont.Weight.light)
+    private lazy var font: UIFont = Fonts.current.light11()
     private lazy var  thinLineWidth = ScreenHelper.lightLineWidth
     private lazy var  options = NSStringDrawingOptions.usesLineFragmentOrigin
     private lazy var  attributes: [NSAttributedString.Key: Any]? = [NSAttributedString.Key.foregroundColor: config.textColor]

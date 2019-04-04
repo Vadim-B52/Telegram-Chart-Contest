@@ -50,17 +50,39 @@ public class ChartTableViewCell: UITableViewCell {
         addSubview(timeSelector)
 
         let views = ["chartView": chartViewContainer, "miniChartView": miniChartViewContainer]
-        NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "V:|[chartView][miniChartView(==60)]|",
-                options: [], metrics: nil, views: views))
-        NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "H:|-15-[chartView]-15-|",
-                options: [], metrics: nil, views: views))
-        NSLayoutConstraint.activate(NSLayoutConstraint.constraints(withVisualFormat: "H:|-15-[miniChartView]-15-|",
-                options: [], metrics: nil, views: views))
+        NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
+            withVisualFormat: "V:|[chartView][miniChartView(==60)]|",
+            metrics: nil,
+            views: views))
+        NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
+            withVisualFormat: "H:|-15-[chartView]-15-|",
+            metrics: nil,
+            views: views))
+        NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
+            withVisualFormat: "H:|-15-[miniChartView]-15-|",
+            metrics: nil,
+            views: views))
         NSLayoutConstraint.activate([
-            timeSelector.topAnchor.constraint(equalTo: miniChartViewContainer.topAnchor),
-            timeSelector.leadingAnchor.constraint(equalTo: miniChartViewContainer.leadingAnchor),
-            timeSelector.bottomAnchor.constraint(equalTo: miniChartViewContainer.bottomAnchor),
-            timeSelector.trailingAnchor.constraint(equalTo: miniChartViewContainer.trailingAnchor),
+            NSLayoutConstraint(
+                item: timeSelector, attribute: .top,
+                relatedBy: .equal,
+                toItem: miniChartViewContainer, attribute: .top,
+                multiplier: 1, constant: 0),
+            NSLayoutConstraint(
+                item: timeSelector, attribute: .leading,
+                relatedBy: .equal,
+                toItem: miniChartViewContainer, attribute: .leading,
+                multiplier: 1, constant: 0),
+            NSLayoutConstraint(
+                item: timeSelector, attribute: .bottom,
+                relatedBy: .equal,
+                toItem: miniChartViewContainer, attribute: .bottom,
+                multiplier: 1, constant: 0),
+            NSLayoutConstraint(
+                item: timeSelector, attribute: .trailing,
+                relatedBy: .equal,
+                toItem: miniChartViewContainer, attribute: .trailing,
+                multiplier: 1, constant: 0),
         ])
 
         timeSelector.addTarget(self, action: #selector(handleValueChanged), for: .valueChanged)

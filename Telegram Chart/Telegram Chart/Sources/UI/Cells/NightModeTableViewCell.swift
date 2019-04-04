@@ -8,14 +8,9 @@ import UIKit
 public class NightModeTableViewCell: UITableViewCell {
     public private(set) lazy var button: UIButton = {
         let button = UIButton(type: .system)
-        button.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(button)
-        NSLayoutConstraint.activate([
-            button.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            button.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            button.topAnchor.constraint(equalTo: contentView.topAnchor),
-            button.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-        ])
+        button.frame = contentView.bounds
+        button.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         return button
     }()
 }

@@ -10,9 +10,9 @@ public final class ChartTextFormatter {
     public static let shared = ChartTextFormatter()
     public let sizingString = "MMM\u{00a0}dd"
 
-    private let valueFont = UIFont.systemFont(ofSize: 11, weight: UIFont.Weight.semibold)
-    private let dateFont = UIFont.systemFont(ofSize: 11, weight: UIFont.Weight.semibold)
-    private let yearFont = UIFont.systemFont(ofSize: 11, weight: UIFont.Weight.regular)
+    private let valueFont = Fonts.current.semibold11()
+    private let dateFont = Fonts.current.semibold11()
+    private let yearFont = Fonts.current.regular11()
 
     private init() {
     }

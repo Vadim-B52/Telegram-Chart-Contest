@@ -195,10 +195,10 @@ fileprivate extension CrosshairView {
             layer.cornerRadius = 4
 
             timeLabel.numberOfLines = 0
-            timeLabel.font = UIFont.systemFont(ofSize: 11, weight: UIFont.Weight.bold)
+            timeLabel.font = Fonts.current.bold11()
             valueLabel.numberOfLines = 0
             valueLabel.textAlignment = .right
-            valueLabel.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.semibold)
+            valueLabel.font = Fonts.current.semibold12()
 
             timeLabel.translatesAutoresizingMaskIntoConstraints = false
             valueLabel.translatesAutoresizingMaskIntoConstraints = false
