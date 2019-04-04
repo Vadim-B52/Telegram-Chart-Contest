@@ -64,25 +64,25 @@ public class ChartTableViewCell: UITableViewCell {
             views: views))
         NSLayoutConstraint.activate([
             NSLayoutConstraint(
-                item: timeSelector, attribute: .top,
+                item: timeSelector, attribute: .centerX,
                 relatedBy: .equal,
-                toItem: miniChartViewContainer, attribute: .top,
+                toItem: miniChartViewContainer, attribute: .centerX,
                 multiplier: 1, constant: 0),
             NSLayoutConstraint(
-                item: timeSelector, attribute: .leading,
+                item: timeSelector, attribute: .centerY,
                 relatedBy: .equal,
-                toItem: miniChartViewContainer, attribute: .leading,
+                toItem: miniChartViewContainer, attribute: .centerY,
                 multiplier: 1, constant: 0),
             NSLayoutConstraint(
-                item: timeSelector, attribute: .bottom,
+                item: timeSelector, attribute: .height,
                 relatedBy: .equal,
-                toItem: miniChartViewContainer, attribute: .bottom,
+                toItem: miniChartViewContainer, attribute: .height,
                 multiplier: 1, constant: 0),
             NSLayoutConstraint(
-                item: timeSelector, attribute: .trailing,
+                item: timeSelector, attribute: .width,
                 relatedBy: .equal,
-                toItem: miniChartViewContainer, attribute: .trailing,
-                multiplier: 1, constant: 0),
+                toItem: miniChartViewContainer, attribute: .width,
+                multiplier: 1, constant: 30),
         ])
 
         timeSelector.addTarget(self, action: #selector(handleValueChanged), for: .valueChanged)

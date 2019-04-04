@@ -64,13 +64,13 @@ public class MiniChartTimeSelectorView: UIControl {
             return
         }
         let selectedTimeRange = self.selectedTimeRange ?? timeRange
-
+        let bounds = self.bounds.insetBy(dx: 15, dy: 0) // TODO: pass as aurgument
         let rect = bounds.insetBy(dx: 0, dy: 6)
         let leftRange = timeRange.beforeTimestamp(selectedTimeRange.min)
         let rightRange = timeRange.afterTimestamp(selectedTimeRange.max)
         let calculator = DrawingChart.XCalculator(timeRange: timeRange)
 
-        var (slice0, rest0) = rect.divided(atDistance: calculator.x(in: rect, timestamp: leftRange.max), from: .minXEdge)
+        var (slice0, rest0) = rect.divided(atDistance: calculator.x(in: rect, timestamp: leftRange.max) - rect.minX, from: .minXEdge)
         leftDimming.frame = slice0.insetBy(dx: 0, dy: 2)
         (slice0, rest0) = rest0.divided(atDistance: 11, from: .minXEdge)
         let updateLeftControlCorners = leftControl.bounds.size != slice0.size
@@ -79,7 +79,7 @@ public class MiniChartTimeSelectorView: UIControl {
             updateRoundedCorners(control: leftControl)
         }
 
-        var (slice1, rest1) = rect.divided(atDistance: calculator.x(in: rect, timestamp: rightRange.min), from: .minXEdge)
+        var (slice1, rest1) = rect.divided(atDistance: calculator.x(in: rect, timestamp: rightRange.min) - rect.minX, from: .minXEdge)
         rightDimming.frame = rest1.insetBy(dx: 0, dy: 2)
 
         var rest = rest0.intersection(slice1)
@@ -167,7 +167,8 @@ public class MiniChartTimeSelectorView: UIControl {
               let timeRange = timeRange else {
             return
         }
-
+        
+        let bounds = self.bounds.insetBy(dx: 15, dy: 0) // TODO: pass as aurgument
         let dx = point.x - panPoint.x
         panPoint = point
 
