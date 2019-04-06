@@ -7,31 +7,31 @@ import UIKit
 
 public class MiniChartView: UIControl, ChartViewProtocol {
 
+    private var layers = [CAShapeLayer]()
+
     public var chart: DrawingChart? {
         didSet {
-            setNeedsDisplay()
+            layers.forEach { $0.removeFromSuperlayer() }
+            layers.removeAll()
+            redraw()
         }
     }
 
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        contentMode = .redraw
-        isOpaque = true
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        layers.forEach { $0.removeFromSuperlayer() }
+        redraw()
     }
 
-    public required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-
-    public override func draw(_ rect: CGRect) {
-        super.draw(rect)
-        guard let chart = chart,
-              let ctx = UIGraphicsGetCurrentContext() else {
+    private func redraw() {
+        guard let chart = chart else {
             return
         }
-        let bounds = integralBounds
-        let drawingRect = bounds.inset(by: UIEdgeInsets(top: 11, left: 0, bottom: 9, right: 0))
-        for plot in chart.plots {
+        let drawingRect = layer.bounds.inset(by: UIEdgeInsets(top: 11, left: 0, bottom: 9, right: 0))
+        chart.plots.forEach { plot in
+            let plotLayer = CAShapeLayer()
+            self.layer.addSublayer(plotLayer)
+            plotLayer.frame = drawingRect
             let panel = ChartPanel(
                     timestamps: chart.timestamps,
                     indexRange: chart.indexRange,
@@ -39,8 +39,9 @@ public class MiniChartView: UIControl, ChartViewProtocol {
                     valueRange: chart.valueRange,
                     plot: plot,
                     lineWidth: 1)
-            
-            panel.drawInContext(ctx, rect: drawingRect)
+
+            panel.drawInContext(plotLayer, rect: plotLayer.bounds)
+            layers.append(plotLayer)
         }
     }
 }

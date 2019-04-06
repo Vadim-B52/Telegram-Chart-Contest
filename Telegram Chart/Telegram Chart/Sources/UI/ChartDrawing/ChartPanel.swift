@@ -29,24 +29,27 @@ public class ChartPanel {
         self.lineWidth = lineWidth
     }
 
-    public func drawInContext(_ ctx: CGContext, rect: CGRect) {
-        plot.color.setStroke()
-        ctx.setLineWidth(lineWidth)
-        ctx.setLineJoin(.round)
+    public func drawInContext(_ layer: CAShapeLayer, rect: CGRect) {
+        layer.lineJoin = .round
+        layer.lineWidth = lineWidth
 
         let values = plot.values
         let calc = DrawingChart.Calculator(timeRange: timeRange, valueRange: valueRange)
         let startIdx = indexRange.startIdx
         let startPoint = calc.pointAtTimestamp(timestamps[startIdx], value: values[startIdx], rect: rect).screenScaledFloor
-        ctx.move(to: startPoint)
+        let path = UIBezierPath()
+        path.move(to: startPoint)
 
         for i in (startIdx + 1)...indexRange.endIdx {
             let time = timestamps[i]
             let value = values[i]
             let point = calc.pointAtTimestamp(time, value: value, rect: rect).screenScaledFloor
-            ctx.addLine(to: point)
+            path.addLine(to: point)
         }
 
-        ctx.strokePath()
+        path.stroke()
+        layer.strokeColor = plot.color.cgColor
+        layer.path = path.cgPath
+        layer.fillColor = UIColor.clear.cgColor
     }
 }
