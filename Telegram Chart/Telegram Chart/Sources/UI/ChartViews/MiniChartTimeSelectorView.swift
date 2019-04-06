@@ -17,6 +17,7 @@ public class MiniChartTimeSelectorView: UIControl {
     private let gesture = UILongPressGestureRecognizer()
     private var actionView: UIView?
     private var panPoint = CGPoint.zero
+    private var shouldRecognize = false
 
     public weak var colorSource: MiniChartTimeSelectorViewColorSource? {
         didSet {
@@ -49,7 +50,8 @@ public class MiniChartTimeSelectorView: UIControl {
         }
 
         gesture.addTarget(self, action: #selector(handleGesture))
-        gesture.minimumPressDuration = 0.125
+        gesture.delegate = self
+        gesture.minimumPressDuration = 0
         addGestureRecognizer(gesture)
         reloadColors()
     }
@@ -129,16 +131,25 @@ public class MiniChartTimeSelectorView: UIControl {
 
     @objc
     private func handleGesture() {
+        let newPanPoint = gesture.location(in: self)
         switch gesture.state {
         case .began:
-            updateActionView(point: gesture.location(in: self))
+            updateActionView(point: newPanPoint)
+            shouldRecognize = false
             setHighlighted(actionView != nil)
             break
         case .changed:
-            handleTranslation(point: gesture.location(in: self))
+            let d = abs(newPanPoint.x - panPoint.x) - abs(newPanPoint.y - panPoint.y)
+            if shouldRecognize || (!shouldRecognize && d > 0) {
+                shouldRecognize = true
+                handleTranslation(point: newPanPoint)
+            } else if d != 0 || actionView == nil {
+                gesture.isEnabled = false
+            }
             break
         default:
             setHighlighted(false)
+            gesture.isEnabled = true
             break
         }
     }
@@ -223,6 +234,22 @@ public class MiniChartTimeSelectorView: UIControl {
 
     private var controlColor: UIColor {
         return colorSource?.controlColor(miniChartTimeSelectorView: self) ?? UIColor.black.withAlphaComponent(0.2)
+    }
+}
+
+extension MiniChartTimeSelectorView: UIGestureRecognizerDelegate {
+    public func gestureRecognizer(
+            _ gestureRecognizer: UIGestureRecognizer,
+            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+
+        return true
+    }
+
+    public func gestureRecognizer(
+            _ gestureRecognizer: UIGestureRecognizer,
+            shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+
+        return true
     }
 }
 
