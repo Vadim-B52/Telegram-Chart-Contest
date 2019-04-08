@@ -68,7 +68,7 @@ public class ChartView: UIControl, ChartViewProtocol {
 
         for (idx, plot) in chart.allPlots.enumerated() {
             let plotLayer = layers[idx]
-            let panel = ChartPanel(
+            let panel = LineChartPanel(
                     timestamps: chart.timestamps,
                     indexRange: chart.indexRange,
                     timeRange: chart.selectedTimeRange,
@@ -95,7 +95,7 @@ public class ChartView: UIControl, ChartViewProtocol {
             animationGroup.duration = 0.4
             animationGroup.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
 
-            let panel = ChartPanel(
+            let panel = LineChartPanel(
                     timestamps: chart.timestamps,
                     indexRange: chart.indexRange,
                     timeRange: chart.selectedTimeRange,

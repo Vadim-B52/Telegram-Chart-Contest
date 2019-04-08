@@ -5,7 +5,11 @@
 
 import UIKit
 
-public class ChartPanel {
+public protocol ChartPanel {
+    func drawInContext(_ layer: CAShapeLayer, rect: CGRect, apply: ((CAShapeLayer, CGPath) -> Void)?)
+}
+
+public class LineChartPanel: ChartPanel {
 
     public let timestamps: [Int64]
     public let indexRange: TimeIndexRange
