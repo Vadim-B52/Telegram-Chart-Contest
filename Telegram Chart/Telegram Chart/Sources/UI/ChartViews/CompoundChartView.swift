@@ -10,7 +10,7 @@ public class CompoundChartView: UIView, ChartViewProtocol {
     private let chartView = ChartView()
     private let crosshairView = CrosshairView()
     private let timeAxisView = TimeAxisView()
-    private var valuePanelConfig: ValueAxisPanel.Config!
+    private let yAxisView = YAxisView()
 
     public weak var timeAxisDelegate: ChartViewTimeAxisDelegate?
     fileprivate var timeAxisDescription: TimeAxisDescription? {
@@ -34,8 +34,6 @@ public class CompoundChartView: UIView, ChartViewProtocol {
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        contentMode = .redraw
-        isOpaque = true
 
         chartView.lineWidth = 2
         chartView.translatesAutoresizingMaskIntoConstraints = false
@@ -44,6 +42,9 @@ public class CompoundChartView: UIView, ChartViewProtocol {
         timeAxisView.translatesAutoresizingMaskIntoConstraints = false
         timeAxisView.delegate = self
         addSubview(timeAxisView)
+
+        yAxisView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(yAxisView)
 
         crosshairView.colorSource = self
         crosshairView.translatesAutoresizingMaskIntoConstraints = false
@@ -74,34 +75,14 @@ public class CompoundChartView: UIView, ChartViewProtocol {
         timeAxisView.frame = timeFrame
         crosshairView.frame = chartFrame
         chartView.frame = chartFrame
+        yAxisView.frame = chartFrame
     }
 
     public func displayChart(_ chart: DrawingChart?, animated: Bool) {
         crosshairView.chart = chart
         timeAxisView.displayChart(chart: chart, timeAxisDescription: self.timeAxisDescription)
-        setNeedsDisplay()
         chartView.displayChart(chart, animated: animated)
-    }
-
-    public override func draw(_ rect: CGRect) {
-        super.draw(rect)
-        guard let chart = chart,
-              let ctx = UIGraphicsGetCurrentContext() else {
-            return
-        }
-        let bounds = integralBounds
-        let (_, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
-
-        var valuePanelConfig = self.valuePanelConfig!
-        if let animationProgress = animationProgressDataSource?.animationProgressAlpha(chartView: self) {
-            let color = valuePanelConfig.axisColor.withAlphaComponent(animationProgress)
-            valuePanelConfig = ValueAxisPanel.Config(
-                    axisColor: color,
-                    zeroAxisColor: color,
-                    textColor: valuePanelConfig.textColor.withAlphaComponent(animationProgress))
-        }
-        let valuePanel = ValueAxisPanel(chart: chart, config: valuePanelConfig)
-        valuePanel.drawInContext(ctx, rect: chartRect)
+        yAxisView.displayChart(chart, animated: animated)
     }
 
     public func reloadColors() {
@@ -112,14 +93,11 @@ public class CompoundChartView: UIView, ChartViewProtocol {
 
     private func reloadValuePanelConfig() {
         guard let colorSource = colorSource else {
-            valuePanelConfig = ValueAxisPanel.Config(
-                    axisColor: .gray,
-                    zeroAxisColor: .gray,
-                    textColor: .gray)
+            yAxisView.valuePanelConfig = nil
             return
         }
         timeAxisView.textColor = colorSource.chartAxisLabelColor(chartView: self)
-        valuePanelConfig = ValueAxisPanel.Config(
+        yAxisView.valuePanelConfig = ValueAxisPanel.Config(
                 axisColor: colorSource.valueAxisColor(chartView: self),
                 zeroAxisColor: colorSource.zeroValueAxisColor(chartView: self),
                 textColor: colorSource.chartAxisLabelColor(chartView: self))
