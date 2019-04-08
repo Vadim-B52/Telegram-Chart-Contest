@@ -29,7 +29,7 @@ public class ChartPanel {
         self.lineWidth = lineWidth
     }
 
-    public func drawInContext(_ layer: CAShapeLayer, rect: CGRect) {
+    public func drawInContext(_ layer: CAShapeLayer, rect: CGRect, apply: ((CAShapeLayer, CGPath) -> Void)? = nil) {
         layer.lineJoin = .round
         layer.lineWidth = lineWidth
 
@@ -49,7 +49,12 @@ public class ChartPanel {
 
         path.stroke()
         layer.strokeColor = plot.color.cgColor
-        layer.path = path.cgPath
         layer.fillColor = UIColor.clear.cgColor
+
+        if let apply = apply {
+            apply(layer, path.cgPath)
+        } else {
+            layer.path = path.cgPath
+        }
     }
 }

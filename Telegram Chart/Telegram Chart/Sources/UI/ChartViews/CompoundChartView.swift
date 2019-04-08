@@ -7,6 +7,7 @@ import UIKit
 
 public class CompoundChartView: UIView, ChartViewProtocol {
 
+    private let chartView = ChartView()
     private let crosshairView = CrosshairView()
     private let timeAxisView = TimeAxisView()
     private var valuePanelConfig: ValueAxisPanel.Config!
@@ -29,18 +30,16 @@ public class CompoundChartView: UIView, ChartViewProtocol {
 
     public weak var animationProgressDataSource: ChartViewAnimationProgressDataSource?
 
-    public var chart: DrawingChart? {
-        didSet {
-            crosshairView.chart = chart
-            timeAxisView.displayChart(chart: chart, timeAxisDescription: self.timeAxisDescription)
-            setNeedsDisplay()
-        }
-    }
+    private var chart: DrawingChart?
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
         contentMode = .redraw
         isOpaque = true
+
+        chartView.lineWidth = 2
+        chartView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(chartView)
 
         timeAxisView.translatesAutoresizingMaskIntoConstraints = false
         timeAxisView.delegate = self
@@ -71,42 +70,38 @@ public class CompoundChartView: UIView, ChartViewProtocol {
     }
     
     public override func layoutSubviews() {
-        let (timeFrame, crosshairFrame) = bounds.divided(atDistance: 24, from: .maxYEdge)
+        let (timeFrame, chartFrame) = bounds.divided(atDistance: 24, from: .maxYEdge)
         timeAxisView.frame = timeFrame
-        crosshairView.frame = crosshairFrame
+        crosshairView.frame = chartFrame
+        chartView.frame = chartFrame
+    }
+
+    public func displayChart(_ chart: DrawingChart?, animated: Bool) {
+        crosshairView.chart = chart
+        timeAxisView.displayChart(chart: chart, timeAxisDescription: self.timeAxisDescription)
+        setNeedsDisplay()
+        chartView.displayChart(chart, animated: animated)
     }
 
     public override func draw(_ rect: CGRect) {
-//        super.draw(rect)
-//        guard let chart = chart,
-//              let ctx = UIGraphicsGetCurrentContext() else {
-//            return
-//        }
-//        let bounds = integralBounds
-//        let (_, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
-//
-//        var valuePanelConfig = self.valuePanelConfig!
-//        if let animationProgress = animationProgressDataSource?.animationProgressAlpha(chartView: self) {
-//            let color = valuePanelConfig.axisColor.withAlphaComponent(animationProgress)
-//            valuePanelConfig = ValueAxisPanel.Config(
-//                    axisColor: color,
-//                    zeroAxisColor: color,
-//                    textColor: valuePanelConfig.textColor.withAlphaComponent(animationProgress))
-//        }
-//        let valuePanel = ValueAxisPanel(chart: chart, config: valuePanelConfig)
-//        valuePanel.drawInContext(ctx, rect: chartRect)
-//
-//        for plot in chart.plots {
-//            let panel = ChartPanel(
-//                    timestamps: chart.timestamps,
-//                    indexRange: chart.indexRange,
-//                    timeRange: chart.selectedTimeRange,
-//                    valueRange: chart.valueRange,
-//                    plot: plot,
-//                    lineWidth: 2)
-//
-//            panel.drawInContext(ctx, rect: chartRect)
-//        }
+        super.draw(rect)
+        guard let chart = chart,
+              let ctx = UIGraphicsGetCurrentContext() else {
+            return
+        }
+        let bounds = integralBounds
+        let (_, chartRect) = bounds.divided(atDistance: 24, from: .maxYEdge)
+
+        var valuePanelConfig = self.valuePanelConfig!
+        if let animationProgress = animationProgressDataSource?.animationProgressAlpha(chartView: self) {
+            let color = valuePanelConfig.axisColor.withAlphaComponent(animationProgress)
+            valuePanelConfig = ValueAxisPanel.Config(
+                    axisColor: color,
+                    zeroAxisColor: color,
+                    textColor: valuePanelConfig.textColor.withAlphaComponent(animationProgress))
+        }
+        let valuePanel = ValueAxisPanel(chart: chart, config: valuePanelConfig)
+        valuePanel.drawInContext(ctx, rect: chartRect)
     }
 
     public func reloadColors() {

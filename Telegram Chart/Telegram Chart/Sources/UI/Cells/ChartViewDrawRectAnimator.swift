@@ -5,7 +5,7 @@
 
 import UIKit
 
-public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIView, CAAnimationDelegate {
+public class ChartViewDrawRectAnimator<ChartViewType: UIView & ChartViewProtocol>: UIView, CAAnimationDelegate {
 
     private let chartView1: ChartViewType
     private let chartView2: ChartViewType
@@ -54,13 +54,13 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
     }
 
     private func performDeadTransitionToChart(_ chart: DrawingChart?) {
-        transitionState = nil
-        chartView1.chart = chart
-        chartView2.chart = nil
-        chartView1.layer.opacity = 1
-        chartView2.layer.opacity = 0
-        chartView1.layer.removeAllAnimations()
-        chartView2.layer.removeAllAnimations()
+//        transitionState = nil
+//        chartView1.chart = chart
+//        chartView2.chart = nil
+//        chartView1.layer.opacity = 1
+//        chartView2.layer.opacity = 0
+//        chartView1.layer.removeAllAnimations()
+//        chartView2.layer.removeAllAnimations()
     }
 
     private func performAnimatedTransitionToChart(_ chart: DrawingChart, previousChart: DrawingChart) {
@@ -113,11 +113,11 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
         guard let state = transitionState else {
             return
         }
-        transitionState = nil
-        state.endChartReceiver.chart = chart
-        state.beginChartReceiver.chart = nil
-        state.endChartReceiver.layer.opacity = 1
-        state.beginChartReceiver.layer.opacity = 0
+//        transitionState = nil
+//        state.endChartReceiver.chart = chart
+//        state.beginChartReceiver.chart = nil
+//        state.endChartReceiver.layer.opacity = 1
+//        state.beginChartReceiver.layer.opacity = 0
     }
 
     @objc
@@ -155,7 +155,7 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
     }
 }
 
-extension ChartViewContainer: ChartViewAnimationProgressDataSource {
+extension ChartViewDrawRectAnimator: ChartViewAnimationProgressDataSource {
     public func animationProgressAlpha(chartView: ChartViewProtocol) -> CGFloat? {
         guard let state = transitionState else {
             return nil
@@ -170,7 +170,7 @@ extension ChartViewContainer: ChartViewAnimationProgressDataSource {
     }
 }
 
-fileprivate extension ChartViewContainer {
+fileprivate extension ChartViewDrawRectAnimator {
     private struct TransitionState<T> {
         let displayLink: CADisplayLink
         let formula: ((Float) -> Float)

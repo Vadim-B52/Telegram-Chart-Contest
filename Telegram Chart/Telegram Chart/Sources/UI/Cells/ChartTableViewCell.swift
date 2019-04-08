@@ -14,8 +14,8 @@ public protocol ChartTableViewCellDelegate: AnyObject {
 
 public class ChartTableViewCell: UITableViewCell {
 
-    private let chartViewContainer: ChartViewContainer<CompoundChartView> = ChartViewContainer(CompoundChartView())
-    private let miniChartViewContainer: ChartViewContainer<ChartView> = ChartViewContainer(ChartView())
+    private let chartView = CompoundChartView()
+    private let miniChartView = ChartView()
     private let timeSelector = MiniChartTimeSelectorView()
 
     private var chart: Chart?
@@ -25,7 +25,7 @@ public class ChartTableViewCell: UITableViewCell {
     public weak var delegate: ChartTableViewCellDelegate?
     public weak var chartViewColorSource: ChartViewColorSource? {
         didSet {
-            chartViewContainer.chartViews.forEach { $0.colorSource = chartViewColorSource }
+            chartView.colorSource = chartViewColorSource
         }
     }
     public weak var timeSelectorViewColorSource: MiniChartTimeSelectorViewColorSource? {
@@ -36,47 +36,42 @@ public class ChartTableViewCell: UITableViewCell {
 
     public override init(style: CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-
-        chartViewContainer.chartViews.forEach { view in
-            view.timeAxisDelegate = self
-            view.animationProgressDataSource = chartViewContainer
-        }
-
-        chartViewContainer.translatesAutoresizingMaskIntoConstraints = false
-        miniChartViewContainer.translatesAutoresizingMaskIntoConstraints = false
+        chartView.timeAxisDelegate = self
+        chartView.translatesAutoresizingMaskIntoConstraints = false
+        miniChartView.translatesAutoresizingMaskIntoConstraints = false
 
         let miniChartViewWrapper = UIView()
         miniChartViewWrapper.translatesAutoresizingMaskIntoConstraints = false
-        miniChartViewWrapper.addSubview(miniChartViewContainer)
+        miniChartViewWrapper.addSubview(miniChartView)
         NSLayoutConstraint.activate([
             NSLayoutConstraint(
                     item: miniChartViewWrapper, attribute: .top,
                     relatedBy: .equal,
-                    toItem: miniChartViewContainer, attribute: .top,
+                    toItem: miniChartView, attribute: .top,
                     multiplier: 1, constant: -11),
             NSLayoutConstraint(
                     item: miniChartViewWrapper, attribute: .bottom,
                     relatedBy: .equal,
-                    toItem: miniChartViewContainer, attribute: .bottom,
+                    toItem: miniChartView, attribute: .bottom,
                     multiplier: 1, constant: 9),
             NSLayoutConstraint(
                     item: miniChartViewWrapper, attribute: .leading,
                     relatedBy: .equal,
-                    toItem: miniChartViewContainer, attribute: .leading,
+                    toItem: miniChartView, attribute: .leading,
                     multiplier: 1, constant: 0),
             NSLayoutConstraint(
                     item: miniChartViewWrapper, attribute: .trailing,
                     relatedBy: .equal,
-                    toItem: miniChartViewContainer, attribute: .trailing,
+                    toItem: miniChartView, attribute: .trailing,
                     multiplier: 1, constant: 0),
         ])
 
         timeSelector.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(chartViewContainer)
+        contentView.addSubview(chartView)
         contentView.addSubview(miniChartViewWrapper)
         addSubview(timeSelector)
 
-        let views = ["chartView": chartViewContainer, "miniChartView": miniChartViewWrapper]
+        let views = ["chartView": chartView, "miniChartView": miniChartViewWrapper]
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
             withVisualFormat: "V:|[chartView][miniChartView(==60)]|",
             metrics: nil,
@@ -121,8 +116,8 @@ public class ChartTableViewCell: UITableViewCell {
 
     public override func prepareForReuse() {
         super.prepareForReuse()
-        chartViewContainer.displayChart(nil)
-        miniChartViewContainer.displayChart(nil)
+        chartView.displayChart(nil, animated: false)
+        miniChartView.displayChart(nil, animated: false)
         timeSelector.timeRange = nil
         timeSelector.selectedTimeRange = nil
     }
@@ -133,8 +128,8 @@ public class ChartTableViewCell: UITableViewCell {
         self.state = state
         timeSelector.timeRange = chart.timeRange
         timeSelector.selectedTimeRange = state.selectedTimeRange
-        chartViewContainer.displayChart(chartViewDrawingChart())
-        miniChartViewContainer.displayChart(miniChartViewDrawingChart())
+        chartView.displayChart(chartViewDrawingChart(), animated: false)
+        miniChartView.displayChart(miniChartViewDrawingChart(), animated: false)
     }
 
     public func hidePlot(plotId: String) {
@@ -142,8 +137,8 @@ public class ChartTableViewCell: UITableViewCell {
             return
         }
         self.state = state.byDisablingPlotWith(identifier: plotId)
-        chartViewContainer.displayChart(chartViewDrawingChart(), animated: true)
-        miniChartViewContainer.displayChart(miniChartViewDrawingChart(), animated: true)
+        chartView.displayChart(chartViewDrawingChart(), animated: true)
+        miniChartView.displayChart(miniChartViewDrawingChart(), animated: true)
     }
 
     public func showPlot(plotId: String) {
@@ -151,8 +146,8 @@ public class ChartTableViewCell: UITableViewCell {
             return
         }
         self.state = state.byEnablingPlotWith(identifier: plotId)
-        chartViewContainer.displayChart(chartViewDrawingChart(), animated: true)
-        miniChartViewContainer.displayChart(miniChartViewDrawingChart(), animated: true)
+        chartView.displayChart(chartViewDrawingChart(), animated: true)
+        miniChartView.displayChart(miniChartViewDrawingChart(), animated: true)
     }
 
     @objc
@@ -161,7 +156,7 @@ public class ChartTableViewCell: UITableViewCell {
             return
         }
         state = state?.byChanging(selectedTimeRange: selectedTimeRange)
-        chartViewContainer.displayChart(chartViewDrawingChart())
+        chartView.displayChart(chartViewDrawingChart(), animated: false)
         delegate?.chartTableViewCell(self, didChangeSelectedTimeRange: selectedTimeRange)
     }
 

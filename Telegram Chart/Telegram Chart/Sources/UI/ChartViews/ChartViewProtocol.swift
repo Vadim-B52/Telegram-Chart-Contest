@@ -6,5 +6,5 @@
 import UIKit
 
 public protocol ChartViewProtocol: AnyObject {
-    var chart: DrawingChart? { get set }
+    func displayChart(_ :DrawingChart?, animated: Bool)
 }
