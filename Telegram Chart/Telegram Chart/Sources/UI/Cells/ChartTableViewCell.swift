@@ -14,8 +14,8 @@ public protocol ChartTableViewCellDelegate: AnyObject {
 
 public class ChartTableViewCell: UITableViewCell {
 
-    private let chartViewContainer: ChartViewContainer<ChartView> = ChartViewContainer(ChartView())
-    private let miniChartViewContainer: ChartViewContainer<MiniChartView> = ChartViewContainer(MiniChartView())
+    private let chartViewContainer: ChartViewContainer<CompoundChartView> = ChartViewContainer(CompoundChartView())
+    private let miniChartViewContainer: ChartViewContainer<ChartView> = ChartViewContainer(ChartView())
     private let timeSelector = MiniChartTimeSelectorView()
 
     private var chart: Chart?
@@ -44,12 +44,39 @@ public class ChartTableViewCell: UITableViewCell {
 
         chartViewContainer.translatesAutoresizingMaskIntoConstraints = false
         miniChartViewContainer.translatesAutoresizingMaskIntoConstraints = false
+
+        let miniChartViewWrapper = UIView()
+        miniChartViewWrapper.translatesAutoresizingMaskIntoConstraints = false
+        miniChartViewWrapper.addSubview(miniChartViewContainer)
+        NSLayoutConstraint.activate([
+            NSLayoutConstraint(
+                    item: miniChartViewWrapper, attribute: .top,
+                    relatedBy: .equal,
+                    toItem: miniChartViewContainer, attribute: .top,
+                    multiplier: 1, constant: -11),
+            NSLayoutConstraint(
+                    item: miniChartViewWrapper, attribute: .bottom,
+                    relatedBy: .equal,
+                    toItem: miniChartViewContainer, attribute: .bottom,
+                    multiplier: 1, constant: 9),
+            NSLayoutConstraint(
+                    item: miniChartViewWrapper, attribute: .leading,
+                    relatedBy: .equal,
+                    toItem: miniChartViewContainer, attribute: .leading,
+                    multiplier: 1, constant: 0),
+            NSLayoutConstraint(
+                    item: miniChartViewWrapper, attribute: .trailing,
+                    relatedBy: .equal,
+                    toItem: miniChartViewContainer, attribute: .trailing,
+                    multiplier: 1, constant: 0),
+        ])
+
         timeSelector.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(chartViewContainer)
-        contentView.addSubview(miniChartViewContainer)
+        contentView.addSubview(miniChartViewWrapper)
         addSubview(timeSelector)
 
-        let views = ["chartView": chartViewContainer, "miniChartView": miniChartViewContainer]
+        let views = ["chartView": chartViewContainer, "miniChartView": miniChartViewWrapper]
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
             withVisualFormat: "V:|[chartView][miniChartView(==60)]|",
             metrics: nil,
@@ -66,22 +93,22 @@ public class ChartTableViewCell: UITableViewCell {
             NSLayoutConstraint(
                 item: timeSelector, attribute: .centerX,
                 relatedBy: .equal,
-                toItem: miniChartViewContainer, attribute: .centerX,
+                toItem: miniChartViewWrapper, attribute: .centerX,
                 multiplier: 1, constant: 0),
             NSLayoutConstraint(
                 item: timeSelector, attribute: .centerY,
                 relatedBy: .equal,
-                toItem: miniChartViewContainer, attribute: .centerY,
+                toItem: miniChartViewWrapper, attribute: .centerY,
                 multiplier: 1, constant: 0),
             NSLayoutConstraint(
                 item: timeSelector, attribute: .height,
                 relatedBy: .equal,
-                toItem: miniChartViewContainer, attribute: .height,
+                toItem: miniChartViewWrapper, attribute: .height,
                 multiplier: 1, constant: 0),
             NSLayoutConstraint(
                 item: timeSelector, attribute: .width,
                 relatedBy: .equal,
-                toItem: miniChartViewContainer, attribute: .width,
+                toItem: miniChartViewWrapper, attribute: .width,
                 multiplier: 1, constant: 30),
         ])
 
@@ -142,11 +169,9 @@ public class ChartTableViewCell: UITableViewCell {
         guard let chart = chart, let state = state else {
             return nil
         }
-        let plots = chart.plots.filter {
-            state.enabledPlotId.contains($0.identifier)
-        }
         return DrawingChart(
-                plots: plots,
+                allPlots: chart.plots,
+                enabledPlotId: state.enabledPlotId,
                 timestamps: chart.timestamps,
                 timeRange: chart.timeRange,
                 selectedTimeRange: state.selectedTimeRange,
@@ -158,11 +183,9 @@ public class ChartTableViewCell: UITableViewCell {
         guard let chart = chart, let state = state else {
             return nil
         }
-        let plots = chart.plots.filter {
-            state.enabledPlotId.contains($0.identifier)
-        }
         return DrawingChart(
-                plots: plots,
+                allPlots: chart.plots,
+                enabledPlotId: state.enabledPlotId,
                 timestamps: chart.timestamps,
                 timeRange: chart.timeRange,
                 valueRangeCalculation: FullValueRangeCalculation(),
@@ -172,11 +195,11 @@ public class ChartTableViewCell: UITableViewCell {
 
 extension ChartTableViewCell: ChartViewTimeAxisDelegate {
 
-    public func chartView(_ chartView: ChartView, didChangeTimeAxisDescription description: TimeAxisDescription?) {
+    public func chartView(_ chartView: CompoundChartView, didChangeTimeAxisDescription description: TimeAxisDescription?) {
         self.timeAxisDescription = description
     }
 
-    public func timeAxisDescription(chartView: ChartView) -> TimeAxisDescription? {
+    public func timeAxisDescription(chartView: CompoundChartView) -> TimeAxisDescription? {
         return timeAxisDescription
     }
 }

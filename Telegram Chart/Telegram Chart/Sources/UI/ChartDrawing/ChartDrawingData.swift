@@ -6,22 +6,26 @@
 import UIKit
 
 public class DrawingChart {
-
-    public let plots: [Chart.Plot]
+    public let allPlots: [Chart.Plot]
+    public let enabledPlotId: Set<String>
+    public let visiblePlots: [Chart.Plot]
     public let timestamps: [Chart.Time]
     public let timeRange: TimeRange
     public let selectedTimeRange: TimeRange
     public let valueRangeCalculation: ValueRangeCalculation
     public let yAxisCalculation: YAxisCalculation
 
-    public init(plots: [Chart.Plot],
+    public init(allPlots: [Chart.Plot],
+                enabledPlotId: Set<String>,
                 timestamps: [Chart.Time],
                 timeRange: TimeRange,
                 selectedTimeRange: TimeRange? = nil,
                 valueRangeCalculation: ValueRangeCalculation,
                 yAxisCalculation: YAxisCalculation) {
 
-        self.plots = plots
+        self.allPlots = allPlots
+        self.enabledPlotId = enabledPlotId
+        visiblePlots = allPlots.filter { enabledPlotId.contains($0.identifier) }
         self.timestamps = timestamps
         self.timeRange = timeRange
         self.selectedTimeRange = selectedTimeRange ?? timeRange
@@ -41,12 +45,16 @@ public class DrawingChart {
     public private(set) lazy var axisValues: YAxisValues = yAxis.yAxisValues
 
     public private(set) lazy var rawValueRange: ValueRange = {
-        return valueRangeCalculation.valueRange(plots: plots, indexRange: indexRange)
+        return valueRangeCalculation.valueRange(plots: visiblePlots, indexRange: indexRange)
     }()
 
     private lazy var yAxis: YAxisCalculationResult = {
         return yAxisCalculation.yAxis(valueRange: rawValueRange)
     }()
+
+    public func isPlotVisible(_ plot: Chart.Plot) -> Bool {
+        return enabledPlotId.contains(plot.identifier)
+    }
 
     public func closestIdxTo(timestamp: Int64) -> Int {
         if timestamp <= selectedTimeRange.min {

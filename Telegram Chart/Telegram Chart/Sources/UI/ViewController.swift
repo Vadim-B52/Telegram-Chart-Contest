@@ -210,27 +210,27 @@ extension ViewController: MiniChartTimeSelectorViewColorSource {
 }
 
 extension ViewController: ChartViewColorSource {
-    public func valueAxisColor(chartView: ChartView) -> UIColor {
+    public func valueAxisColor(chartView: CompoundChartView) -> UIColor {
         return skin.valueAxisColor
     }
 
-    public func zeroValueAxisColor(chartView: ChartView) -> UIColor {
+    public func zeroValueAxisColor(chartView: CompoundChartView) -> UIColor {
         return skin.zeroValueAxisColor
     }
 
-    public func chartAxisLabelColor(chartView: ChartView) -> UIColor {
+    public func chartAxisLabelColor(chartView: CompoundChartView) -> UIColor {
         return skin.chartAxisLabelColor
     }
 
-    public func popupBackgroundColor(chartView: ChartView) -> UIColor {
+    public func popupBackgroundColor(chartView: CompoundChartView) -> UIColor {
         return skin.popupBackgroundColor
     }
 
-    public func popupLabelColor(chartView: ChartView) -> UIColor {
+    public func popupLabelColor(chartView: CompoundChartView) -> UIColor {
         return skin.popupLabelColor
     }
 
-    public func backgroundColor(chartView: ChartView) -> UIColor {
+    public func backgroundColor(chartView: CompoundChartView) -> UIColor {
         return skin.cellBackgroundColor
     }
 }

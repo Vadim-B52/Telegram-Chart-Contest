@@ -5,7 +5,7 @@
 
 import UIKit
 
-public class ChartView: UIView, ChartViewProtocol {
+public class CompoundChartView: UIView, ChartViewProtocol {
 
     private let crosshairView = CrosshairView()
     private let timeAxisView = TimeAxisView()
@@ -131,7 +131,7 @@ public class ChartView: UIView, ChartViewProtocol {
     }
 }
 
-extension ChartView: CrosshairViewColorSource {
+extension CompoundChartView: CrosshairViewColorSource {
     public func pointFillColor(crosshairView: CrosshairView) -> UIColor {
         return colorSource?.backgroundColor(chartView: self) ?? UIColor.white
     }
@@ -149,7 +149,7 @@ extension ChartView: CrosshairViewColorSource {
     }
 }
 
-extension ChartView: TimeAxisViewDelegate {
+extension CompoundChartView: TimeAxisViewDelegate {
     public func timeAxisView(_ view: TimeAxisView, didUpdateTimeAxisDescription descr: TimeAxisDescription) {
         if descr != timeAxisDescription {
             timeAxisDescription = descr
@@ -158,17 +158,17 @@ extension ChartView: TimeAxisViewDelegate {
 }
 
 public protocol ChartViewTimeAxisDelegate: AnyObject {
-    func chartView(_ chartView: ChartView, didChangeTimeAxisDescription description: TimeAxisDescription?)
-    func timeAxisDescription(chartView: ChartView) -> TimeAxisDescription?
+    func chartView(_ chartView: CompoundChartView, didChangeTimeAxisDescription description: TimeAxisDescription?)
+    func timeAxisDescription(chartView: CompoundChartView) -> TimeAxisDescription?
 }
 
 public protocol ChartViewColorSource: AnyObject {
-    func valueAxisColor(chartView: ChartView) -> UIColor
-    func zeroValueAxisColor(chartView: ChartView) -> UIColor
-    func chartAxisLabelColor(chartView: ChartView) -> UIColor
-    func popupBackgroundColor(chartView: ChartView) -> UIColor
-    func popupLabelColor(chartView: ChartView) -> UIColor
-    func backgroundColor(chartView: ChartView) -> UIColor
+    func valueAxisColor(chartView: CompoundChartView) -> UIColor
+    func zeroValueAxisColor(chartView: CompoundChartView) -> UIColor
+    func chartAxisLabelColor(chartView: CompoundChartView) -> UIColor
+    func popupBackgroundColor(chartView: CompoundChartView) -> UIColor
+    func popupLabelColor(chartView: CompoundChartView) -> UIColor
+    func backgroundColor(chartView: CompoundChartView) -> UIColor
 }
 
 public protocol ChartViewAnimationProgressDataSource: AnyObject {

@@ -78,7 +78,7 @@ public class CrosshairView: UIView {
             let x = calc.x(in: bounds, timestamp: timestamp)
             frame.origin.x = x - frame.width / 2
 
-            for plot in chart.plots {
+            for plot in chart.visiblePlots {
                 let yCalc = DrawingChart.YCalculator(valueRange: chart.valueRange)
                 let y = yCalc.y(in: bounds, value: plot.values[idx])
                 if frame.contains(CGPoint(x: x, y: y)) {
@@ -151,7 +151,7 @@ public class CrosshairView: UIView {
             let timestamp: Int64 = chart.timestamps[idx]
             let formatter = ChartTextFormatter.shared
             popup.timeLabel.attributedText = formatter.popupDateText(timestamp: timestamp)
-            popup.valueLabel.attributedText = formatter.popupValueText(index: idx, plots: chart.plots)
+            popup.valueLabel.attributedText = formatter.popupValueText(index: idx, plots: chart.visiblePlots)
             setNeedsLayout()
 //            TODO: animated if needed
 //            let options: UIView.AnimationOptions = [.beginFromCurrentState, .curveLinear]

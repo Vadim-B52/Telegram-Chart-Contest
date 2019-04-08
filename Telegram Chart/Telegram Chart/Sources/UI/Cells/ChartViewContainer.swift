@@ -64,48 +64,49 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
     }
 
     private func performAnimatedTransitionToChart(_ chart: DrawingChart, previousChart: DrawingChart) {
-        chartView1.chart = nil
-        chartView2.chart = nil
-        chartView1.chart = previousChart
-        chartView2.chart = previousChart
-        chartView1.layer.opacity = 1
-        chartView2.layer.opacity = 1
-
-        let link = CADisplayLink(target: self, selector: #selector(onRenderTime))
-        link.add(to: .main, forMode: .common)
-
-        let animation = CABasicAnimation(keyPath: "opacity")
-        animation.duration = 0.4
-        animation.delegate = self
-
-        let toShowPlot = previousChart.plots.count < chart.plots.count
-        if toShowPlot {
-            chartView2.layer.opacity = 1
-            animation.fromValue = 0
-            animation.toValue = 1
-            animation.timingFunction = CAMediaTimingFunction(name: .easeIn)
-            transitionState = TransitionState(
-                    displayLink: link,
-                    formula: { $0 },
-                    beginChart: previousChart,
-                    endChart: chart,
-                    beginChartReceiver: chartView1,
-                    endChartReceiver: chartView2)
-        } else {
-            chartView2.layer.opacity = 0
-            animation.fromValue = 1
-            animation.toValue = 0
-            animation.timingFunction = CAMediaTimingFunction(name: .easeOut)
-            transitionState = TransitionState(
-                    displayLink: link,
-                    formula: { 1 - $0 },
-                    beginChart: previousChart,
-                    endChart: chart,
-                    beginChartReceiver: chartView2,
-                    endChartReceiver: chartView1)
-        }
-        render(state: transitionState!, progress: 0)
-        chartView2.layer.add(animation, forKey: "opacityAnimation")
+        performDeadTransitionToChart(chart)
+//        chartView1.chart = nil
+//        chartView2.chart = nil
+//        chartView1.chart = previousChart
+//        chartView2.chart = previousChart
+//        chartView1.layer.opacity = 1
+//        chartView2.layer.opacity = 1
+//
+//        let link = CADisplayLink(target: self, selector: #selector(onRenderTime))
+//        link.add(to: .main, forMode: .common)
+//
+//        let animation = CABasicAnimation(keyPath: "opacity")
+//        animation.duration = 0.4
+//        animation.delegate = self
+//
+//        let toShowPlot = previousChart.plots.count < chart.plots.count
+//        if toShowPlot {
+//            chartView2.layer.opacity = 1
+//            animation.fromValue = 0
+//            animation.toValue = 1
+//            animation.timingFunction = CAMediaTimingFunction(name: .easeIn)
+//            transitionState = TransitionState(
+//                    displayLink: link,
+//                    formula: { $0 },
+//                    beginChart: previousChart,
+//                    endChart: chart,
+//                    beginChartReceiver: chartView1,
+//                    endChartReceiver: chartView2)
+//        } else {
+//            chartView2.layer.opacity = 0
+//            animation.fromValue = 1
+//            animation.toValue = 0
+//            animation.timingFunction = CAMediaTimingFunction(name: .easeOut)
+//            transitionState = TransitionState(
+//                    displayLink: link,
+//                    formula: { 1 - $0 },
+//                    beginChart: previousChart,
+//                    endChart: chart,
+//                    beginChartReceiver: chartView2,
+//                    endChartReceiver: chartView1)
+//        }
+//        render(state: transitionState!, progress: 0)
+//        chartView2.layer.add(animation, forKey: "opacityAnimation")
     }
 
     public func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
@@ -128,29 +129,29 @@ public class ChartViewContainer<ChartViewType: UIView & ChartViewProtocol>: UIVi
     }
 
     private func render(state: TransitionState<ChartViewType>, progress: Float) {
-        transitionProgress = progress
-
-        let minD = state.endChart.valueRange.min - state.beginChart.valueRange.min
-        let maxD = state.endChart.valueRange.max - state.beginChart.valueRange.max
-        let valueRange = ValueRange(
-                min: state.beginChart.valueRange.min + Chart.Value(transitionProgress * Float(minD)),
-                max: state.beginChart.valueRange.max + Chart.Value(transitionProgress * Float(maxD)))
-
-        state.beginChartReceiver.chart = DrawingChart(
-                plots: state.beginChart.plots,
-                timestamps: state.beginChart.timestamps,
-                timeRange: state.beginChart.timeRange,
-                selectedTimeRange: state.beginChart.selectedTimeRange,
-                valueRangeCalculation: StaticValueRangeCalculation(valueRange: valueRange),
-                yAxisCalculation: ValueRangeHasStaticYAxis(valueRange: valueRange, yAxisValues: state.beginChart.axisValues))
-
-        state.endChartReceiver.chart = DrawingChart(
-                plots: state.endChart.plots,
-                timestamps: state.endChart.timestamps,
-                timeRange: state.endChart.timeRange,
-                selectedTimeRange: state.endChart.selectedTimeRange,
-                valueRangeCalculation: StaticValueRangeCalculation(valueRange: valueRange),
-                yAxisCalculation: ValueRangeHasStaticYAxis(valueRange: valueRange, yAxisValues: state.endChart.axisValues))
+//        transitionProgress = progress
+//
+//        let minD = state.endChart.valueRange.min - state.beginChart.valueRange.min
+//        let maxD = state.endChart.valueRange.max - state.beginChart.valueRange.max
+//        let valueRange = ValueRange(
+//                min: state.beginChart.valueRange.min + Chart.Value(transitionProgress * Float(minD)),
+//                max: state.beginChart.valueRange.max + Chart.Value(transitionProgress * Float(maxD)))
+//
+//        state.beginChartReceiver.chart = DrawingChart(
+//                plots: state.beginChart.plots,
+//                timestamps: state.beginChart.timestamps,
+//                timeRange: state.beginChart.timeRange,
+//                selectedTimeRange: state.beginChart.selectedTimeRange,
+//                valueRangeCalculation: StaticValueRangeCalculation(valueRange: valueRange),
+//                yAxisCalculation: ValueRangeHasStaticYAxis(valueRange: valueRange, yAxisValues: state.beginChart.axisValues))
+//
+//        state.endChartReceiver.chart = DrawingChart(
+//                plots: state.endChart.plots,
+//                timestamps: state.endChart.timestamps,
+//                timeRange: state.endChart.timeRange,
+//                selectedTimeRange: state.endChart.selectedTimeRange,
+//                valueRangeCalculation: StaticValueRangeCalculation(valueRange: valueRange),
+//                yAxisCalculation: ValueRangeHasStaticYAxis(valueRange: valueRange, yAxisValues: state.endChart.axisValues))
     }
 }
 

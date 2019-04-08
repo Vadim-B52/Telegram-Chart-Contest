@@ -5,33 +5,53 @@
 
 import UIKit
 
-public class MiniChartView: UIControl, ChartViewProtocol {
+public class ChartView: UIControl, ChartViewProtocol {
 
     private var layers = [CAShapeLayer]()
 
     public var chart: DrawingChart? {
         didSet {
-            layers.forEach { $0.removeFromSuperlayer() }
-            layers.removeAll()
+            updateLayers()
             redraw()
         }
     }
 
     public override func layoutSubviews() {
         super.layoutSubviews()
-        layers.forEach { $0.removeFromSuperlayer() }
+        let frame = plotFrame()
+        layers.forEach { $0.frame = frame }
         redraw()
+    }
+
+    private func updateLayers() {
+        let plotsCount = chart?.allPlots.count ?? 0
+        let d = layers.count - plotsCount
+        if d > 0 {
+            for _ in 0..<d {
+                layers.last?.removeFromSuperlayer()
+            }
+        } else if d < 0 {
+            let frame = plotFrame()
+            for _ in 0..<(-d) {
+                let plotLayer = CAShapeLayer()
+                plotLayer.frame = frame
+                layer.addSublayer(plotLayer)
+                layers.append(plotLayer)
+            }
+        }
+    }
+
+    private func plotFrame() -> CGRect {
+        return layer.bounds
     }
 
     private func redraw() {
         guard let chart = chart else {
             return
         }
-        let drawingRect = layer.bounds.inset(by: UIEdgeInsets(top: 11, left: 0, bottom: 9, right: 0))
-        chart.plots.forEach { plot in
-            let plotLayer = CAShapeLayer()
-            self.layer.addSublayer(plotLayer)
-            plotLayer.frame = drawingRect
+
+        for (idx, plot) in chart.allPlots.enumerated() {
+            let plotLayer = layers[idx]
             let panel = ChartPanel(
                     timestamps: chart.timestamps,
                     indexRange: chart.indexRange,
@@ -41,7 +61,7 @@ public class MiniChartView: UIControl, ChartViewProtocol {
                     lineWidth: 1)
 
             panel.drawInContext(plotLayer, rect: plotLayer.bounds)
-            layers.append(plotLayer)
+            plotLayer.opacity = chart.isPlotVisible(plot) ? 1 : 0
         }
     }
 }
