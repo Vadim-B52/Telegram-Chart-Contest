@@ -22,6 +22,8 @@ public struct ChartTO {
     public enum ColumnType: String, RawRepresentable {
         case x = "x"
         case line = "line"
+        case area = "area"
+        case bar = "bar"
     }
 
     public struct Column {

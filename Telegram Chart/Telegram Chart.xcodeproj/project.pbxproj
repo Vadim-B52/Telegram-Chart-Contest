@@ -29,7 +29,7 @@
 		6AC71EBD7BF2879ECC8DB908 /* ChartPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71F1C11EF230B241273B2 /* ChartPanel.swift */; };
 		6AC71ECAE35E6F18EE7D5411 /* ChartDrawingData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC712480BA5369ECEAD436E /* ChartDrawingData.swift */; };
 		DD7A05EE2256AB23003014B3 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7A05ED2256AB23003014B3 /* Fonts.swift */; };
-		DDC16F4322358CCA0060596D /* sample_data.json in Resources */ = {isa = PBXBuildFile; fileRef = DDC16F4222358CCA0060596D /* sample_data.json */; };
+		DD8CAC10225BE3370030E505 /* sample_data in Resources */ = {isa = PBXBuildFile; fileRef = DD8CAC0F225BE3370030E505 /* sample_data */; };
 		DDC16F4722358D670060596D /* ChartTO.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC16F4622358D670060596D /* ChartTO.swift */; };
 		DDC16F492236EC4B0060596D /* ChartListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC16F482236EC4B0060596D /* ChartListScreen.swift */; };
 		DDC16F4D223700BE0060596D /* Skin.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC16F4C223700BE0060596D /* Skin.swift */; };
@@ -75,7 +75,7 @@
 		6AC71F60026D701CF45660A7 /* ChartTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartTableViewCell.swift; sourceTree = "<group>"; };
 		6AC71FCB29C5626EA888BBDE /* ChartTimeSelectorView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartTimeSelectorView.swift; sourceTree = "<group>"; };
 		DD7A05ED2256AB23003014B3 /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
-		DDC16F4222358CCA0060596D /* sample_data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = sample_data.json; sourceTree = "<group>"; };
+		DD8CAC0F225BE3370030E505 /* sample_data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sample_data; sourceTree = "<group>"; };
 		DDC16F4622358D670060596D /* ChartTO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartTO.swift; sourceTree = "<group>"; };
 		DDC16F482236EC4B0060596D /* ChartListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartListScreen.swift; sourceTree = "<group>"; };
 		DDC16F4C223700BE0060596D /* Skin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Skin.swift; sourceTree = "<group>"; };
@@ -169,7 +169,7 @@
 		DDC16F3D22358C420060596D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				DDC16F4222358CCA0060596D /* sample_data.json */,
+				DD8CAC0F225BE3370030E505 /* sample_data */,
 				DDFF54E222358A79005EB0D9 /* Main.storyboard */,
 				DDFF54E522358A7A005EB0D9 /* Assets.xcassets */,
 				DDFF54E722358A7A005EB0D9 /* LaunchScreen.storyboard */,
@@ -339,8 +339,8 @@
 			files = (
 				DDFF54E922358A7A005EB0D9 /* LaunchScreen.storyboard in Resources */,
 				DDFF54E622358A7A005EB0D9 /* Assets.xcassets in Resources */,
+				DD8CAC10225BE3370030E505 /* sample_data in Resources */,
 				DDFF54E422358A79005EB0D9 /* Main.storyboard in Resources */,
-				DDC16F4322358CCA0060596D /* sample_data.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

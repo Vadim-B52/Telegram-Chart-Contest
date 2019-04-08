@@ -12,7 +12,7 @@ public final class ChartJsonParser {
     public init() {
     }
 
-    public func parseData(_ data: Data) throws -> [ChartTO] {
+    public func parseChartListData(_ data: Data) throws -> [ChartTO] {
         guard let json = try? JSONSerialization.jsonObject(with: data) else {
             throw ChartParserError.noJson
         }
@@ -20,6 +20,13 @@ public final class ChartJsonParser {
             throw ChartParserError.noChart
         }
         return try remoteCharts.map { return try readChart($0) }
+    }
+    
+    public func parseChartData(_ data: Data) throws -> ChartTO {
+        guard let json = try? JSONSerialization.jsonObject(with: data) else {
+            throw ChartParserError.noJson
+        }
+        return try readChart(json)
     }
 
     private func readChart(_ remoteChart0: Any) throws -> ChartTO {
@@ -57,7 +64,12 @@ public final class ChartJsonParser {
                 types[key] = .x
             case ChartTO.ColumnType.line.rawValue:
                 types[key] = .line
+            case ChartTO.ColumnType.bar.rawValue:
+                types[key] = .bar
+            case ChartTO.ColumnType.area.rawValue:
+                types[key] = .area
             default:
+                assertionFailure("need be implementer")
                 continue
             }
         }

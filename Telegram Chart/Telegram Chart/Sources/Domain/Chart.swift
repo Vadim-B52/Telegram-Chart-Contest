@@ -28,21 +28,26 @@ public class Chart {
         return TimeRange(min: min, max: max)
     }()
 
+    // TODO: replace type with class?
     public class Plot {
         public let identifier: String
         public let name: String
         public let color: UIColor
         public let values: [Chart.Value]
+        public let type: PlotType
 
-        public init(identifier: String,
-                         name: String,
-                         color: UIColor,
-                         values: [Int64]) {
+        public init(
+            identifier: String,
+            name: String,
+            color: UIColor,
+            values: [Int64],
+            type: PlotType) {
             
             self.identifier = identifier
             self.name = name
             self.color = color
             self.values = values
+            self.type = type
         }
 
         // TODO: is needed or optimize
@@ -54,6 +59,10 @@ public class Chart {
             return ValueRange(values: values, indexRange: indexRange)
         }
     }
+}
+
+public enum PlotType {
+    case line, area, bar
 }
 
 public struct ValueRange: Equatable {

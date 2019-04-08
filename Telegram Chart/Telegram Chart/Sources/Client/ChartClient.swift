@@ -11,13 +11,21 @@ public class ChartClient {
     }
 
     public func loadChartData() throws -> [Chart] {
-        guard let url = Bundle.main.url(forResource: "sample_data", withExtension: "json"),
-              let data = try? Data(contentsOf: url) else {
+        guard let dataDir = Bundle.main.url(forResource: "sample_data", withExtension: nil) else {
             throw ChartClientError.noData
         }
-        let parser = ChartJsonParser()
-        let chartTOs = try parser.parseData(data)
-        return try chartTOs.map { try chartFromChartTO($0) }
+        var charts = [Chart]()
+        for i in 1...5 {
+            let typePath = dataDir.appendingPathComponent("\(i)", isDirectory: true)
+            let overviewPath = typePath.appendingPathComponent("overview.json")
+            guard let data = try? Data(contentsOf: overviewPath) else {
+                throw ChartClientError.noData
+            }
+            let parser = ChartJsonParser()
+            let chartTo = try parser.parseChartData(data)
+            charts.append(try chartFromChartTO(chartTo))
+        }
+        return charts
     }
     
     // TODO: validate
@@ -43,25 +51,32 @@ public class ChartClient {
                 continue
             }
             let columnType = chartTO.types.values[key]!
+            let plotType: PlotType
             switch columnType {
             case .line:
-                let plot = try plotWithKey(key, chartTO: chartTO, values: column.values)
-                plots.append(plot)
-            default:
+                plotType = .line
+            case .x:
+                fatalError("Illegal!")
                 break
+            case .area:
+                plotType = .area
+            case .bar:
+                plotType = .bar
             }
+            let plot = try plotWithKey(key, chartTO: chartTO, values: column.values, type: plotType)
+            plots.append(plot)
         }
 
         return Chart(timestamps: timestamps, plots: plots)
     }
 
-    private func plotWithKey(_ key: String, chartTO: ChartTO, values: [Int64]) throws -> Chart.Plot {
+    private func plotWithKey(_ key: String, chartTO: ChartTO, values: [Int64], type: PlotType) throws -> Chart.Plot {
         guard let name = chartTO.names.values[key],
               let colorCode = chartTO.colors.values[key] else {
             throw ChartClientError.invalidData
         }
         let color = colorWithCode(colorCode)
-        let plot = Chart.Plot(identifier: key, name: name, color: color, values: values)
+        let plot = Chart.Plot(identifier: key, name: name, color: color, values: values, type: type)
         return plot
     }
 
