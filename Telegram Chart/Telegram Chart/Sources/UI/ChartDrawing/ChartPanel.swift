@@ -34,9 +34,6 @@ public class LineChartPanel: ChartPanel {
     }
 
     public func drawInContext(_ layer: CAShapeLayer, rect: CGRect, apply: ((CAShapeLayer, CGPath) -> Void)? = nil) {
-        layer.lineJoin = .round
-        layer.lineWidth = lineWidth
-
         let values = plot.values
         let calc = DrawingChart.Calculator(timeRange: timeRange, valueRange: valueRange)
         let startIdx = indexRange.startIdx
@@ -51,7 +48,8 @@ public class LineChartPanel: ChartPanel {
             path.addLine(to: point)
         }
 
-        path.stroke()
+        layer.lineJoin = .round
+        layer.lineWidth = lineWidth
         layer.strokeColor = plot.color.cgColor
         layer.fillColor = UIColor.clear.cgColor
 
