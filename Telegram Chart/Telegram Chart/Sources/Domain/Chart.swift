@@ -14,10 +14,12 @@ public class Chart {
 
     public let plots: [Plot]
     public let timestamps: [Chart.Time]
+    public let yScaled: Bool
 
-    public init(timestamps: [Int64], plots: [Plot]) {
+    public init(timestamps: [Int64], plots: [Plot], yScaled: Bool) {
         self.timestamps = timestamps
         self.plots = plots
+        self.yScaled = yScaled
     }
 
     public private(set) lazy var timeRange: TimeRange = {
@@ -30,7 +32,9 @@ public class Chart {
 
     // TODO: replace type with class?
     public class Plot {
-        public let identifier: String
+        public typealias Identifier = String
+
+        public let identifier: Identifier
         public let name: String
         public let color: UIColor
         public let values: [Chart.Value]

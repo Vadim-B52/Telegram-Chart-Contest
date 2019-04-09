@@ -67,7 +67,7 @@ public class ChartClient {
             plots.append(plot)
         }
 
-        return Chart(timestamps: timestamps, plots: plots)
+        return Chart(timestamps: timestamps, plots: plots, yScaled: chartTO.yScaled)
     }
 
     private func plotWithKey(_ key: String, chartTO: ChartTO, values: [Int64], type: PlotType) throws -> Chart.Plot {

@@ -6,8 +6,10 @@
 import UIKit
 
 public class DrawingChart {
+    private var valueRangeCache = [Chart.Plot.Identifier: ValueRange]()
+    private var yAxisCache = [Chart.Plot.Identifier: YAxisCalculationResult]()
     public let allPlots: [Chart.Plot]
-    public let enabledPlotId: Set<String>
+    public let enabledPlotId: Set<Chart.Plot.Identifier>
     public let visiblePlots: [Chart.Plot]
     public let timestamps: [Chart.Time]
     public let timeRange: TimeRange
@@ -41,20 +43,30 @@ public class DrawingChart {
         }
     }()
 
-    private lazy var rawValueRange: ValueRange = {
-        return valueRangeCalculation.valueRange(plots: visiblePlots, indexRange: timeIndexRange)
-    }()
+    private func rawValueRange(plot: Chart.Plot) -> ValueRange {
+        if let vr = valueRangeCache[plot.identifier] {
+            return vr
+        }
+        let vr = valueRangeCalculation.valueRange(plot: plot, visiblePlots: visiblePlots, indexRange: timeIndexRange)
+        valueRangeCache[plot.identifier] = vr
+        return vr
+    }
 
-    private lazy var yAxis: YAxisCalculationResult = {
-        return yAxisCalculation.yAxis(valueRange: rawValueRange)
-    }()
+    private func yAxis(plot: Chart.Plot) -> YAxisCalculationResult {
+        if let r = yAxisCache[plot.identifier] {
+            return r
+        }
+        let r = yAxisCalculation.yAxis(valueRange: rawValueRange(plot: plot))
+        yAxisCache[plot.identifier] = r
+        return r
+    }
 
     public func valueRange(plot: Chart.Plot) -> ValueRange {
-        return yAxis.valueRange
+        return yAxis(plot: plot).valueRange
     }
 
     public func axisValues(plot: Chart.Plot) -> YAxisValues {
-        return yAxis.yAxisValues
+        return yAxis(plot: plot).yAxisValues
     }
 
     public func isPlotVisible(_ plot: Chart.Plot) -> Bool {
@@ -136,7 +148,7 @@ public class DrawingChart {
 }
 
 public protocol ValueRangeCalculation {
-    func valueRange(plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange
+    func valueRange(plot: Chart.Plot, visiblePlots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange
 }
 
 public protocol YAxisCalculation {
@@ -217,21 +229,30 @@ public struct ValueRangeHasYAxis: YAxisCalculation {
 public struct StaticValueRangeCalculation: ValueRangeCalculation {
     public let valueRange: ValueRange
 
-    public func valueRange(plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
+    public func valueRange(plot: Chart.Plot, visiblePlots plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
         return valueRange
     }
 }
 
 public struct FullValueRangeCalculation: ValueRangeCalculation {
-    public func valueRange(plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
+    public func valueRange(plot: Chart.Plot, visiblePlots plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
         return ValueRange(ranges: plots.map { $0.valueRange } )
     }
 }
 
 public struct SelectedValueRangeCalculation: ValueRangeCalculation {
-    public func valueRange(plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
+    public func valueRange(plot: Chart.Plot, visiblePlots plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
         let ranges = plots.map { $0.valueRange(indexRange: indexRange) }
         return ValueRange(ranges: ranges)
     }
 }
 
+public struct YScaledValueRangeCalculation: ValueRangeCalculation {
+    public let internalCalculation: ValueRangeCalculation
+
+    public func valueRange(plot: Chart.Plot, visiblePlots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
+        let vr = internalCalculation.valueRange(plot: plot, visiblePlots: [plot], indexRange: indexRange)
+        // TODO: assumption 0 is min
+        return ValueRange(min: 0, max: vr.max)
+    }
+}

@@ -164,13 +164,14 @@ public class ChartTableViewCell: UITableViewCell {
         guard let chart = chart, let state = state else {
             return nil
         }
+        let vrc = SelectedValueRangeCalculation()
         return DrawingChart(
                 allPlots: chart.plots,
                 enabledPlotId: state.enabledPlotId,
                 timestamps: chart.timestamps,
                 timeRange: chart.timeRange,
                 selectedTimeRange: state.selectedTimeRange,
-                valueRangeCalculation: SelectedValueRangeCalculation(),
+                valueRangeCalculation: chart.yScaled ? YScaledValueRangeCalculation(internalCalculation: vrc) : vrc,
                 yAxisCalculation: ValueRangeHasYAxis())
     }
 
@@ -178,12 +179,13 @@ public class ChartTableViewCell: UITableViewCell {
         guard let chart = chart, let state = state else {
             return nil
         }
+        let vrc = FullValueRangeCalculation()
         return DrawingChart(
                 allPlots: chart.plots,
                 enabledPlotId: state.enabledPlotId,
                 timestamps: chart.timestamps,
                 timeRange: chart.timeRange,
-                valueRangeCalculation: FullValueRangeCalculation(),
+                valueRangeCalculation: chart.yScaled ? YScaledValueRangeCalculation(internalCalculation: vrc) : vrc,
                 yAxisCalculation: ValueRangeNoYAxisStrategy())
     }
 }

@@ -16,6 +16,7 @@ public struct ChartTO {
     public let types: Types
     public let names: Names
     public let colors: Colors
+    public let yScaled: Bool
 
     public typealias ColumnKey = String
 
