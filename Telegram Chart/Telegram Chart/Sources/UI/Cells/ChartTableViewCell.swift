@@ -171,7 +171,7 @@ public class ChartTableViewCell: UITableViewCell {
                 timestamps: chart.timestamps,
                 timeRange: chart.timeRange,
                 selectedTimeRange: state.selectedTimeRange,
-                valueRangeCalculation: chart.chartType == .yScaled ? YScaledValueRangeCalculation(internalCalculation: vrc) : vrc,
+                valueRangeCalculation: valueRangeCalculation(baseCalculation: vrc, chart: chart),
                 yAxisCalculation: ValueRangeHasYAxis())
     }
 
@@ -185,8 +185,19 @@ public class ChartTableViewCell: UITableViewCell {
                 enabledPlotId: state.enabledPlotId,
                 timestamps: chart.timestamps,
                 timeRange: chart.timeRange,
-                valueRangeCalculation: chart.chartType == .yScaled ? YScaledValueRangeCalculation(internalCalculation: vrc) : vrc,
+                valueRangeCalculation: valueRangeCalculation(baseCalculation: vrc, chart: chart),
                 yAxisCalculation: ValueRangeNoYAxisStrategy())
+    }
+
+    private func valueRangeCalculation(baseCalculation: ValueRangeCalculation, chart: Chart) -> ValueRangeCalculation {
+        switch chart.chartType {
+        case .simple:
+            return baseCalculation
+        case .yScaled:
+            return YScaledValueRangeCalculation(internalCalculation: baseCalculation)
+        case .stacked:
+            return StackedValueRangeCalculation(internalCalculation: baseCalculation)
+        }
     }
 }
 

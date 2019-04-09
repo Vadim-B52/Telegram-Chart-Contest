@@ -256,3 +256,17 @@ public struct YScaledValueRangeCalculation: ValueRangeCalculation {
         return ValueRange(min: 0, max: vr.max)
     }
 }
+
+public struct StackedValueRangeCalculation: ValueRangeCalculation {
+    public let internalCalculation: ValueRangeCalculation
+
+    public func valueRange(plot: Chart.Plot, visiblePlots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
+        let vrs = visiblePlots.map { internalCalculation.valueRange(plot: $0, visiblePlots: [$0], indexRange: indexRange)  }
+        var max: Chart.Value = 0
+        vrs.forEach { range in
+            max += range.max
+        }
+        // TODO: assumption non negative values
+        return ValueRange(min: 0, max: max)
+    }
+}
