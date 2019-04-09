@@ -186,7 +186,7 @@ public class MiniChartTimeSelectorView: UIControl {
         var leftRect = leftControl.frame
         var rightRect = rightControl.frame
 
-        let distance: CGFloat = 50
+        let distance: CGFloat = 30
         if actionView == leftControl {
             leftRect = leftRect.offsetBy(dx: dx, dy: 0)
             if leftRect.minX < bounds.minX {

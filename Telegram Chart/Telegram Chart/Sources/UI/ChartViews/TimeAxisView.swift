@@ -35,19 +35,6 @@ public class TimeAxisView: UIView {
         }
     }
 
-    public override var bounds: CGRect {
-        get {
-            return super.bounds
-        }
-        set {
-            super.bounds = newValue
-            if let chart = self.chart {
-                updateDescription(chart: chart)
-                rebuildLabels(animated: true)
-            }
-        }
-    }
-
     public func displayChart(chart: DrawingChart?, timeAxisDescription: TimeAxisDescription?) {
         let prevChart = self.chart
         self.chart = chart
@@ -68,6 +55,10 @@ public class TimeAxisView: UIView {
         super.layoutSubviews()
         guard let chart = chart else {
             return
+        }
+        if let chart = self.chart {
+            updateDescription(chart: chart)
+            rebuildLabels(animated: true)
         }
         updatePosition(labels: labels, chart: chart)
         updatePosition(labels: removingLabels, chart: chart)

@@ -46,7 +46,11 @@ class YAxisView: UIView, ChartViewProtocol {
         }
         let bounds = self.integralBounds
 
-        var valuePanelConfig = self.valuePanelConfig!
+        let valuePanelConfig = self.valuePanelConfig!
+        let (zeroLine, _) = bounds.divided(atDistance: ScreenHelper.lightLineWidth, from: .maxYEdge)
+        valuePanelConfig.zeroAxisColor.setFill()
+        ctx.fill(zeroLine)
+
 //        if let animationProgress = animationProgressDataSource?.animationProgressAlpha(chartView: self) {
 //            let color = valuePanelConfig.axisColor.withAlphaComponent(animationProgress)
 //            valuePanelConfig = ValueAxisPanel.Config(

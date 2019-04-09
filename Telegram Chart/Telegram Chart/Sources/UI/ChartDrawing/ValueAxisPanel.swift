@@ -12,9 +12,9 @@ public class ValueAxisPanel {
     // TODO: foce unwrap
     private lazy var calculator: DrawingChart.YCalculator = DrawingChart.YCalculator(valueRange: chart.valueRange(plot: chart.visiblePlots.first!))
     private lazy var font: UIFont = Fonts.current.light11()
-    private lazy var  thinLineWidth = ScreenHelper.lightLineWidth
-    private lazy var  options = NSStringDrawingOptions.usesLineFragmentOrigin
-    private lazy var  attributes: [NSAttributedString.Key: Any]? = [NSAttributedString.Key.foregroundColor: config.textColor]
+    private lazy var thinLineWidth = ScreenHelper.lightLineWidth
+    private lazy var options = NSStringDrawingOptions.usesLineFragmentOrigin
+    private lazy var attributes: [NSAttributedString.Key: Any]? = [NSAttributedString.Key.foregroundColor: config.textColor]
 
     public init(chart: DrawingChart, config: Config) {
         self.chart = chart
