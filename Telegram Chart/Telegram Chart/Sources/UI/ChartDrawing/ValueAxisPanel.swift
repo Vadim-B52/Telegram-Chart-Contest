@@ -9,7 +9,8 @@ public class ValueAxisPanel {
     public let chart: DrawingChart
     public let config: Config
 
-    private lazy var calculator: DrawingChart.YCalculator = DrawingChart.YCalculator(valueRange: chart.valueRange)
+    // TODO: foce unwrap
+    private lazy var calculator: DrawingChart.YCalculator = DrawingChart.YCalculator(valueRange: chart.valueRange(plot: chart.visiblePlots.first!))
     private lazy var font: UIFont = Fonts.current.light11()
     private lazy var  thinLineWidth = ScreenHelper.lightLineWidth
     private lazy var  options = NSStringDrawingOptions.usesLineFragmentOrigin
@@ -21,7 +22,7 @@ public class ValueAxisPanel {
     }
 
     public func drawInContext(_ ctx: CGContext, rect: CGRect) {
-        let yAxisValues = chart.axisValues
+        let yAxisValues = chart.axisValues(plot: chart.visiblePlots.first!) // TODO: force unwrap
         config.zeroAxisColor.setFill()
         _ = drawLineInContext(ctx, atValue: yAxisValues.zero, rect: rect)
         config.axisColor.setFill()

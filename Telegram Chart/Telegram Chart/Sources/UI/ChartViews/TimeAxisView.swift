@@ -100,7 +100,7 @@ public class TimeAxisView: UIView {
         labels.forEach { existing.insert($0.key) }
 
         var current = Set<Int>()
-        let n = min(chart.indexRange.endIdx, chart.timestamps.count - 1)
+        let n = min(chart.timeIndexRange.endIdx, chart.timestamps.count - 1)
         for i in stride(from: description.zeroIdx, through: n, by: description.step) {
             current.insert(i)
         }
@@ -158,7 +158,7 @@ public class TimeAxisView: UIView {
             }
 
             var newZero = currDescr.zeroIdx
-            while newZero >= chart.indexRange.startIdx {
+            while newZero >= chart.timeIndexRange.startIdx {
                 newZero -= currDescr.step
             }
             currDescr.zeroIdx = newZero + currDescr.step

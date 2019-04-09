@@ -155,20 +155,20 @@ public class ChartViewDrawRectAnimator<ChartViewType: UIView & ChartViewProtocol
     }
 }
 
-extension ChartViewDrawRectAnimator: ChartViewAnimationProgressDataSource {
-    public func animationProgressAlpha(chartView: ChartViewProtocol) -> CGFloat? {
-        guard let state = transitionState else {
-            return nil
-        }
-        if state.endChart.valueRange == state.beginChart.valueRange {
-            return nil
-        }
-        if chartView as! ChartViewType == state.beginChartReceiver {
-            return CGFloat(1 - transitionProgress)
-        }
-        return CGFloat(transitionProgress)
-    }
-}
+//extension ChartViewDrawRectAnimator: ChartViewAnimationProgressDataSource {
+//    public func animationProgressAlpha(chartView: ChartViewProtocol) -> CGFloat? {
+//        guard let state = transitionState else {
+//            return nil
+//        }
+//        if state.endChart.valueRange == state.beginChart.valueRange {
+//            return nil
+//        }
+//        if chartView as! ChartViewType == state.beginChartReceiver {
+//            return CGFloat(1 - transitionProgress)
+//        }
+//        return CGFloat(transitionProgress)
+//    }
+//}
 
 fileprivate extension ChartViewDrawRectAnimator {
     private struct TransitionState<T> {

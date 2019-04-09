@@ -79,7 +79,7 @@ public class CrosshairView: UIView {
             frame.origin.x = x - frame.width / 2
 
             for plot in chart.visiblePlots {
-                let yCalc = DrawingChart.YCalculator(valueRange: chart.valueRange)
+                let yCalc = DrawingChart.YCalculator(valueRange: chart.valueRange(plot: plot))
                 let y = yCalc.y(in: bounds, value: plot.values[idx])
                 if frame.contains(CGPoint(x: x, y: y)) {
                     var frame1 = frame

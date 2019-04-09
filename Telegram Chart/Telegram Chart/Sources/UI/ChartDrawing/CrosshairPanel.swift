@@ -23,8 +23,8 @@ public struct CrosshairPanel {
         config.lineColor.setFill()
         ctx.fill(line)
 
-        let calc = DrawingChart.Calculator(timeRange: chart.selectedTimeRange, valueRange: chart.valueRange)
         for plot in chart.visiblePlots {
+            let calc = DrawingChart.Calculator(timeRange: chart.selectedTimeRange, valueRange: chart.valueRange(plot: plot))
             let point = calc.pointAtTimestamp(timestamp, value: plot.values[timestampIndex], rect: rect).screenScaledFloor
             plot.color.setFill()
             let outer = CGRect(x: point.x - 4, y: point.y - 4, width: 9, height: 9)

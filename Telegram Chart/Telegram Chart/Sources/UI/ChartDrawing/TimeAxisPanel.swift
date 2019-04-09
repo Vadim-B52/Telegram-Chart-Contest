@@ -42,7 +42,7 @@ public class TimeAxisPanel {
             }
 
             var i = currDescr.zeroIdx
-            while i >= chart.indexRange.startIdx {
+            while i >= chart.timeIndexRange.startIdx {
                 i -= currDescr.step
             }
             currDescr.zeroIdx = i + currDescr.step
@@ -67,7 +67,7 @@ public class TimeAxisPanel {
 
     private func drawInContext(_ ctx: CGContext, rect: CGRect, description: TimeAxisDescription) {
         var i = description.zeroIdx
-        while i <= chart.indexRange.endIdx {
+        while i <= chart.timeIndexRange.endIdx {
             let timestamp = chart.timestamps[i]
             let str = formatter.axisDateText(timestamp: timestamp)
             let size = str.boundingRect(

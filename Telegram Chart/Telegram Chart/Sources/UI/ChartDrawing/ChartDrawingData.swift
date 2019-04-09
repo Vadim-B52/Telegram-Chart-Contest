@@ -33,7 +33,7 @@ public class DrawingChart {
         self.yAxisCalculation = yAxisCalculation
     }
 
-    public private(set) lazy var indexRange: TimeIndexRange = {
+    public private(set) lazy var timeIndexRange: TimeIndexRange = {
         if selectedTimeRange != timeRange {
             return TimeIndexRange(timestamps: timestamps, timeRange: selectedTimeRange)
         } else {
@@ -41,16 +41,21 @@ public class DrawingChart {
         }
     }()
 
-    public private(set) lazy var valueRange: ValueRange = yAxis.valueRange
-    public private(set) lazy var axisValues: YAxisValues = yAxis.yAxisValues
-
-    public private(set) lazy var rawValueRange: ValueRange = {
-        return valueRangeCalculation.valueRange(plots: visiblePlots, indexRange: indexRange)
+    private lazy var rawValueRange: ValueRange = {
+        return valueRangeCalculation.valueRange(plots: visiblePlots, indexRange: timeIndexRange)
     }()
 
     private lazy var yAxis: YAxisCalculationResult = {
         return yAxisCalculation.yAxis(valueRange: rawValueRange)
     }()
+
+    public func valueRange(plot: Chart.Plot) -> ValueRange {
+        return yAxis.valueRange
+    }
+
+    public func axisValues(plot: Chart.Plot) -> YAxisValues {
+        return yAxis.yAxisValues
+    }
 
     public func isPlotVisible(_ plot: Chart.Plot) -> Bool {
         return enabledPlotId.contains(plot.identifier)
@@ -58,13 +63,13 @@ public class DrawingChart {
 
     public func closestIdxTo(timestamp: Int64) -> Int {
         if timestamp <= selectedTimeRange.min {
-            return indexRange.startIdx
+            return timeIndexRange.startIdx
         }
         if timestamp >= selectedTimeRange.max {
-            return indexRange.endIdx
+            return timeIndexRange.endIdx
         }
-        var low = indexRange.startIdx
-        var high = indexRange.endIdx
+        var low = timeIndexRange.startIdx
+        var high = timeIndexRange.endIdx
         while low != high {
             let mid = low + (high - low) / 2
             if timestamps[mid] <= timestamp && timestamp <= timestamps[mid + 1] {

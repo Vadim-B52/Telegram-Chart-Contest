@@ -70,9 +70,9 @@ public class ChartView: UIControl, ChartViewProtocol {
             let plotLayer = layers[idx]
             let panel = LineChartPanel(
                     timestamps: chart.timestamps,
-                    indexRange: chart.indexRange,
+                    indexRange: chart.timeIndexRange,
                     timeRange: chart.selectedTimeRange,
-                    valueRange: chart.valueRange,
+                    valueRange: chart.valueRange(plot: plot),
                     plot: plot,
                     lineWidth: lineWidth)
 
@@ -97,9 +97,9 @@ public class ChartView: UIControl, ChartViewProtocol {
 
             let panel = LineChartPanel(
                     timestamps: chart.timestamps,
-                    indexRange: chart.indexRange,
+                    indexRange: chart.timeIndexRange,
                     timeRange: chart.selectedTimeRange,
-                    valueRange: chart.valueRange,
+                    valueRange: chart.valueRange(plot: plot),
                     plot: plot,
                     lineWidth: lineWidth)
 
