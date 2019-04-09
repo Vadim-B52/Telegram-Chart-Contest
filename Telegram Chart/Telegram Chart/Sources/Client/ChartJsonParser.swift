@@ -42,7 +42,8 @@ public final class ChartJsonParser {
         let names = try readNames(remoteChart["names"])
         let colors = try readColors(remoteChart["colors"])
         let yScaled = remoteChart["y_scaled"] as? Bool ?? false
-        return ChartTO(columns: columns, types: types, names: names, colors: colors, yScaled: yScaled)
+        let stacked = remoteChart["stacked"] as? Bool ?? false
+        return ChartTO(columns: columns, types: types, names: names, colors: colors, yScaled: yScaled, stacked: stacked)
     }
 
     private func readColors(_ remoteColors: Any?) throws -> ChartTO.Colors {

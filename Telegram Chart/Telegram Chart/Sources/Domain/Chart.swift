@@ -14,12 +14,12 @@ public class Chart {
 
     public let plots: [Plot]
     public let timestamps: [Chart.Time]
-    public let yScaled: Bool
+    public let chartType: ChartType
 
-    public init(timestamps: [Int64], plots: [Plot], yScaled: Bool) {
+    public init(timestamps: [Int64], plots: [Plot], chartType: ChartType) {
         self.timestamps = timestamps
         self.plots = plots
-        self.yScaled = yScaled
+        self.chartType = chartType
     }
 
     public private(set) lazy var timeRange: TimeRange = {
@@ -63,6 +63,10 @@ public class Chart {
             return ValueRange(values: values, indexRange: indexRange)
         }
     }
+}
+
+public enum ChartType {
+    case simple, yScaled, stacked
 }
 
 public enum PlotType {
