@@ -56,7 +56,7 @@ public class LineChartPanel: ChartPanel {
 }
 
 // TODO: this is stacked bar drawer?
-public class BarChartPanel: ChartPanel {
+public class StackedBarChartPanel: ChartPanel {
 
     public let chart: DrawingChart
     public let timestamps: [Int64]
@@ -126,5 +126,67 @@ public class BarChartPanel: ChartPanel {
             v += chart.visiblePlots[i].values[idx]
         }
         return v
+    }
+}
+
+public class BarChartPanel: ChartPanel {
+
+    public let chart: DrawingChart
+    public let timestamps: [Int64]
+    public let indexRange: TimeIndexRange
+    public let timeRange: TimeRange
+    public let valueRange: ValueRange
+    public let plot: Chart.Plot
+    public let lineWidth: CGFloat
+
+    public init(chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
+        self.chart = chart
+        self.timestamps = chart.timestamps
+        self.indexRange = chart.timeIndexRange
+        self.timeRange = chart.selectedTimeRange
+        self.valueRange = chart.valueRange(plot: plot)
+        self.plot = plot
+        self.lineWidth = lineWidth
+    }
+
+    // FIXME: bug at first and last point
+    public func drawInContext(_ layer: CAShapeLayer, rect: CGRect, apply: ((CAShapeLayer, CGPath) -> Void)? = nil) {
+        let values = plot.values
+        let calc = DrawingChart.Calculator(timeRange: timeRange, valueRange: valueRange)
+        let startIdx = indexRange.startIdx
+        let startPoint = calc.pointAtTimestamp(
+                timestamps[startIdx],
+                value: values[startIdx], rect: rect).screenScaledFloor
+
+        let path = UIBezierPath()
+        path.move(to: CGPoint(x: startPoint.x, y: rect.maxY))
+
+        for i in startIdx..<indexRange.endIdx {
+            let currTime = timestamps[i]
+            let currValue = values[i]
+            let currPoint = calc.pointAtTimestamp(currTime, value: currValue, rect: rect).screenScaledFloor
+            path.addLine(to: currPoint)
+
+            let nextTime = timestamps[i + 1]
+            let nextValue = values[i + 1]
+            let nextPoint = calc.pointAtTimestamp(nextTime, value: nextValue, rect: rect).screenScaledFloor
+            path.addLine(to: CGPoint(x: nextPoint.x, y: currPoint.y))
+        }
+
+        let endTime = timestamps[indexRange.endIdx]
+        let endValue = values[indexRange.endIdx]
+        let endPoint = calc.pointAtTimestamp(endTime, value: endValue, rect: rect).screenScaledFloor
+        path.addLine(to: CGPoint(x: endPoint.x, y: rect.maxY))
+        path.close()
+
+        defer {
+            layer.lineWidth = 0
+            layer.fillColor = plot.color.cgColor
+            if let apply = apply {
+                apply(layer, path.cgPath)
+            } else {
+                layer.path = path.cgPath
+            }
+        }
     }
 }

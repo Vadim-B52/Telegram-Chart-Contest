@@ -112,7 +112,8 @@ public class ChartView: UIControl, ChartViewProtocol {
         case .area:
             return LineChartPanel(chart: chart, plot: plot, lineWidth: lineWidth)
         case .bar:
-            return BarChartPanel(chart: chart, plot: plot, lineWidth: lineWidth)
+//          TODO: bar chart drawer if needed
+            return StackedBarChartPanel(chart: chart, plot: plot, lineWidth: lineWidth)
         }
     }
 }
