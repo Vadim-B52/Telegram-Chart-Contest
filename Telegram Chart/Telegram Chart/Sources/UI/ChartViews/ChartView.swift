@@ -51,7 +51,7 @@ public class ChartView: UIControl, ChartViewProtocol {
             for _ in 0..<(-d) {
                 let plotLayer = CAShapeLayer()
                 plotLayer.frame = frame
-                layer.addSublayer(plotLayer)
+                layer.insertSublayer(plotLayer, at: 0)
                 layers.append(plotLayer)
             }
         }
@@ -66,17 +66,10 @@ public class ChartView: UIControl, ChartViewProtocol {
             return
         }
 
-        for (idx, plot) in chart.allPlots.enumerated() {
+        for (idx, plot) in chart.allPlots.enumerated().reversed() {
             let plotLayer = layers[idx]
-            let panel = LineChartPanel(
-                    timestamps: chart.timestamps,
-                    indexRange: chart.timeIndexRange,
-                    timeRange: chart.selectedTimeRange,
-                    valueRange: chart.valueRange(plot: plot),
-                    plot: plot,
-                    lineWidth: lineWidth)
-
-            panel.drawInContext(plotLayer, rect: plotLayer.bounds)
+            let panel = makeChartPanel(chart: chart, plot: plot)
+            panel.drawInContext(plotLayer, rect: plotLayer.bounds, apply: nil)
             plotLayer.opacity = chart.isPlotVisible(plot) ? 1 : 0
         }
     }
@@ -95,14 +88,7 @@ public class ChartView: UIControl, ChartViewProtocol {
             animationGroup.duration = 0.4
             animationGroup.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
 
-            let panel = LineChartPanel(
-                    timestamps: chart.timestamps,
-                    indexRange: chart.timeIndexRange,
-                    timeRange: chart.selectedTimeRange,
-                    valueRange: chart.valueRange(plot: plot),
-                    plot: plot,
-                    lineWidth: lineWidth)
-
+            let panel = makeChartPanel(chart: chart, plot: plot)
             pathAnimation.fromValue = plotLayer.presentation()?.path ?? plotLayer.path
             panel.drawInContext(plotLayer, rect: plotLayer.bounds) { layer, path in
                 pathAnimation.toValue = path
@@ -115,6 +101,18 @@ public class ChartView: UIControl, ChartViewProtocol {
 
             plotLayer.removeAllAnimations()
             plotLayer.add(animationGroup, forKey: nil)
+        }
+    }
+
+    // TODO: type dispatch vs case
+    private func makeChartPanel(chart: DrawingChart, plot: Chart.Plot) -> ChartPanel {
+        switch plot.type {
+        case .line:
+            fallthrough
+        case .area:
+            return LineChartPanel(chart: chart, plot: plot, lineWidth: lineWidth)
+        case .bar:
+            return BarChartPanel(chart: chart, plot: plot, lineWidth: lineWidth)
         }
     }
 }
