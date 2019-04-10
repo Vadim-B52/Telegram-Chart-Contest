@@ -108,9 +108,9 @@ public class ChartView: UIControl, ChartViewProtocol {
     private func makeChartPanel(chart: DrawingChart, plot: Chart.Plot) -> ChartPanel {
         switch plot.type {
         case .line:
-            fallthrough
-        case .area:
             return LineChartPanel(chart: chart, plot: plot, lineWidth: lineWidth)
+        case .area:
+            return AreaChartPanel(chart: chart, plot: plot, lineWidth: lineWidth)
         case .bar:
 //          TODO: bar chart drawer if needed
             return StackedBarChartPanel(chart: chart, plot: plot, lineWidth: lineWidth)
