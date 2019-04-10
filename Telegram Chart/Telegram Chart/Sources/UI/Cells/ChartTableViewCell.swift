@@ -192,12 +192,21 @@ public class ChartTableViewCell: UITableViewCell {
     private func valueRangeCalculation(baseCalculation: ValueRangeCalculation, chart: Chart) -> ValueRangeCalculation {
         switch chart.chartType {
         case .simple:
-            return baseCalculation
+            return valueRangeCalculation(forSimpleChart: chart, baseCalculation: baseCalculation)
         case .yScaled:
             return YScaledValueRangeCalculation(internalCalculation: baseCalculation)
         case .stacked:
             return StackedValueRangeCalculation(internalCalculation: baseCalculation)
         }
+    }
+
+    private func valueRangeCalculation(
+            forSimpleChart chart: Chart,
+            baseCalculation: ValueRangeCalculation) -> ValueRangeCalculation {
+
+        return chart.plots.contains { $0.type == .bar } ?
+                VolumeStyleValueRangeCalculation(internalCalculation: baseCalculation) :
+                baseCalculation;
     }
 }
 

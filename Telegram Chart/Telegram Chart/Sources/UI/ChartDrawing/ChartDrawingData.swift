@@ -270,3 +270,13 @@ public struct StackedValueRangeCalculation: ValueRangeCalculation {
         return ValueRange(min: 0, max: max)
     }
 }
+
+public struct VolumeStyleValueRangeCalculation: ValueRangeCalculation {
+    public let internalCalculation: ValueRangeCalculation
+
+    public func valueRange(plot: Chart.Plot, visiblePlots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
+        let vr = internalCalculation.valueRange(plot: plot, visiblePlots: visiblePlots, indexRange: indexRange)
+        // TODO: assumption 0 is min
+        return ValueRange(min: 0, max: vr.max)
+    }
+}
