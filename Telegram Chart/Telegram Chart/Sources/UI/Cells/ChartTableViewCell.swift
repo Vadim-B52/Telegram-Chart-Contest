@@ -16,7 +16,7 @@ public class ChartTableViewCell: UITableViewCell {
 
     private let chartView = CompoundChartView()
     private let miniChartView = ChartView()
-    private let timeSelector = MiniChartTimeSelectorView()
+    private let timeSelector = TimeFrameSelectorView()
 
     private var chart: Chart?
     private var state: ChartState?

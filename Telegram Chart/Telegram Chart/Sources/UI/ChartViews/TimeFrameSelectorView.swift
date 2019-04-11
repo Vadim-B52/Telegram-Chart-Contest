@@ -5,7 +5,7 @@
 
 import UIKit
 
-public class MiniChartTimeSelectorView: UIControl {
+public class TimeFrameSelectorView: UIControl {
 
     private let leftControl = UILabel()
     private let rightControl = UILabel()
@@ -237,7 +237,7 @@ public class MiniChartTimeSelectorView: UIControl {
     }
 }
 
-extension MiniChartTimeSelectorView: UIGestureRecognizerDelegate {
+extension TimeFrameSelectorView: UIGestureRecognizerDelegate {
     public func gestureRecognizer(
             _ gestureRecognizer: UIGestureRecognizer,
             shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -254,7 +254,7 @@ extension MiniChartTimeSelectorView: UIGestureRecognizerDelegate {
 }
 
 public protocol MiniChartTimeSelectorViewColorSource: AnyObject {
-    func chevronColor(miniChartTimeSelectorView view: MiniChartTimeSelectorView) -> UIColor
-    func dimmingColor(miniChartTimeSelectorView view: MiniChartTimeSelectorView) -> UIColor
-    func controlColor(miniChartTimeSelectorView view: MiniChartTimeSelectorView) -> UIColor
+    func chevronColor(miniChartTimeSelectorView view: TimeFrameSelectorView) -> UIColor
+    func dimmingColor(miniChartTimeSelectorView view: TimeFrameSelectorView) -> UIColor
+    func controlColor(miniChartTimeSelectorView view: TimeFrameSelectorView) -> UIColor
 }

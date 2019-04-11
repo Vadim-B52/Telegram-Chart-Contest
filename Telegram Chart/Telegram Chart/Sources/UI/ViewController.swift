@@ -196,15 +196,15 @@ fileprivate extension ViewController {
 }
 
 extension ViewController: MiniChartTimeSelectorViewColorSource {
-    func chevronColor(miniChartTimeSelectorView view: MiniChartTimeSelectorView) -> UIColor {
+    func chevronColor(miniChartTimeSelectorView view: TimeFrameSelectorView) -> UIColor {
         return skin.timeSelectorChevronColor
     }
 
-    func dimmingColor(miniChartTimeSelectorView view: MiniChartTimeSelectorView) -> UIColor {
+    func dimmingColor(miniChartTimeSelectorView view: TimeFrameSelectorView) -> UIColor {
         return skin.timeSelectorDimmingColor
     }
 
-    func controlColor(miniChartTimeSelectorView view: MiniChartTimeSelectorView) -> UIColor {
+    func controlColor(miniChartTimeSelectorView view: TimeFrameSelectorView) -> UIColor {
         return skin.timeSelectorControlColor
     }
 }
