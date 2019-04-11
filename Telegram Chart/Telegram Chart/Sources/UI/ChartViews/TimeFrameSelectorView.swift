@@ -162,9 +162,11 @@ public class TimeFrameSelectorView: UIControl {
 
     private func updateActionView(point: CGPoint) {
         panPoint = point
-        if leftControl.frame.inset(by: UIEdgeInsets(top: 0, left: -10, bottom: 0, right: -10)).contains(point) {
+        let leftFrame = leftControl.frame.insetBy(dx: -10, dy: 0)
+        let rightFrame = rightControl.frame.insetBy(dx: -10, dy: 0)
+        if leftFrame.contains(point) && abs(leftFrame.midX - point.x) < abs(rightFrame.midX - point.x) {
             actionView = leftControl
-        } else if rightControl.frame.inset(by: UIEdgeInsets(top: 0, left: -10, bottom: 0, right: -10)).contains(point) {
+        } else if rightFrame.contains(point) {
             actionView = rightControl
         } else if point.x > leftControl.center.x && point.x < rightControl.center.x {
             actionView = self
@@ -179,7 +181,7 @@ public class TimeFrameSelectorView: UIControl {
             return
         }
         
-        let bounds = self.bounds.insetBy(dx: 15, dy: 0) // TODO: pass as aurgument
+        let bounds = self.bounds.insetBy(dx: 15, dy: 0) // TODO: pass as argument
         let dx = point.x - panPoint.x
         panPoint = point
 
