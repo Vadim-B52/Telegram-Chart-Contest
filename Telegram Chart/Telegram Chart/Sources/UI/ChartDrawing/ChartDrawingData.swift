@@ -133,6 +133,22 @@ public class DrawingChart {
         }
     }
 
+    public struct StackedYCalculator {
+        public let valueRange: ValueRange
+        public let plots: [Chart.Plot]
+        public let plotIdx: Int
+
+        public func y(in rect: CGRect, at idx: Int) -> CGFloat {
+            var idxValue = Chart.Value.zero
+            for i in 0...plotIdx {
+                idxValue += plots[i].values[idx]
+            }
+            let v = CGFloat(idxValue - valueRange.min) / CGFloat(valueRange.size)
+            let y = rect.minY + rect.size.height * v
+            return rect.maxY + rect.minY - y
+        }
+    }
+
     public struct PercentageStackedYCalculator {
         public let plots: [Chart.Plot]
         public let plotIdx: Int

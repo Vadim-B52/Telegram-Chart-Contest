@@ -83,30 +83,32 @@ public class StackedBarChartPanel: ChartPanel {
             return
         }
 
-        let calc = DrawingChart.Calculator(timeRange: timeRange, valueRange: valueRange)
-        let startIdx = indexRange.startIdx
-        let startPoint = calc.pointAtTimestamp(
-            timestamps[startIdx],
-            value: getValue(at: startIdx, plotIdx: plotIdx), rect: rect).screenScaledFloor
+        let xCalc = DrawingChart.XCalculator(timeRange: timeRange)
+        let yCalc = DrawingChart.StackedYCalculator(valueRange: valueRange, plots: chart.visiblePlots, plotIdx: plotIdx)
+        let startPoint = CGPoint(
+                x: xCalc.x(in: rect, timestamp: timestamps[indexRange.startIdx]),
+                y: rect.maxY)
         
-        path.move(to: CGPoint(x: startPoint.x, y: rect.maxY))
+        path.move(to: startPoint)
 
-        for i in startIdx..<indexRange.endIdx {
-            let currTime = timestamps[i]
-            let currValue = getValue(at: i, plotIdx: plotIdx)
-            let currPoint = calc.pointAtTimestamp(currTime, value: currValue, rect: rect).screenScaledFloor
+        for i in indexRange.startIdx..<indexRange.endIdx {
+            let currPoint = CGPoint(
+                    x: xCalc.x(in: rect, timestamp: timestamps[i]),
+                    y: yCalc.y(in: rect, at: i))
+
+            let nextPoint = CGPoint(
+                    x: xCalc.x(in: rect, timestamp: timestamps[i + 1]),
+                    y: currPoint.y)
+
             path.addLine(to: currPoint)
-
-            let nextTime = timestamps[i + 1]
-            let nextValue = getValue(at: i + 1, plotIdx: plotIdx)
-            let nextPoint = calc.pointAtTimestamp(nextTime, value: nextValue, rect: rect).screenScaledFloor
-            path.addLine(to: CGPoint(x: nextPoint.x, y: currPoint.y))
+            path.addLine(to: nextPoint)
         }
 
-        let endTime = timestamps[indexRange.endIdx]
-        let endValue = getValue(at: indexRange.endIdx, plotIdx: plotIdx)
-        let endPoint = calc.pointAtTimestamp(endTime, value: endValue, rect: rect).screenScaledFloor
-        path.addLine(to: CGPoint(x: endPoint.x, y: rect.maxY))
+        let endPoint = CGPoint(
+                x: xCalc.x(in: rect, timestamp: timestamps[indexRange.endIdx]),
+                y: rect.maxY)
+
+        path.addLine(to: endPoint)
         path.close()
 
         defer {
@@ -118,14 +120,6 @@ public class StackedBarChartPanel: ChartPanel {
                 layer.path = path.cgPath
             }
         }
-    }
-    
-    private func getValue(at idx: Int, plotIdx: Int) -> Chart.Value {
-        var v = Chart.Value(0)
-        for i in 0...plotIdx {
-            v += chart.visiblePlots[i].values[idx]
-        }
-        return v
     }
 }
 
