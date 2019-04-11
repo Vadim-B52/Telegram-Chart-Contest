@@ -65,6 +65,10 @@ public class Chart {
     }
 }
 
+public extension Chart.Value {
+    public static let zero = Chart.Value(0)
+}
+
 public enum ChartType {
     case simple, yScaled, stacked, percentageStacked
 }

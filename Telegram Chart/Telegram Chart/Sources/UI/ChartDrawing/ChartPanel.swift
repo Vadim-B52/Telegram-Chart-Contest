@@ -191,8 +191,7 @@ public class BarChartPanel: ChartPanel {
     }
 }
 
-// TODO: implement correctly
-public class AreaChartPanel: ChartPanel {
+public class PercentageStackedAreaChartPanel: ChartPanel {
 
     public let chart: DrawingChart
     public let timestamps: [Int64]
@@ -213,35 +212,41 @@ public class AreaChartPanel: ChartPanel {
     }
 
     public func drawInContext(_ layer: CAShapeLayer, rect: CGRect, apply: ((CAShapeLayer, CGPath) -> Void)? = nil) {
-        let path = UIBezierPath()
+        let path: UIBezierPath
         guard let plotIdx = chart.visiblePlots.firstIndex(where: { $0 === plot } ) else {
+            path = UIBezierPath()
             return
         }
+        if plotIdx == chart.visiblePlots.count - 1 {
+            path = UIBezierPath(rect: rect)
+        } else {
+            path = UIBezierPath()
+            let xCalc = DrawingChart.XCalculator(timeRange: timeRange)
+            let yCalc = DrawingChart.PercentageStackedYCalculator(plots: chart.visiblePlots, plotIdx: plotIdx)
 
-        let calc = DrawingChart.Calculator(timeRange: timeRange, valueRange: valueRange)
-        let startIdx = indexRange.startIdx
-        let startPoint = calc.pointAtTimestamp(
-                timestamps[startIdx],
-                value: getValue(at: startIdx, plotIdx: plotIdx), rect: rect).screenScaledFloor
+            let startIdx = indexRange.startIdx
+            let startPoint = CGPoint(
+                    x: xCalc.x(in: rect, timestamp: timestamps[startIdx]),
+                    y: rect.maxY)
 
-        path.move(to: CGPoint(x: startPoint.x, y: rect.maxY))
+            path.move(to: startPoint)
 
-        for i in startIdx...indexRange.endIdx {
-            let currTime = timestamps[i]
-            let currValue = getValue(at: i, plotIdx: plotIdx)
-            let currPoint = calc.pointAtTimestamp(currTime, value: currValue, rect: rect).screenScaledFloor
-            path.addLine(to: currPoint)
+            for i in startIdx...indexRange.endIdx {
+                let currPoint = CGPoint(
+                        x: xCalc.x(in: rect, timestamp: timestamps[i]),
+                        y: yCalc.y(in: rect, at: i))
+
+                path.addLine(to: currPoint)
+            }
+
+            let endIdx = indexRange.endIdx
+            let endPoint = CGPoint(
+                    x: xCalc.x(in: rect, timestamp: timestamps[endIdx]),
+                    y: rect.maxY)
+
+            path.addLine(to: endPoint)
+            path.close()
         }
-
-        let endIdx = indexRange.endIdx
-        let endPoint = calc.pointAtTimestamp(
-                timestamps[endIdx],
-                value: getValue(at: endIdx, plotIdx: plotIdx), rect: rect).screenScaledFloor
-
-        path.addLine(to: CGPoint(x: endPoint.x, y: rect.maxY))
-
-        path.close()
-
         defer {
             layer.lineWidth = 0
             layer.fillColor = plot.color.cgColor
@@ -251,13 +256,5 @@ public class AreaChartPanel: ChartPanel {
                 layer.path = path.cgPath
             }
         }
-    }
-
-    private func getValue(at idx: Int, plotIdx: Int) -> Chart.Value {
-        var v = Chart.Value(0)
-        for i in 0...plotIdx {
-            v += chart.visiblePlots[i].values[idx]
-        }
-        return v
     }
 }

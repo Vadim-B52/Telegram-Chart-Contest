@@ -133,6 +133,23 @@ public class DrawingChart {
         }
     }
 
+    public struct PercentageStackedYCalculator {
+        public let plots: [Chart.Plot]
+        public let plotIdx: Int
+
+        public func y(in rect: CGRect, at idx: Int) -> CGFloat {
+            var idxValue = Chart.Value.zero
+            for i in 0...plotIdx {
+                idxValue += plots[i].values[idx]
+            }
+            var value100 = Chart.Value(0)
+            plots.forEach { value100 += $0.values[idx] }
+            let v = CGFloat(idxValue) / CGFloat(value100)
+            let y = rect.minY + rect.size.height * v
+            return rect.maxY + rect.minY - y
+        }
+    }
+
     public struct Calculator {
         public let timeRange: TimeRange
         public let valueRange: ValueRange
@@ -227,6 +244,9 @@ public struct ValueRangeHasYAxis: YAxisCalculation {
 }
 
 public struct StaticValueRangeCalculation: ValueRangeCalculation {
+
+    public static let percentage = StaticValueRangeCalculation(valueRange: ValueRange(min: 0, max: 100))
+
     public let valueRange: ValueRange
 
     public func valueRange(plot: Chart.Plot, visiblePlots plots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
