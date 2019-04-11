@@ -197,6 +197,9 @@ public class ChartTableViewCell: UITableViewCell {
             return YScaledValueRangeCalculation(internalCalculation: baseCalculation)
         case .stacked:
             return StackedValueRangeCalculation(internalCalculation: baseCalculation)
+        case .percentageStacked:
+            // TODO: is correct?
+            return StackedValueRangeCalculation(internalCalculation: baseCalculation)
         }
     }
 

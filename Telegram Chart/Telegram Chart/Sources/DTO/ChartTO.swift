@@ -18,6 +18,7 @@ public struct ChartTO {
     public let colors: Colors
     public let yScaled: Bool
     public let stacked: Bool
+    public let percentage: Bool
 
     public typealias ColumnKey = String
 

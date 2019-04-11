@@ -71,7 +71,11 @@ public class ChartClient {
         if chartTO.yScaled {
             chartType = .yScaled
         } else if chartTO.stacked {
-            chartType = .stacked
+            if chartTO.percentage {
+                chartType = .percentageStacked
+            } else {
+                chartType = .stacked
+            }
         } else {
             chartType = .simple
         }

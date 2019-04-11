@@ -66,7 +66,7 @@ public class Chart {
 }
 
 public enum ChartType {
-    case simple, yScaled, stacked
+    case simple, yScaled, stacked, percentageStacked
 }
 
 public enum PlotType {
