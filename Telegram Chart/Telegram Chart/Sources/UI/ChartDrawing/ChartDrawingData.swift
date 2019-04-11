@@ -212,6 +212,10 @@ public struct ValueRangeNoYAxisStrategy: YAxisCalculation {
 }
 
 public struct ValueRangeHasStaticYAxis: YAxisCalculation {
+    public static let percentage: YAxisCalculation = ValueRangeHasStaticYAxis(
+            valueRange: ValueRange(min: 0, max: 100),
+            yAxisValues: YAxisValues(zero: 0, step: 25))
+
     public let valueRange: ValueRange
     public let yAxisValues: YAxisValues
     

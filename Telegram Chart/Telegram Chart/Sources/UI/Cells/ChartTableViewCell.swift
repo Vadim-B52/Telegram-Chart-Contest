@@ -165,6 +165,10 @@ public class ChartTableViewCell: UITableViewCell {
             return nil
         }
         let vrc = SelectedValueRangeCalculation()
+        let yAxis = chart.chartType != .percentageStacked ?
+                ValueRangeHasYAxis() :
+                ValueRangeHasStaticYAxis.percentage
+
         return DrawingChart(
                 allPlots: chart.plots,
                 enabledPlotId: state.enabledPlotId,
@@ -172,7 +176,7 @@ public class ChartTableViewCell: UITableViewCell {
                 timeRange: chart.timeRange,
                 selectedTimeRange: state.selectedTimeRange,
                 valueRangeCalculation: valueRangeCalculation(baseCalculation: vrc, chart: chart),
-                yAxisCalculation: ValueRangeHasYAxis())
+                yAxisCalculation: yAxis)
     }
 
     private func miniChartViewDrawingChart() -> DrawingChart? {
