@@ -140,7 +140,8 @@ public class TimeFrameSelectorView: UIControl {
 
     @objc
     private func handleGesture() {
-        let newPanPoint = gesture.location(in: self)
+        let gesturePoint = gesture.location(in: self)
+        let newPanPoint = CGPoint(x: floor(gesturePoint.x), y: gesturePoint.y)
         switch gesture.state {
         case .began:
             updateActionView(point: newPanPoint)
@@ -159,6 +160,7 @@ public class TimeFrameSelectorView: UIControl {
         default:
             setHighlighted(false)
             gesture.isEnabled = true
+            updateTimeRange()
             setNeedsLayout()
         }
     }
@@ -185,8 +187,7 @@ public class TimeFrameSelectorView: UIControl {
     }
 
     private func handleTranslation(point: CGPoint) {
-        guard actionView != nil,
-              let timeRange = timeRange else {
+        guard actionView != nil else {
             return
         }
         
@@ -229,8 +230,33 @@ public class TimeFrameSelectorView: UIControl {
         rightControl.frame = rightRect
         layoutDimmingAndBalk()
         panPoint = point
-        
+
+        setNeedsUpdateTimeRange()
+    }
+
+    private var needsUpdateTimeRange = false
+    private func setNeedsUpdateTimeRange() {
+        guard !needsUpdateTimeRange else {
+            return
+        }
+        needsUpdateTimeRange = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) { [weak self] in
+            guard self?.needsUpdateTimeRange ?? false else {
+                return
+            }
+            self?.updateTimeRange()
+        }
+    }
+
+    private func updateTimeRange() {
+        needsUpdateTimeRange = false
+        guard let timeRange = timeRange else {
+            return
+        }
+        let leftRect = leftControl.frame
+        let rightRect = rightControl.frame
         // TODO: corners
+        let bounds = rect
         let calculator = DrawingChart.XCalculator(timeRange: timeRange)
         let min = calculator.timestampAt(x: leftRect.minX, rect: bounds)
         let max = calculator.timestampAt(x: rightRect.maxX, rect: bounds)
