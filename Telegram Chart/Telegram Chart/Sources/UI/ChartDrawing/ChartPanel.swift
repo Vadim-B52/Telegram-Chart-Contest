@@ -6,19 +6,32 @@
 import UIKit
 
 public protocol ChartPanel {
-    func drawInContext(_ layer: CAShapeLayer, rect: CGRect, apply: ((CAShapeLayer, CGPath) -> Void)?)
+    func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animated: Bool)
+}
+
+public protocol ChartPanelDelegate: AnyObject {
+    func charPanel(
+            _ panel: ChartPanel,
+            applyPath path: CGPath,
+            isVisible: Bool,
+            toLayer layer: CAShapeLayer,
+            animated: Bool)
 }
 
 public class LineChartPanel: ChartPanel {
 
+    public let chart: DrawingChart
     public let timestamps: [Int64]
     public let indexRange: TimeIndexRange
     public let timeRange: TimeRange
     public let valueRange: ValueRange
     public let plot: Chart.Plot
     public let lineWidth: CGFloat
+    public weak var delegate: ChartPanelDelegate?
 
-    public init(chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
+    public init(delegate: ChartPanelDelegate, chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
+        self.chart = chart
+        self.delegate = delegate
         self.timestamps = chart.timestamps
         self.indexRange = chart.timeIndexRange
         self.timeRange = chart.selectedTimeRange
@@ -27,7 +40,7 @@ public class LineChartPanel: ChartPanel {
         self.lineWidth = lineWidth
     }
 
-    public func drawInContext(_ layer: CAShapeLayer, rect: CGRect, apply: ((CAShapeLayer, CGPath) -> Void)?) {
+    public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animated: Bool) {
         let values = plot.values
         let calc = DrawingChart.PointCalculator(timeRange: timeRange, valueRange: valueRange)
         let startIdx = indexRange.startIdx
@@ -47,11 +60,7 @@ public class LineChartPanel: ChartPanel {
         layer.strokeColor = plot.color.cgColor
         layer.fillColor = UIColor.clear.cgColor
 
-        if let apply = apply {
-            apply(layer, path.cgPath)
-        } else {
-            layer.path = path.cgPath
-        }
+        delegate?.charPanel(self, applyPath: path.cgPath, isVisible: chart.isPlotVisible(plot), toLayer: layer, animated: animated)
     }
 }
 
@@ -65,8 +74,10 @@ public class StackedBarChartPanel: ChartPanel {
     public let valueRange: ValueRange
     public let plot: Chart.Plot
     public let lineWidth: CGFloat
+    public weak var delegate: ChartPanelDelegate?
 
-    public init(chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
+    public init(delegate: ChartPanelDelegate, chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
+        self.delegate = delegate
         self.chart = chart
         self.timestamps = chart.timestamps
         self.indexRange = chart.timeIndexRange
@@ -77,16 +88,12 @@ public class StackedBarChartPanel: ChartPanel {
     }
 
     // FIXME: bug at first and last point
-    public func drawInContext(_ layer: CAShapeLayer, rect: CGRect, apply: ((CAShapeLayer, CGPath) -> Void)? = nil) {
+    public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animated: Bool) {
         let path = UIBezierPath()
         defer {
             layer.lineWidth = 0
             layer.fillColor = plot.color.lighter().cgColor
-            if let apply = apply {
-                apply(layer, path.cgPath)
-            } else {
-                layer.path = path.cgPath
-            }
+            delegate?.charPanel(self, applyPath: path.cgPath, isVisible: chart.isPlotVisible(plot), toLayer: layer, animated: animated)
         }
 
         guard let plotIdx = chart.visiblePlots.firstIndex(where: { $0 === plot } ) else {
@@ -132,8 +139,10 @@ public class BarChartPanel: ChartPanel {
     public let valueRange: ValueRange
     public let plot: Chart.Plot
     public let lineWidth: CGFloat
+    public weak var delegate: ChartPanelDelegate?
 
-    public init(chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
+    public init(delegate: ChartPanelDelegate, chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
+        self.delegate = delegate
         self.chart = chart
         self.timestamps = chart.timestamps
         self.indexRange = chart.timeIndexRange
@@ -144,16 +153,12 @@ public class BarChartPanel: ChartPanel {
     }
 
     // FIXME: bug at first and last point
-    public func drawInContext(_ layer: CAShapeLayer, rect: CGRect, apply: ((CAShapeLayer, CGPath) -> Void)? = nil) {
+    public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animated: Bool) {
         let path = UIBezierPath()
         defer {
             layer.lineWidth = 0
             layer.fillColor = plot.color.lighter().cgColor
-            if let apply = apply {
-                apply(layer, path.cgPath)
-            } else {
-                layer.path = path.cgPath
-            }
+            delegate?.charPanel(self, applyPath: path.cgPath, isVisible: chart.isPlotVisible(plot), toLayer: layer, animated: animated)
         }
 
         let values = plot.values
@@ -194,8 +199,10 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
     public let valueRange: ValueRange
     public let plot: Chart.Plot
     public let lineWidth: CGFloat
+    public weak var delegate: ChartPanelDelegate?
 
-    public init(chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
+    public init(delegate: ChartPanelDelegate, chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
+        self.delegate = delegate
         self.chart = chart
         self.timestamps = chart.timestamps
         self.indexRange = chart.timeIndexRange
@@ -205,51 +212,46 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
         self.lineWidth = lineWidth
     }
 
-    public func drawInContext(_ layer: CAShapeLayer, rect: CGRect, apply: ((CAShapeLayer, CGPath) -> Void)? = nil) {
-        let path: UIBezierPath
-        defer {
+    public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animated: Bool) {
+        let path = UIBezierPath()
+        guard let plotIdx = chart.visiblePlots.firstIndex(where: { $0 === plot } ),
+              plotIdx < chart.visiblePlots.count - 1 else {
+
             layer.lineWidth = 0
             layer.fillColor = plot.color.lighter().cgColor
-            if let apply = apply {
-                apply(layer, path.cgPath)
-            } else {
-                layer.path = path.cgPath
-            }
-        }
-        guard let plotIdx = chart.visiblePlots.firstIndex(where: { $0 === plot } ) else {
-            path = UIBezierPath()
+            delegate?.charPanel(self, applyPath: path.cgPath, isVisible: false, toLayer: layer, animated: animated)
             return
         }
-        if plotIdx == chart.visiblePlots.count - 1 {
-            path = UIBezierPath(rect: rect)
-        } else {
-            path = UIBezierPath()
-            let xCalc = DrawingChart.XCalculator(timeRange: timeRange)
-            let yCalc = DrawingChart.PercentageStackedYCalculator(plots: chart.visiblePlots, plotIdx: plotIdx)
 
-            let startIdx = indexRange.startIdx
-            let startPoint = CGPoint(
-                    x: xCalc.x(in: rect, timestamp: timestamps[startIdx]),
-                    y: rect.maxY)
+        let xCalc = DrawingChart.XCalculator(timeRange: timeRange)
+        let yCalc = DrawingChart.PercentageStackedYCalculator(plots: chart.visiblePlots, plotIdx: plotIdx)
 
-            path.move(to: startPoint)
+        let startIdx = indexRange.startIdx
+        let startPoint = CGPoint(
+                x: xCalc.x(in: rect, timestamp: timestamps[startIdx]),
+                y: rect.maxY)
 
-            for i in startIdx...indexRange.endIdx {
-                let currPoint = CGPoint(
-                        x: xCalc.x(in: rect, timestamp: timestamps[i]),
-                        y: yCalc.y(in: rect, at: i))
+        path.move(to: startPoint)
 
-                path.addLine(to: currPoint)
-            }
+        for i in startIdx...indexRange.endIdx {
+            let currPoint = CGPoint(
+                    x: xCalc.x(in: rect, timestamp: timestamps[i]),
+                    y: yCalc.y(in: rect, at: i))
 
-            let endIdx = indexRange.endIdx
-            let endPoint = CGPoint(
-                    x: xCalc.x(in: rect, timestamp: timestamps[endIdx]),
-                    y: rect.maxY)
-
-            path.addLine(to: endPoint)
-            path.close()
+            path.addLine(to: currPoint)
         }
+
+        let endIdx = indexRange.endIdx
+        let endPoint = CGPoint(
+                x: xCalc.x(in: rect, timestamp: timestamps[endIdx]),
+                y: rect.maxY)
+
+        path.addLine(to: endPoint)
+        path.close()
+
+        layer.lineWidth = 0
+        layer.fillColor = plot.color.lighter().cgColor
+        delegate?.charPanel(self, applyPath: path.cgPath, isVisible: true, toLayer: layer, animated: animated)
     }
 }
 

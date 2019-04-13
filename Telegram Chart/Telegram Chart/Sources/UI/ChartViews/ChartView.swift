@@ -28,17 +28,13 @@ public class ChartView: UIControl, ChartViewProtocol {
         for l in layers {
             l.frame = frame
         }
-        redraw()
+        redraw(animated: false)
     }
 
     public func displayChart(_ chart: DrawingChart?, animated: Bool) {
         self.chart = chart
         updateLayers()
-        if animated {
-            redrawAnimated()
-        } else {
-            redraw()
-        }
+        redraw(animated: animated)
     }
 
     private func updateLayers() {
@@ -63,7 +59,7 @@ public class ChartView: UIControl, ChartViewProtocol {
         return layer.bounds
     }
 
-    private func redraw() {
+    private func redraw(animated: Bool) {
         guard let chart = chart else {
             return
         }
@@ -71,37 +67,7 @@ public class ChartView: UIControl, ChartViewProtocol {
         for (idx, plot) in chart.allPlots.enumerated().reversed() {
             let plotLayer = layers[idx]
             let panel = makeChartPanel(chart: chart, plot: plot)
-            panel.drawInContext(plotLayer, rect: plotLayer.bounds, apply: nil)
-            plotLayer.opacity = chart.isPlotVisible(plot) ? 1 : 0
-        }
-    }
-
-    private func redrawAnimated() {
-        guard let chart = chart else {
-            return
-        }
-
-        for (idx, plot) in chart.allPlots.enumerated() {
-            let plotLayer = layers[idx]
-            let animationGroup = CAAnimationGroup()
-            let pathAnimation = CABasicAnimation(keyPath: "path")
-            let opacityAnimation = CABasicAnimation(keyPath: "opacity")
-            animationGroup.animations = [pathAnimation, opacityAnimation]
-            animationGroup.duration = 0.4
-            animationGroup.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-
-            let panel = makeChartPanel(chart: chart, plot: plot)
-            pathAnimation.fromValue = plotLayer.presentation()?.path ?? plotLayer.path
-            panel.drawInContext(plotLayer, rect: plotLayer.bounds) { layer, path in
-                pathAnimation.toValue = path
-                plotLayer.path = path
-            }
-
-            opacityAnimation.fromValue = plotLayer.presentation()?.opacity ?? plotLayer.opacity
-            opacityAnimation.toValue = chart.isPlotVisible(plot) ? 1 : 0
-            plotLayer.opacity = chart.isPlotVisible(plot) ? 1 : 0
-
-            plotLayer.add(animationGroup, forKey: nil)
+            panel.drawInLayer(plotLayer, rect: plotLayer.bounds, animated: animated)
         }
     }
 
@@ -109,12 +75,35 @@ public class ChartView: UIControl, ChartViewProtocol {
     private func makeChartPanel(chart: DrawingChart, plot: Chart.Plot) -> ChartPanel {
         switch plot.type {
         case .line:
-            return LineChartPanel(chart: chart, plot: plot, lineWidth: lineWidth)
+            return LineChartPanel(delegate: self, chart: chart, plot: plot, lineWidth: lineWidth)
         case .area:
-            return PercentageStackedAreaChartPanel(chart: chart, plot: plot, lineWidth: lineWidth)
+            return PercentageStackedAreaChartPanel(delegate: self, chart: chart, plot: plot, lineWidth: lineWidth)
         case .bar:
 //          TODO: bar chart drawer if needed
-            return StackedBarChartPanel(chart: chart, plot: plot, lineWidth: lineWidth)
+            return StackedBarChartPanel(delegate: self, chart: chart, plot: plot, lineWidth: lineWidth)
+        }
+    }
+}
+
+extension ChartView: ChartPanelDelegate {
+    public func charPanel(_ panel: ChartPanel, applyPath path: CGPath, isVisible: Bool, toLayer layer: CAShapeLayer, animated: Bool) {
+        layer.path = path
+        layer.opacity = isVisible ? 1 : 0
+        if animated {
+            let animationGroup = CAAnimationGroup()
+            let pathAnimation = CABasicAnimation(keyPath: "path")
+            let opacityAnimation = CABasicAnimation(keyPath: "opacity")
+            animationGroup.animations = [pathAnimation, opacityAnimation]
+            animationGroup.duration = 0.4
+            animationGroup.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+
+            pathAnimation.fromValue = layer.presentation()?.path ?? layer.path
+            pathAnimation.toValue = path
+
+            opacityAnimation.fromValue = layer.presentation()?.opacity ?? layer.opacity
+            opacityAnimation.toValue = isVisible ? 1 : 0
+
+            layer.add(animationGroup, forKey: nil)
         }
     }
 }
