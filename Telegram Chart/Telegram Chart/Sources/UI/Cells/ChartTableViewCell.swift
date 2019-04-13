@@ -129,7 +129,6 @@ public class ChartTableViewCell: UITableViewCell {
     }
 
     public func display(chart: Chart, state: ChartState, animated: Bool) {
-        self.timeAxisDescription = nil
         self.chart = chart
         self.state = state
         timeSelector.update(timeRange: chart.timeRange, selectedTimeRange: state.selectedTimeRange)
