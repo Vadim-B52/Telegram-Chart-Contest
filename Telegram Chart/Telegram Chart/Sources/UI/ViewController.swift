@@ -85,32 +85,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             updateSkin()
             return
         }
-        guard isPlotRowAt(indexPath) else {
-            return
-        }
-        let plotIdx = indexPath.row - 1
-        guard model.canChangeVisibilityForChartAt(section, plotIndex: plotIdx) else {
-            let title = "Cannot change"
-            let msg = "Enable other plot before"
-            let alert = UIAlertController(title: title, message: msg, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Ok", style: .default))
-            present(alert, animated: true)
-            return
-        }
-        model.changeVisibilityForChartAt(section, plotIndex: plotIdx)
-        let chartIndexPath = IndexPath(row: 0, section: section)
-        if let chartCell = tableView.cellForRow(at: chartIndexPath) as? ChartTableViewCell {
-            let (chart, state) = model.dataAt(indexPath.section)
-            let plotId = chart.plots[plotIdx].identifier
-            if state.enabledPlotId.contains(plotId) {
-                chartCell.showPlot(plotId: plotId)
-            } else {
-                chartCell.hidePlot(plotId: plotId)
-            }
-        }
-        if let plotCell = tableView.cellForRow(at: indexPath) as? PlotSelectorTableViewCell {
-            configure(plotSelector: plotCell.view, atIndexPath: indexPath)
-        }
     }
 
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -186,7 +160,7 @@ fileprivate extension ViewController {
         cell.timeSelectorViewColorSource = self
         cell.chartViewColorSource = self
         let (chart, state) = model.dataAt(indexPath.section)
-        cell.display(chart: chart, state: state)
+        cell.display(chart: chart, state: state, animated: false)
         return cell
     }
 
@@ -260,30 +234,16 @@ extension ViewController: PlotSelectorViewColorSource {
 }
 
 extension ViewController: PlotSelectorViewDelegate {
-    public func plotSelectorView(_ view: PlotSelectorView, didChangeState: ChartState) {
-//        let indexPath = tableView.indexPath(for: view)
-//        let plotIdx = indexPath.row - 1
-//        guard model.canChangeVisibilityForChartAt(section, plotIndex: plotIdx) else {
-//            let title = "Cannot change"
-//            let msg = "Enable other plot before"
-//            let alert = UIAlertController(title: title, message: msg, preferredStyle: .alert)
-//            alert.addAction(UIAlertAction(title: "Ok", style: .default))
-//            present(alert, animated: true)
-//            return
-//        }
-//        model.changeVisibilityForChartAt(section, plotIndex: plotIdx)
-//        let chartIndexPath = IndexPath(row: 0, section: section)
-//        if let chartCell = tableView.cellForRow(at: chartIndexPath) as? ChartTableViewCell {
-//            let (chart, state) = model.dataAt(indexPath.section)
-//            let plotId = chart.plots[plotIdx].identifier
-//            if state.enabledPlotId.contains(plotId) {
-//                chartCell.showPlot(plotId: plotId)
-//            } else {
-//                chartCell.hidePlot(plotId: plotId)
-//            }
-//        }
-//        if let plotCell = tableView.cellForRow(at: indexPath) as? PlotSelectorTableViewCell {
-//            configure(plotSelectorCell: plotCell, atIndexPath: indexPath)
-//        }
+    public func plotSelectorView(_ view: PlotSelectorView, didChangeState state: ChartState) {
+        guard let cell = view.owningCell,
+              let chartIdx = tableView.indexPath(for: cell)?.section else {
+            return
+        }
+        model.updateState(state, at: chartIdx)
+        let chartIndexPath = IndexPath(row: 0, section: chartIdx)
+        if let chartCell = tableView.cellForRow(at: chartIndexPath) as? ChartTableViewCell {
+            let (chart, state) = model.dataAt(chartIdx)
+            chartCell.display(chart: chart, state: state, animated: true)
+        }
     }
 }

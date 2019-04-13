@@ -65,6 +65,10 @@ public class ChartListScreen {
             chartStates[idx] = state.byEnablingPlot(identifier: plotId)
         }
     }
+
+    public func updateState(_ state: ChartState, at idx: Int) {
+        chartStates[idx] = state
+    }
 }
 
 public struct ChartState {

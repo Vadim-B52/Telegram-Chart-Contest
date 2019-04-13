@@ -122,34 +122,16 @@ public class ChartTableViewCell: UITableViewCell {
         timeSelector.selectedTimeRange = nil
     }
 
-    public func display(chart: Chart, state: ChartState) {
+    public func display(chart: Chart, state: ChartState, animated: Bool) {
         self.timeAxisDescription = nil
         self.chart = chart
         self.state = state
         timeSelector.timeRange = chart.timeRange
         timeSelector.selectedTimeRange = state.selectedTimeRange
-        chartView.displayChart(chartViewDrawingChart(), animated: false)
-        miniChartView.displayChart(miniChartViewDrawingChart(), animated: false)
+        chartView.displayChart(chartViewDrawingChart(), animated: animated)
+        miniChartView.displayChart(miniChartViewDrawingChart(), animated: animated)
     }
-
-    public func hidePlot(plotId: String) {
-        guard let _ = chart, let state = state else {
-            return
-        }
-        self.state = state.byDisablingPlot(identifier: plotId)
-        chartView.displayChart(chartViewDrawingChart(), animated: true)
-        miniChartView.displayChart(miniChartViewDrawingChart(), animated: true)
-    }
-
-    public func showPlot(plotId: String) {
-        guard let _ = chart, let state = state else {
-            return
-        }
-        self.state = state.byEnablingPlot(identifier: plotId)
-        chartView.displayChart(chartViewDrawingChart(), animated: true)
-        miniChartView.displayChart(miniChartViewDrawingChart(), animated: true)
-    }
-
+    
     @objc
     private func handleValueChanged() {
         guard let selectedTimeRange = timeSelector.selectedTimeRange else {
