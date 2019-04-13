@@ -125,16 +125,14 @@ public class ChartTableViewCell: UITableViewCell {
         super.prepareForReuse()
         chartView.displayChart(nil, animated: false)
         miniChartView.displayChart(nil, animated: false)
-        timeSelector.timeRange = nil
-        timeSelector.selectedTimeRange = nil
+        timeSelector.update(timeRange: nil, selectedTimeRange: nil)
     }
 
     public func display(chart: Chart, state: ChartState, animated: Bool) {
         self.timeAxisDescription = nil
         self.chart = chart
         self.state = state
-        timeSelector.timeRange = chart.timeRange
-        timeSelector.selectedTimeRange = state.selectedTimeRange
+        timeSelector.update(timeRange: chart.timeRange, selectedTimeRange: state.selectedTimeRange)
         if state.enabledPlotId.count == 0 {
             let prevErrorView = errorView
             prevErrorView?.removeFromSuperview()

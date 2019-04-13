@@ -25,16 +25,8 @@ public class TimeFrameSelectorView: UIControl {
         }
     }
 
-    public var timeRange: TimeRange? {
-        didSet {
-            setNeedsLayout()
-        }
-    }
-    public var selectedTimeRange: TimeRange? {
-        didSet {
-            setNeedsLayout()
-        }
-    }
+    public private(set) var selectedTimeRange: TimeRange?
+    public private(set) var timeRange: TimeRange?
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -60,20 +52,23 @@ public class TimeFrameSelectorView: UIControl {
         super.init(coder: aDecoder)
     }
 
+    private var rect: CGRect {
+        let bounds = self.bounds.insetBy(dx: 15, dy: 0) // TODO: pass as aurgument
+        return bounds.insetBy(dx: 0, dy: 6)
+    }
+
     public override func layoutSubviews() {
         super.layoutSubviews()
-        guard let timeRange = timeRange else {
+        guard let timeRange = timeRange, gesture.state == .possible else {
             return
         }
         let selectedTimeRange = self.selectedTimeRange ?? timeRange
-        let bounds = self.bounds.insetBy(dx: 15, dy: 0) // TODO: pass as aurgument
-        let rect = bounds.insetBy(dx: 0, dy: 6)
+        let rect = self.rect
         let leftRange = timeRange.beforeTimestamp(selectedTimeRange.min)
         let rightRange = timeRange.afterTimestamp(selectedTimeRange.max)
         let calculator = DrawingChart.XCalculator(timeRange: timeRange)
 
         var (slice0, rest0) = rect.divided(atDistance: calculator.x(in: rect, timestamp: leftRange.max) - rect.minX, from: .minXEdge)
-        leftDimming.frame = slice0.insetBy(dx: 0, dy: 2)
         (slice0, rest0) = rest0.divided(atDistance: 11, from: .minXEdge)
         let updateLeftControlCorners = leftControl.bounds.size != slice0.size
         leftControl.frame = slice0
@@ -81,8 +76,7 @@ public class TimeFrameSelectorView: UIControl {
             updateRoundedCorners(control: leftControl)
         }
 
-        var (slice1, rest1) = rect.divided(atDistance: calculator.x(in: rect, timestamp: rightRange.min) - rect.minX, from: .minXEdge)
-        rightDimming.frame = rest1.insetBy(dx: 0, dy: 2)
+        var (slice1, _) = rect.divided(atDistance: calculator.x(in: rect, timestamp: rightRange.min) - rect.minX, from: .minXEdge)
 
         var rest = rest0.intersection(slice1)
         (slice1, rest) = rest.divided(atDistance: 11, from: .maxXEdge)
@@ -92,10 +86,25 @@ public class TimeFrameSelectorView: UIControl {
             updateRoundedCorners(control: rightControl)
         }
 
-        (slice0, rest) = rest.divided(atDistance: 1, from: .minYEdge)
-        (slice1, rest) = rest.divided(atDistance: 1, from: .maxYEdge)
-        topBalk.frame = slice0
-        bottomBalk.frame = slice1
+        layoutDimmingAndBalk()
+    }
+
+    private func layoutDimmingAndBalk() {
+        let rect = self.rect
+        var (slice, rest) = rect.divided(atDistance: leftControl.frame.minX - rect.minX, from: .minXEdge)
+        leftDimming.frame = slice.insetBy(dx: 0, dy: 2)
+        (slice, rest) = rest.divided(atDistance: leftControl.frame.width, from: .minXEdge)
+        (slice, rest) = rest.divided(atDistance: rightControl.frame.minX - leftControl.frame.maxX, from: .minXEdge)
+        topBalk.frame = slice.divided(atDistance: 1, from: .minYEdge).slice
+        bottomBalk.frame = slice.divided(atDistance: 1, from: .maxYEdge).slice
+        (slice, rest) = rect.divided(atDistance: rect.maxX - rightControl.frame.maxX, from: .maxXEdge)
+        rightDimming.frame = slice.insetBy(dx: 0, dy: 2)
+    }
+
+    public func update(timeRange: TimeRange?, selectedTimeRange: TimeRange?) {
+        self.timeRange = timeRange
+        self.selectedTimeRange = selectedTimeRange
+        setNeedsLayout()
     }
 
     public func reloadColors() {
@@ -137,7 +146,7 @@ public class TimeFrameSelectorView: UIControl {
             updateActionView(point: newPanPoint)
             shouldRecognize = false
             setHighlighted(actionView != nil)
-            break
+
         case .changed:
             let d = abs(newPanPoint.x - panPoint.x) - abs(newPanPoint.y - panPoint.y)
             if shouldRecognize || (!shouldRecognize && d > 0) {
@@ -146,11 +155,11 @@ public class TimeFrameSelectorView: UIControl {
             } else if d != 0 || actionView == nil {
                 gesture.isEnabled = false
             }
-            break
+
         default:
             setHighlighted(false)
             gesture.isEnabled = true
-            break
+            setNeedsLayout()
         }
     }
 
@@ -181,10 +190,8 @@ public class TimeFrameSelectorView: UIControl {
             return
         }
         
-        let bounds = self.bounds.insetBy(dx: 15, dy: 0) // TODO: pass as argument
+        let bounds = rect
         let dx = point.x - panPoint.x
-        panPoint = point
-
         var leftRect = leftControl.frame
         var rightRect = rightControl.frame
 
@@ -217,8 +224,13 @@ public class TimeFrameSelectorView: UIControl {
                 leftRect.origin.x = rightRect.minX - d - leftRect.width
             }
         }
+
+        leftControl.frame = leftRect
+        rightControl.frame = rightRect
+        layoutDimmingAndBalk()
+        panPoint = point
         
-    // TODO: corners
+        // TODO: corners
         let calculator = DrawingChart.XCalculator(timeRange: timeRange)
         let min = calculator.timestampAt(x: leftRect.minX, rect: bounds)
         let max = calculator.timestampAt(x: rightRect.maxX, rect: bounds)

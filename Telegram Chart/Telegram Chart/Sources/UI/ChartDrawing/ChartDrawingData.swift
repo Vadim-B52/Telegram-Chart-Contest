@@ -101,18 +101,20 @@ public class DrawingChart {
     }
 
     public struct XCalculator {
+        private let pow = 10
         public let timeRange: TimeRange
 
         public func x(in rect: CGRect, timestamp: Int64) -> CGFloat {
-            let t = CGFloat(timestamp - timeRange.min) / CGFloat(timeRange.size)
-            let x = rect.minX + rect.width * t
-            return x
+            let d = (timestamp - timeRange.min) << pow
+            let t = d / timeRange.size
+            let x = Int64(rect.width) * t
+            return rect.minX + CGFloat(x >> pow)
         }
 
         public func timestampAt(x: CGFloat, rect: CGRect) -> Int64 {
-            let d = (x - rect.minX) / rect.width
-            let timestamp = CGFloat(timeRange.min) + CGFloat(timeRange.size) * d
-            return Int64(timestamp)
+            let d = (Int64(x - rect.minX) << pow) / Int64(rect.width)
+            let ts = timeRange.size * d
+            return timeRange.min + (ts >> pow)
         }
     }
 
