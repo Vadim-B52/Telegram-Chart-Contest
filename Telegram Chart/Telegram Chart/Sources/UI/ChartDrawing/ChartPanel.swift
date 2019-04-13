@@ -16,6 +16,12 @@ public protocol ChartPanelDelegate: AnyObject {
             isVisible: Bool,
             toLayer layer: CAShapeLayer,
             animated: Bool)
+
+    // TODO: separate delegate
+    func charPanel(
+            _ panel: ChartPanel,
+            applyBackgroundColor color: UIColor,
+            toSuperlayerAnimated animated: Bool)
 }
 
 public class LineChartPanel: ChartPanel {
@@ -213,16 +219,19 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
     }
 
     public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animated: Bool) {
-        let path = UIBezierPath()
-        guard let plotIdx = chart.visiblePlots.firstIndex(where: { $0 === plot } ),
-              plotIdx < chart.visiblePlots.count - 1 else {
-
+        guard let plotIdx = chart.visiblePlots.firstIndex(where: { $0 === plot } ) else {
+            let path = UIBezierPath()
             layer.lineWidth = 0
             layer.fillColor = plot.color.lighter().cgColor
             delegate?.charPanel(self, applyPath: path.cgPath, isVisible: false, toLayer: layer, animated: animated)
             return
         }
+        guard plotIdx < chart.visiblePlots.count - 1 else {
+            delegate?.charPanel(self, applyBackgroundColor: plot.color.lighter(), toSuperlayerAnimated: animated)
+            return
+        }
 
+        let path = UIBezierPath()
         let xCalc = DrawingChart.XCalculator(timeRange: timeRange)
         let yCalc = DrawingChart.PercentageStackedYCalculator(plots: chart.visiblePlots, plotIdx: plotIdx)
 

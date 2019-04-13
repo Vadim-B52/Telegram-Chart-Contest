@@ -32,6 +32,9 @@ public class ChartView: UIControl, ChartViewProtocol {
     }
 
     public func displayChart(_ chart: DrawingChart?, animated: Bool) {
+        if chart == nil {
+            layer.backgroundColor = nil
+        }
         self.chart = chart
         updateLayers()
         redraw(animated: animated)
@@ -103,7 +106,19 @@ extension ChartView: ChartPanelDelegate {
             opacityAnimation.fromValue = layer.presentation()?.opacity ?? layer.opacity
             opacityAnimation.toValue = isVisible ? 1 : 0
 
-            layer.add(animationGroup, forKey: nil)
+            layer.add(animationGroup, forKey: "opacityAndPathAnimationKey")
+        }
+    }
+
+    public func charPanel(_ panel: ChartPanel, applyBackgroundColor color: UIColor, toSuperlayerAnimated animated: Bool) {
+        layer.backgroundColor = color.cgColor
+        if animated {
+            let animation = CABasicAnimation(keyPath: "backgroundColor")
+            animation.duration = 0.4
+            animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+            animation.fromValue = layer.presentation()?.backgroundColor ?? layer.backgroundColor
+            animation.toValue = color.cgColor
+            layer.add(animation, forKey: "backgroundColorAnimationKey")
         }
     }
 }
