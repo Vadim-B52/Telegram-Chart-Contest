@@ -66,8 +66,8 @@ public class ChartListScreen {
         }
     }
 
-    public func updateState(_ state: ChartState, at idx: Int) {
-        chartStates[idx] = state
+    public func updateState(enabledPlotIds ids: Set<String>, at idx: Int) {
+        chartStates[idx] = chartStates[idx].byChanging(enabledPlotId: ids)
     }
 }
 
@@ -80,15 +80,8 @@ public struct ChartState {
         return ChartState(enabledPlotId: enabledPlotId, selectedTimeRange: selectedTimeRange)
     }
 
-    public func byTurningPlot(identifier: String) -> ChartState {
-        if enabledPlotId.contains(identifier) {
-            return byDisablingPlot(identifier: identifier)
-        }
-        return byEnablingPlot(identifier: identifier)
-    }
-
-    public func bySingleEnabling(identifier: String) -> ChartState {
-        return ChartState(enabledPlotId: [identifier], selectedTimeRange: selectedTimeRange)
+    public func byChanging(enabledPlotId: Set<String>) -> ChartState {
+        return ChartState(enabledPlotId: enabledPlotId, selectedTimeRange: selectedTimeRange)
     }
 
     public func byEnablingPlot(identifier: String) -> ChartState {

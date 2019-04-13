@@ -175,7 +175,8 @@ fileprivate extension ViewController {
     }
 
     private func configure(plotSelector view: PlotSelectorView, atIndexPath indexPath: IndexPath) {
-        view.data = model.dataAt(indexPath.section)
+        let data = model.dataAt(indexPath.section)
+        view.data = (data.chart, data.state.enabledPlotId)
     }
 }
 
@@ -235,12 +236,12 @@ extension ViewController: PlotSelectorViewColorSource {
 }
 
 extension ViewController: PlotSelectorViewDelegate {
-    public func plotSelectorView(_ view: PlotSelectorView, didChangeState state: ChartState) {
+    public func plotSelectorView(_ view: PlotSelectorView, didChangeEnabledPlotIds ids: Set<Chart.Plot.Identifier>) {
         guard let cell = view.owningCell,
               let chartIdx = tableView.indexPath(for: cell)?.section else {
             return
         }
-        model.updateState(state, at: chartIdx)
+        model.updateState(enabledPlotIds: ids, at: chartIdx)
         let chartIndexPath = IndexPath(row: 0, section: chartIdx)
         if let chartCell = tableView.cellForRow(at: chartIndexPath) as? ChartTableViewCell {
             let (chart, state) = model.dataAt(chartIdx)

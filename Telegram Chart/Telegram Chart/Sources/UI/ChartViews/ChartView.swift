@@ -99,7 +99,6 @@ public class ChartView: UIControl, ChartViewProtocol {
             opacityAnimation.toValue = chart.isPlotVisible(plot) ? 1 : 0
             plotLayer.opacity = chart.isPlotVisible(plot) ? 1 : 0
 
-            plotLayer.removeAllAnimations()
             plotLayer.add(animationGroup, forKey: nil)
         }
     }

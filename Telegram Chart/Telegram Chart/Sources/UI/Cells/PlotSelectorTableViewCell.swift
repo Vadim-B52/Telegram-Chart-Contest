@@ -10,7 +10,7 @@ public protocol PlotSelectorViewColorSource: AnyObject {
 }
 
 public protocol PlotSelectorViewDelegate: AnyObject {
-    func plotSelectorView(_ view: PlotSelectorView, didChangeState: ChartState)
+    func plotSelectorView(_ view: PlotSelectorView, didChangeEnabledPlotIds: Set<Chart.Plot.Identifier>)
 }
 
 public class PlotSelectorTableViewCell: UITableViewCell {
@@ -33,7 +33,7 @@ public class PlotSelectorView: UIView {
     public fileprivate(set) unowned var owningCell: UITableViewCell?
     public weak var delegate: PlotSelectorViewDelegate?
 
-    public var data: (chart: Chart, state: ChartState)? {
+    public var data: (chart: Chart, enabledPlotIds: Set<Chart.Plot.Identifier>)? {
         didSet {
             collectionView.reloadData()
         }
@@ -48,8 +48,8 @@ public class PlotSelectorView: UIView {
         return data?.chart
     }
 
-    private var state: ChartState! {
-        return data?.state
+    private var enabledPlotIds: Set<Chart.Plot.Identifier>! {
+        return data?.enabledPlotIds
     }
 
     public override var intrinsicContentSize: CGSize {
@@ -101,7 +101,7 @@ extension PlotSelectorView: UICollectionViewDataSource {
         configure(
                 view: cell.plotView,
                 plot: plot,
-                checked: state.enabledPlotId.contains(plot.identifier),
+                checked: enabledPlotIds.contains(plot.identifier),
                 backgroundColor: colorSource?.backgroundColor(view: self))
         return cell
     }
@@ -109,20 +109,26 @@ extension PlotSelectorView: UICollectionViewDataSource {
 
 extension PlotSelectorView: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let newState = state.byTurningPlot(identifier: chart.plots[indexPath.row].identifier)
-        data = (chart, newState)
-        delegate?.plotSelectorView(self, didChangeState: newState)
+        let identifier = chart.plots[indexPath.row].identifier
+        let newIds: Set<Chart.Plot.Identifier>
+        if enabledPlotIds.contains(identifier) {
+            newIds = enabledPlotIds.subtracting([identifier])
+        } else {
+            newIds = enabledPlotIds.union([identifier])
+        }
+        data = (chart, newIds)
+        delegate?.plotSelectorView(self, didChangeEnabledPlotIds: newIds)
         collectionView.reloadData()
     }
 
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let chart = data!.chart
-        let state = data!.state
+        let state = data!.enabledPlotIds
         let plot = chart.plots[indexPath.row]
         configure(
                 view: sizingView,
                 plot: plot,
-                checked: state.enabledPlotId.contains(plot.identifier),
+                checked: state.contains(plot.identifier),
                 backgroundColor: colorSource?.backgroundColor(view: self))
         return sizingView.sizeThatFits(.zero)
     }
@@ -134,9 +140,9 @@ extension PlotSelectorView {
         guard let indexPath = collectionView.indexPath(for: sender) else {
             return
         }
-        let newState = state.bySingleEnabling(identifier: chart.plots[indexPath.row].identifier)
+        let newState: Set<Chart.Plot.Identifier> = [chart.plots[indexPath.row].identifier]
         data = (chart, newState)
-        delegate?.plotSelectorView(self, didChangeState: newState)
+        delegate?.plotSelectorView(self, didChangeEnabledPlotIds: newState)
         collectionView.reloadData()
     }
 
