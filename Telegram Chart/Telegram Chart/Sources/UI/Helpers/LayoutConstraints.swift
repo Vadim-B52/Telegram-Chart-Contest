@@ -10,24 +10,24 @@ class LayoutConstraints {
     static func constraints(view view1: UIView, pinnedToView view2: UIView) -> [NSLayoutConstraint] {
         return [
             NSLayoutConstraint(
-                    item: view1, attribute: .centerX,
+                    item: view1, attribute: .top,
                     relatedBy: .equal,
-                    toItem: view2, attribute: .centerX,
+                    toItem: view2, attribute: .top,
                     multiplier: 1, constant: 0),
             NSLayoutConstraint(
-                    item: view1, attribute: .centerY,
+                    item: view1, attribute: .leading,
                     relatedBy: .equal,
-                    toItem: view2, attribute: .centerY,
+                    toItem: view2, attribute: .leading,
                     multiplier: 1, constant: 0),
             NSLayoutConstraint(
-                    item: view1, attribute: .height,
+                    item: view1, attribute: .bottom,
                     relatedBy: .equal,
-                    toItem: view2, attribute: .height,
+                    toItem: view2, attribute: .bottom,
                     multiplier: 1, constant: 0),
             NSLayoutConstraint(
-                    item: view1, attribute: .width,
+                    item: view1, attribute: .trailing,
                     relatedBy: .equal,
-                    toItem: view2, attribute: .width,
+                    toItem: view2, attribute: .trailing,
                     multiplier: 1, constant: 0),
         ]
     }

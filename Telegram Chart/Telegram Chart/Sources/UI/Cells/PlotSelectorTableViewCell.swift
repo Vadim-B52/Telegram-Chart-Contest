@@ -15,16 +15,18 @@ public protocol PlotSelectorTableViewCellDelegate: AnyObject {
 
 public class PlotSelectorTableViewCell: UITableViewCell {
 
-    private let layout = UICollectionViewFlowLayout()
+    private let layout = CloudFlowLayout()
     private let collectionView: UICollectionView
     private lazy var sizingView: PlotView = PlotView()
     private let plotCellId = "plotCellId"
 
     public weak var delegate: PlotSelectorTableViewCellDelegate?
 
+    private var heightConstraint: NSLayoutConstraint!
     public var data: (chart: Chart, state: ChartState)? {
         didSet {
             collectionView.reloadData()
+            setNeedsUpdateConstraints()
         }
     }
     public weak var colorSource: PlotSelectorTableViewCellColorSource? {
@@ -48,11 +50,25 @@ public class PlotSelectorTableViewCell: UITableViewCell {
         collectionView.delegate = self
         collectionView.register(PlotCollectionViewCell.self, forCellWithReuseIdentifier: plotCellId)
         collectionView.contentInset = UIEdgeInsets(top: 10, left: 15, bottom: 10, right: 15)
+        layout.minimumInteritemSpacing = 10
+        layout.minimumLineSpacing = 10
 
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(collectionView)
         NSLayoutConstraint.activate(LayoutConstraints.constraints(view: collectionView, pinnedToView: contentView))
+
+        heightConstraint = NSLayoutConstraint(
+                item: collectionView, attribute: .height,
+                relatedBy: .equal,
+                toItem: nil, attribute: .notAnAttribute,
+                multiplier: 1, constant: 40)
+        heightConstraint.isActive = true
     }
+
+//    public override func updateConstraints() {
+//        heightConstraint.constant = collectionView.contentSize.height
+//        super.updateConstraints()
+//    }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -60,7 +76,9 @@ public class PlotSelectorTableViewCell: UITableViewCell {
 
     public func reloadColors() {
         collectionView.reloadData()
-        collectionView.backgroundColor = colorSource?.backgroundColor(cell: self)
+        let color = colorSource?.backgroundColor(cell: self)
+        collectionView.backgroundColor = color
+        backgroundColor = color
     }
 }
 
@@ -232,5 +250,30 @@ extension PlotSelectorTableViewCell {
             label.text = text
             checkmark.text = isChecked ? "\u{2713} " : nil
         }
+    }
+}
+
+class CloudFlowLayout: UICollectionViewFlowLayout {
+    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+        guard let attributes = super.layoutAttributesForElements(in: rect) else {
+            return nil
+        }
+        guard attributes.count > 1 else {
+            return attributes
+        }
+        for i in 1..<attributes.count {
+            let prev = attributes[i - 1]
+            let curr = attributes[i]
+            guard prev.frame.minY < curr.frame.midY,
+                  curr.frame.midY < prev.frame.maxY,
+                  prev.indexPath.row + 1 == curr.indexPath.row else {
+
+                continue
+            }
+            var frame = curr.frame
+            frame.origin.x = prev.frame.maxX + minimumInteritemSpacing
+            curr.frame = frame
+        }
+        return attributes
     }
 }

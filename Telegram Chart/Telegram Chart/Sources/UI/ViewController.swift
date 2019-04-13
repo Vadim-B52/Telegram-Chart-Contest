@@ -19,7 +19,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     private var skin: Skin = DaySkin()
 
     private lazy var screenMaxEdge = max(UIScreen.main.bounds.size.height, UIScreen.main.bounds.width)
-    private lazy var chartCellHeight = UIScreen.main.bounds.size.height / 2
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,13 +39,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             return chart.plots.count > 1 ? 2 : 1
         }
         return 1
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if isChartRowAt(indexPath) {
-            return chartCellHeight
-        }
-        return 44
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
