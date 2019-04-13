@@ -34,6 +34,9 @@ public class CompoundChartView: UIView, ChartViewProtocol {
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        yAxisView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(yAxisView)
 
         chartView.lineWidth = 2
         chartView.translatesAutoresizingMaskIntoConstraints = false
@@ -42,9 +45,6 @@ public class CompoundChartView: UIView, ChartViewProtocol {
         timeAxisView.translatesAutoresizingMaskIntoConstraints = false
         timeAxisView.delegate = self
         addSubview(timeAxisView)
-
-        yAxisView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(yAxisView)
 
         crosshairView.colorSource = self
         crosshairView.translatesAutoresizingMaskIntoConstraints = false
@@ -79,6 +79,11 @@ public class CompoundChartView: UIView, ChartViewProtocol {
     }
 
     public func displayChart(_ chart: DrawingChart?, animated: Bool) {
+        if chart?.allPlots.first(where: { $0.type != .line }) == nil {
+            [yAxisView, chartView, timeAxisView, crosshairView].forEach { bringSubviewToFront($0) }
+        } else {
+            [chartView, yAxisView, timeAxisView, crosshairView].forEach { bringSubviewToFront($0) }
+        }
         crosshairView.chart = chart
         timeAxisView.displayChart(chart: chart, timeAxisDescription: self.timeAxisDescription)
         chartView.displayChart(chart, animated: animated)
