@@ -79,6 +79,16 @@ public class StackedBarChartPanel: ChartPanel {
     // FIXME: bug at first and last point
     public func drawInContext(_ layer: CAShapeLayer, rect: CGRect, apply: ((CAShapeLayer, CGPath) -> Void)? = nil) {
         let path = UIBezierPath()
+        defer {
+            layer.lineWidth = 0
+            layer.fillColor = plot.color.cgColor
+            if let apply = apply {
+                apply(layer, path.cgPath)
+            } else {
+                layer.path = path.cgPath
+            }
+        }
+
         guard let plotIdx = chart.visiblePlots.firstIndex(where: { $0 === plot } ) else {
             return
         }
@@ -110,16 +120,6 @@ public class StackedBarChartPanel: ChartPanel {
 
         path.addLine(to: endPoint)
         path.close()
-
-        defer {
-            layer.lineWidth = 0
-            layer.fillColor = plot.color.cgColor
-            if let apply = apply {
-                apply(layer, path.cgPath)
-            } else {
-                layer.path = path.cgPath
-            }
-        }
     }
 }
 
@@ -145,6 +145,17 @@ public class BarChartPanel: ChartPanel {
 
     // FIXME: bug at first and last point
     public func drawInContext(_ layer: CAShapeLayer, rect: CGRect, apply: ((CAShapeLayer, CGPath) -> Void)? = nil) {
+        let path = UIBezierPath()
+        defer {
+            layer.lineWidth = 0
+            layer.fillColor = plot.color.cgColor
+            if let apply = apply {
+                apply(layer, path.cgPath)
+            } else {
+                layer.path = path.cgPath
+            }
+        }
+
         let values = plot.values
         let calc = DrawingChart.Calculator(timeRange: timeRange, valueRange: valueRange)
         let startIdx = indexRange.startIdx
@@ -152,7 +163,6 @@ public class BarChartPanel: ChartPanel {
                 timestamps[startIdx],
                 value: values[startIdx], rect: rect).screenScaledFloor
 
-        let path = UIBezierPath()
         path.move(to: CGPoint(x: startPoint.x, y: rect.maxY))
 
         for i in startIdx..<indexRange.endIdx {
@@ -172,16 +182,6 @@ public class BarChartPanel: ChartPanel {
         let endPoint = calc.pointAtTimestamp(endTime, value: endValue, rect: rect).screenScaledFloor
         path.addLine(to: CGPoint(x: endPoint.x, y: rect.maxY))
         path.close()
-
-        defer {
-            layer.lineWidth = 0
-            layer.fillColor = plot.color.cgColor
-            if let apply = apply {
-                apply(layer, path.cgPath)
-            } else {
-                layer.path = path.cgPath
-            }
-        }
     }
 }
 
@@ -207,6 +207,15 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
 
     public func drawInContext(_ layer: CAShapeLayer, rect: CGRect, apply: ((CAShapeLayer, CGPath) -> Void)? = nil) {
         let path: UIBezierPath
+        defer {
+            layer.lineWidth = 0
+            layer.fillColor = plot.color.cgColor
+            if let apply = apply {
+                apply(layer, path.cgPath)
+            } else {
+                layer.path = path.cgPath
+            }
+        }
         guard let plotIdx = chart.visiblePlots.firstIndex(where: { $0 === plot } ) else {
             path = UIBezierPath()
             return
@@ -240,15 +249,6 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
 
             path.addLine(to: endPoint)
             path.close()
-        }
-        defer {
-            layer.lineWidth = 0
-            layer.fillColor = plot.color.cgColor
-            if let apply = apply {
-                apply(layer, path.cgPath)
-            } else {
-                layer.path = path.cgPath
-            }
         }
     }
 }
