@@ -12,8 +12,10 @@
 		6AC713C9F6AFFE68F4AA6B0D /* ScreenHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC713A024D7DADDC16C0CA3 /* ScreenHelper.swift */; };
 		6AC7145D7B7D27C40DBDE2F2 /* ChartTextFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC711BE80856EF5178E381E /* ChartTextFormatter.swift */; };
 		6AC7150428B2635F24CD07F3 /* ValueAxisPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC7172228330B7244FC78BC /* ValueAxisPanel.swift */; };
+		6AC7159FFEB32682CBDD7576 /* LayoutConstraints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC710DA89436DEEE7B615BA /* LayoutConstraints.swift */; };
 		6AC7166DAA209E433B4D861C /* ChartViewDrawRectAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71ABE093B2186770EDD25 /* ChartViewDrawRectAnimator.swift */; };
 		6AC71680C695B78D82912F8E /* Chart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC715D6F57BFF6CEAC49574 /* Chart.swift */; };
+		6AC716BCE71657022E8A2872 /* PlotSelectorTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC714CB094D58FC75364142 /* PlotSelectorTableViewCell.swift */; };
 		6AC717092E30F60B338475F4 /* TimeAxisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC710A47585A891E43EF3D2 /* TimeAxisView.swift */; };
 		6AC717180E31FF41DA067C70 /* ChartJsonParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71E59D6E64D1805DD1E06 /* ChartJsonParser.swift */; };
 		6AC718326B8482D951EA9DF1 /* NightModeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC71020B6020F41F629A9A2 /* NightModeTableViewCell.swift */; };
@@ -54,11 +56,13 @@
 /* Begin PBXFileReference section */
 		6AC71020B6020F41F629A9A2 /* NightModeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NightModeTableViewCell.swift; sourceTree = "<group>"; };
 		6AC710A47585A891E43EF3D2 /* TimeAxisView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeAxisView.swift; sourceTree = "<group>"; };
+		6AC710DA89436DEEE7B615BA /* LayoutConstraints.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LayoutConstraints.swift; sourceTree = "<group>"; };
 		6AC711BE80856EF5178E381E /* ChartTextFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartTextFormatter.swift; sourceTree = "<group>"; };
 		6AC7120BA3BC285553BA4F18 /* CrosshairPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrosshairPanel.swift; sourceTree = "<group>"; };
 		6AC712480BA5369ECEAD436E /* ChartDrawingData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartDrawingData.swift; sourceTree = "<group>"; };
 		6AC712854E421161A8F67D8C /* ChartViewProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartViewProtocol.swift; sourceTree = "<group>"; };
 		6AC713A024D7DADDC16C0CA3 /* ScreenHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenHelper.swift; sourceTree = "<group>"; };
+		6AC714CB094D58FC75364142 /* PlotSelectorTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlotSelectorTableViewCell.swift; sourceTree = "<group>"; };
 		6AC715096E2D394D012B9201 /* CrosshairView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrosshairView.swift; sourceTree = "<group>"; };
 		6AC715D6F57BFF6CEAC49574 /* Chart.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Chart.swift; sourceTree = "<group>"; };
 		6AC7164D077F89D5E85CAEA0 /* YAxisView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YAxisView.swift; sourceTree = "<group>"; };
@@ -136,6 +140,7 @@
 				6AC71020B6020F41F629A9A2 /* NightModeTableViewCell.swift */,
 				6AC71F60026D701CF45660A7 /* ChartTableViewCell.swift */,
 				6AC71ABE093B2186770EDD25 /* ChartViewDrawRectAnimator.swift */,
+				6AC714CB094D58FC75364142 /* PlotSelectorTableViewCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -161,6 +166,14 @@
 				6AC71E1470CB6775F9CA41BA /* ChartClient.swift */,
 			);
 			path = Client;
+			sourceTree = "<group>";
+		};
+		6AC71C7C0F22F66090577CAA /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				6AC710DA89436DEEE7B615BA /* LayoutConstraints.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 		DDC16F3D22358C420060596D /* Resources */ = {
@@ -197,6 +210,7 @@
 				6AC7163371B1B361DA9AB5EF /* ChartDrawing */,
 				6AC71165AA6DF5B5C6BB46A9 /* ChartViews */,
 				6AC7160454ABC05F71630F04 /* Cells */,
+				6AC71C7C0F22F66090577CAA /* Helpers */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -383,6 +397,8 @@
 				DD7A05EE2256AB23003014B3 /* Fonts.swift in Sources */,
 				6AC717092E30F60B338475F4 /* TimeAxisView.swift in Sources */,
 				6AC71C880AFFFE32E4563AC2 /* YAxisView.swift in Sources */,
+				6AC716BCE71657022E8A2872 /* PlotSelectorTableViewCell.swift in Sources */,
+				6AC7159FFEB32682CBDD7576 /* LayoutConstraints.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

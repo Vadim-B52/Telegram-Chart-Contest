@@ -60,9 +60,9 @@ public class ChartListScreen {
         let (chart, state) = dataAt(idx)
         let plotId = chart.plots[plotIndex].identifier
         if state.enabledPlotId.contains(plotId) {
-            chartStates[idx] = state.byDisablingPlotWith(identifier: plotId)
+            chartStates[idx] = state.byDisablingPlot(identifier: plotId)
         } else {
-            chartStates[idx] = state.byEnablingPlotWith(identifier: plotId)
+            chartStates[idx] = state.byEnablingPlot(identifier: plotId)
         }
     }
 }
@@ -76,11 +76,22 @@ public struct ChartState {
         return ChartState(enabledPlotId: enabledPlotId, selectedTimeRange: selectedTimeRange)
     }
 
-    func byEnablingPlotWith(identifier: String) -> ChartState {
+    public func byTurningPlot(identifier: String) -> ChartState {
+        if enabledPlotId.contains(identifier) {
+            return byDisablingPlot(identifier: identifier)
+        }
+        return byEnablingPlot(identifier: identifier)
+    }
+
+    public func bySingleEnabling(identifier: String) -> ChartState {
+        return ChartState(enabledPlotId: [identifier], selectedTimeRange: selectedTimeRange)
+    }
+
+    public func byEnablingPlot(identifier: String) -> ChartState {
         return ChartState(enabledPlotId: enabledPlotId.union([identifier]), selectedTimeRange: selectedTimeRange)
     }
 
-    func byDisablingPlotWith(identifier: String) -> ChartState {
+    public func byDisablingPlot(identifier: String) -> ChartState {
         return ChartState(enabledPlotId: enabledPlotId.subtracting([identifier]), selectedTimeRange: selectedTimeRange)
     }
 }

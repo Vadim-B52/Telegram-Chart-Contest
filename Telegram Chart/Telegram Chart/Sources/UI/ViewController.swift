@@ -14,7 +14,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     private let model = ChartListScreen()
     private let chartCellReuseId = "chartCell"
-    private let plotCellReuseId = "plotCell"
+    private let plotSelectorCellReuseId = "plotSelectorCellReuseId"
     private let nightModeCellId = "nightModeCell"
     private var skin: Skin = DaySkin()
 
@@ -25,7 +25,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         super.viewDidLoad()
         navigationItem.title = NSLocalizedString("Statistics", comment: "")
         tableView.register(ChartTableViewCell.self, forCellReuseIdentifier: chartCellReuseId)
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: plotCellReuseId)
+        tableView.register(PlotSelectorTableViewCell.self, forCellReuseIdentifier: plotSelectorCellReuseId)
         tableView.register(NightModeTableViewCell.self, forCellReuseIdentifier: nightModeCellId)
         updateSkin()
     }
@@ -36,7 +36,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if isChartSection(section) {
-            return model.charts[section].plots.count + 1
+            let chart = model.charts[section]
+            return chart.plots.count > 1 ? 2 : 1
         }
         return 1
     }
@@ -55,7 +56,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         if isChartRowAt(indexPath) {
             return chartCellAt(indexPath, tableView: tableView)
         }
-        return plotCellAt(indexPath, tableView: tableView)
+        return plotSelectorCellAt(indexPath, tableView: tableView)
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -89,8 +90,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 chartCell.hidePlot(plotId: plotId)
             }
         }
-        if let plotCell = tableView.cellForRow(at: indexPath) {
-            configure(plotCell: plotCell, atIndexPath: indexPath)
+        if let plotCell = tableView.cellForRow(at: indexPath) as? PlotSelectorTableViewCell {
+            configure(plotSelectorCell: plotCell, atIndexPath: indexPath)
         }
     }
 
@@ -171,27 +172,17 @@ fileprivate extension ViewController {
         return cell
     }
 
-    private func plotCellAt(_ indexPath: IndexPath, tableView: UITableView) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: plotCellReuseId)!
-        cell.textLabel?.textColor = skin.mainTextColor
-        cell.imageView?.clipsToBounds = true
-        cell.imageView?.backgroundColor = skin.cellBackgroundColor
-        cell.imageView?.layer.cornerRadius = 2
-        cell.backgroundColor = skin.cellBackgroundColor
-        cell.backgroundView?.backgroundColor = skin.cellBackgroundColor
-        cell.selectedBackgroundView? = UIView()
-        cell.selectedBackgroundView?.backgroundColor = skin.rowSelectionColor
-        configure(plotCell: cell, atIndexPath: indexPath)
+    private func plotSelectorCellAt(_ indexPath: IndexPath, tableView: UITableView) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: plotSelectorCellReuseId) as! PlotSelectorTableViewCell
+        cell.selectionStyle = .none
+        cell.colorSource = self
+        cell.delegate = self
+        configure(plotSelectorCell: cell, atIndexPath: indexPath)
         return cell
     }
 
-    private func configure(plotCell cell: UITableViewCell, atIndexPath indexPath: IndexPath) {
-        let (chart, state) = model.dataAt(indexPath.section)
-        let plotIdx = indexPath.row - 1
-        let plot = chart.plots[plotIdx]
-        cell.textLabel?.text = plot.name
-        cell.imageView?.image = UIImage.plotIndicatorWithColor(plot.color)
-        cell.accessoryType = state.enabledPlotId.contains(plot.identifier) ? .checkmark : .none
+    private func configure(plotSelectorCell cell: PlotSelectorTableViewCell, atIndexPath indexPath: IndexPath) {
+        cell.data = model.dataAt(indexPath.section)
     }
 }
 
@@ -241,5 +232,40 @@ extension ViewController: ChartTableViewCellDelegate {
             return
         }
         model.updateSelectedTimeRange(timeRange, at: indexPath.section)
+    }
+}
+
+extension ViewController: PlotSelectorTableViewCellColorSource {
+    public func backgroundColor(cell: PlotSelectorTableViewCell) -> UIColor {
+        return skin.cellBackgroundColor
+    }
+}
+
+extension ViewController: PlotSelectorTableViewCellDelegate {
+    public func plotSelectorTableViewCell(_ cell: UITableViewCell, didChangeState: ChartState) {
+        let indexPath = tableView.indexPath(for: cell)
+//        let plotIdx = indexPath.row - 1
+//        guard model.canChangeVisibilityForChartAt(section, plotIndex: plotIdx) else {
+//            let title = "Cannot change"
+//            let msg = "Enable other plot before"
+//            let alert = UIAlertController(title: title, message: msg, preferredStyle: .alert)
+//            alert.addAction(UIAlertAction(title: "Ok", style: .default))
+//            present(alert, animated: true)
+//            return
+//        }
+//        model.changeVisibilityForChartAt(section, plotIndex: plotIdx)
+//        let chartIndexPath = IndexPath(row: 0, section: section)
+//        if let chartCell = tableView.cellForRow(at: chartIndexPath) as? ChartTableViewCell {
+//            let (chart, state) = model.dataAt(indexPath.section)
+//            let plotId = chart.plots[plotIdx].identifier
+//            if state.enabledPlotId.contains(plotId) {
+//                chartCell.showPlot(plotId: plotId)
+//            } else {
+//                chartCell.hidePlot(plotId: plotId)
+//            }
+//        }
+//        if let plotCell = tableView.cellForRow(at: indexPath) as? PlotSelectorTableViewCell {
+//            configure(plotSelectorCell: plotCell, atIndexPath: indexPath)
+//        }
     }
 }

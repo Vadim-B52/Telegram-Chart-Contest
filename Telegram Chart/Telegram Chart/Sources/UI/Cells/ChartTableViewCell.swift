@@ -136,7 +136,7 @@ public class ChartTableViewCell: UITableViewCell {
         guard let _ = chart, let state = state else {
             return
         }
-        self.state = state.byDisablingPlotWith(identifier: plotId)
+        self.state = state.byDisablingPlot(identifier: plotId)
         chartView.displayChart(chartViewDrawingChart(), animated: true)
         miniChartView.displayChart(miniChartViewDrawingChart(), animated: true)
     }
@@ -145,7 +145,7 @@ public class ChartTableViewCell: UITableViewCell {
         guard let _ = chart, let state = state else {
             return
         }
-        self.state = state.byEnablingPlotWith(identifier: plotId)
+        self.state = state.byEnablingPlot(identifier: plotId)
         chartView.displayChart(chartViewDrawingChart(), animated: true)
         miniChartView.displayChart(miniChartViewDrawingChart(), animated: true)
     }

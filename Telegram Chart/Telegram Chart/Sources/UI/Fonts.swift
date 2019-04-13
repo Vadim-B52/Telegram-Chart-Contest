@@ -10,6 +10,7 @@ import UIKit
 
 public protocol FontsProtocol {
     func bold11() -> UIFont
+    func bold13() -> UIFont
     func light11() -> UIFont
     func semibold11() -> UIFont
     func semibold12() -> UIFont
@@ -30,6 +31,10 @@ public struct Fonts {
 public struct ModernFonts: FontsProtocol {
     public func bold11() -> UIFont {
         return UIFont.systemFont(ofSize: 11, weight: .bold)
+    }
+
+    public func bold13() -> UIFont {
+        return UIFont.systemFont(ofSize: 13, weight: .bold)
     }
 
     public func light11() -> UIFont {
@@ -56,6 +61,10 @@ public struct ModernFonts: FontsProtocol {
 public struct LegacyFonts: FontsProtocol {
     public func bold11() -> UIFont {
         return UIFont.boldSystemFont(ofSize: 11)
+    }
+
+    public func bold13() -> UIFont {
+        return UIFont.boldSystemFont(ofSize: 13)
     }
 
     public func light11() -> UIFont {
