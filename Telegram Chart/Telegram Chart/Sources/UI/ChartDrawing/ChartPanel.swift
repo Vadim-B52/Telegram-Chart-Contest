@@ -81,7 +81,7 @@ public class StackedBarChartPanel: ChartPanel {
         let path = UIBezierPath()
         defer {
             layer.lineWidth = 0
-            layer.fillColor = plot.color.cgColor
+            layer.fillColor = plot.color.lighter().cgColor
             if let apply = apply {
                 apply(layer, path.cgPath)
             } else {
@@ -148,7 +148,7 @@ public class BarChartPanel: ChartPanel {
         let path = UIBezierPath()
         defer {
             layer.lineWidth = 0
-            layer.fillColor = plot.color.cgColor
+            layer.fillColor = plot.color.lighter().cgColor
             if let apply = apply {
                 apply(layer, path.cgPath)
             } else {
@@ -209,7 +209,7 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
         let path: UIBezierPath
         defer {
             layer.lineWidth = 0
-            layer.fillColor = plot.color.cgColor
+            layer.fillColor = plot.color.lighter().cgColor
             if let apply = apply {
                 apply(layer, path.cgPath)
             } else {
@@ -250,5 +250,18 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
             path.addLine(to: endPoint)
             path.close()
         }
+    }
+}
+
+fileprivate extension UIColor {
+    func lighter() -> UIColor {
+        let r = UnsafeMutablePointer<CGFloat>.allocate(capacity: 1)
+        let g = UnsafeMutablePointer<CGFloat>.allocate(capacity: 1)
+        let b = UnsafeMutablePointer<CGFloat>.allocate(capacity: 1)
+        getRed(r, green: g, blue: b, alpha: nil)
+        func adjust(_ v: UnsafeMutablePointer<CGFloat>) -> CGFloat {
+            return v.pointee + 0.5 * (1 - v.pointee)
+        }
+        return UIColor(red: adjust(r), green: adjust(g), blue: adjust(b), alpha: 1)
     }
 }
