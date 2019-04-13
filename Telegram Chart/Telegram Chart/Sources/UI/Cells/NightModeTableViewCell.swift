@@ -13,8 +13,4 @@ public class NightModeTableViewCell: UITableViewCell {
         button.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         return button
     }()
-
-    public override var intrinsicContentSize: CGSize {
-        return CGSize(width: UIView.noIntrinsicMetric, height: 44)
-    }
 }

@@ -34,8 +34,6 @@ public class ChartTableViewCell: UITableViewCell {
         }
     }
 
-    private static let intrinsicHeight = UIScreen.main.bounds.size.height / 2
-
     public override init(style: CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         chartView.timeAxisDelegate = self
@@ -75,8 +73,8 @@ public class ChartTableViewCell: UITableViewCell {
 
         let views = ["chartView": chartView, "miniChartView": miniChartViewWrapper]
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
-            withVisualFormat: "V:|[chartView(==chartViewHeight)][miniChartView(==60)]|",
-            metrics: ["chartViewHeight": ChartTableViewCell.intrinsicHeight - 60],
+            withVisualFormat: "V:|[chartView][miniChartView(==60)]|",
+            metrics: nil,
             views: views))
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
             withVisualFormat: "H:|-15-[chartView]-15-|",

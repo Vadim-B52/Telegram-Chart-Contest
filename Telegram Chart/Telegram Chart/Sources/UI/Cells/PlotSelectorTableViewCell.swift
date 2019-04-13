@@ -5,31 +5,40 @@
 
 import UIKit
 
-public protocol PlotSelectorTableViewCellColorSource: AnyObject {
-    func backgroundColor(cell: PlotSelectorTableViewCell) -> UIColor
+public protocol PlotSelectorViewColorSource: AnyObject {
+    func backgroundColor(view: PlotSelectorView) -> UIColor
 }
 
-public protocol PlotSelectorTableViewCellDelegate: AnyObject {
-    func plotSelectorTableViewCell(_ cell: UITableViewCell, didChangeState: ChartState)
+public protocol PlotSelectorViewDelegate: AnyObject {
+    func plotSelectorView(_ view: PlotSelectorView, didChangeState: ChartState)
 }
 
 public class PlotSelectorTableViewCell: UITableViewCell {
+    public private(set) lazy var view: PlotSelectorView = {
+        let view = PlotSelectorView()
+        view.owningCell = self
+        view.frame = contentView.bounds
+        view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        contentView.addSubview(view)
+        return view
+    }()
+}
 
+public class PlotSelectorView: UIView {
     private let layout = CloudFlowLayout()
     private let collectionView: UICollectionView
     private lazy var sizingView: PlotView = PlotView()
     private let plotCellId = "plotCellId"
 
-    public weak var delegate: PlotSelectorTableViewCellDelegate?
+    public fileprivate(set) unowned var owningCell: UITableViewCell?
+    public weak var delegate: PlotSelectorViewDelegate?
 
-    private var heightConstraint: NSLayoutConstraint!
     public var data: (chart: Chart, state: ChartState)? {
         didSet {
             collectionView.reloadData()
-            setNeedsUpdateConstraints()
         }
     }
-    public weak var colorSource: PlotSelectorTableViewCellColorSource? {
+    public weak var colorSource: PlotSelectorViewColorSource? {
         didSet {
             reloadColors()
         }
@@ -43,9 +52,17 @@ public class PlotSelectorTableViewCell: UITableViewCell {
         return data?.state
     }
 
-    public override init(style: CellStyle, reuseIdentifier: String?) {
+    public override var intrinsicContentSize: CGSize {
+        collectionView.layoutIfNeeded()
+        var sz = collectionView.contentSize
+        sz.height += 20
+        return sz
+    }
+
+    public override init(frame: CGRect) {
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        super.init(frame: frame)
+        collectionView.bounces = false
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.register(PlotCollectionViewCell.self, forCellWithReuseIdentifier: plotCellId)
@@ -54,21 +71,9 @@ public class PlotSelectorTableViewCell: UITableViewCell {
         layout.minimumLineSpacing = 10
 
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(collectionView)
-        NSLayoutConstraint.activate(LayoutConstraints.constraints(view: collectionView, pinnedToView: contentView))
-
-        heightConstraint = NSLayoutConstraint(
-                item: collectionView, attribute: .height,
-                relatedBy: .equal,
-                toItem: nil, attribute: .notAnAttribute,
-                multiplier: 1, constant: 40)
-        heightConstraint.isActive = true
+        addSubview(collectionView)
+        NSLayoutConstraint.activate(LayoutConstraints.constraints(view: collectionView, pinnedToView: self))
     }
-
-//    public override func updateConstraints() {
-//        heightConstraint.constant = collectionView.contentSize.height
-//        super.updateConstraints()
-//    }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -76,13 +81,13 @@ public class PlotSelectorTableViewCell: UITableViewCell {
 
     public func reloadColors() {
         collectionView.reloadData()
-        let color = colorSource?.backgroundColor(cell: self)
+        let color = colorSource?.backgroundColor(view: self)
         collectionView.backgroundColor = color
         backgroundColor = color
     }
 }
 
-extension PlotSelectorTableViewCell: UICollectionViewDataSource {
+extension PlotSelectorView: UICollectionViewDataSource {
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return data?.chart.plots.count ?? 0
     }
@@ -97,16 +102,16 @@ extension PlotSelectorTableViewCell: UICollectionViewDataSource {
                 view: cell.plotView,
                 plot: plot,
                 checked: state.enabledPlotId.contains(plot.identifier),
-                backgroundColor: colorSource?.backgroundColor(cell: self))
+                backgroundColor: colorSource?.backgroundColor(view: self))
         return cell
     }
 }
 
-extension PlotSelectorTableViewCell: UICollectionViewDelegateFlowLayout {
+extension PlotSelectorView: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let newState = state.byTurningPlot(identifier: chart.plots[indexPath.row].identifier)
         data = (chart, newState)
-        delegate?.plotSelectorTableViewCell(self, didChangeState: newState)
+        delegate?.plotSelectorView(self, didChangeState: newState)
         collectionView.reloadData()
     }
 
@@ -118,12 +123,12 @@ extension PlotSelectorTableViewCell: UICollectionViewDelegateFlowLayout {
                 view: sizingView,
                 plot: plot,
                 checked: state.enabledPlotId.contains(plot.identifier),
-                backgroundColor: colorSource?.backgroundColor(cell: self))
+                backgroundColor: colorSource?.backgroundColor(view: self))
         return sizingView.sizeThatFits(.zero)
     }
 }
 
-extension PlotSelectorTableViewCell {
+extension PlotSelectorView {
 
     fileprivate func handleLongPress(sender: PlotCollectionViewCell) {
         guard let indexPath = collectionView.indexPath(for: sender) else {
@@ -131,7 +136,7 @@ extension PlotSelectorTableViewCell {
         }
         let newState = state.bySingleEnabling(identifier: chart.plots[indexPath.row].identifier)
         data = (chart, newState)
-        delegate?.plotSelectorTableViewCell(self, didChangeState: newState)
+        delegate?.plotSelectorView(self, didChangeState: newState)
         collectionView.reloadData()
     }
 
@@ -261,9 +266,10 @@ class CloudFlowLayout: UICollectionViewFlowLayout {
         guard attributes.count > 1 else {
             return attributes
         }
-        for i in 1..<attributes.count {
-            let prev = attributes[i - 1]
-            let curr = attributes[i]
+        var newAttributes = NSArray(array: attributes, copyItems: true) as! [UICollectionViewLayoutAttributes]
+        for i in 1..<newAttributes.count {
+            let prev = newAttributes[i - 1]
+            let curr = newAttributes[i]
             guard prev.frame.minY < curr.frame.midY,
                   curr.frame.midY < prev.frame.maxY,
                   prev.indexPath.row + 1 == curr.indexPath.row else {
@@ -274,6 +280,6 @@ class CloudFlowLayout: UICollectionViewFlowLayout {
             frame.origin.x = prev.frame.maxX + minimumInteritemSpacing
             curr.frame = frame
         }
-        return attributes
+        return newAttributes
     }
 }

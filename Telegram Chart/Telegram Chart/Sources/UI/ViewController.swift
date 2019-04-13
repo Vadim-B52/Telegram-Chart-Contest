@@ -10,7 +10,9 @@ import UIKit
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
-    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet
+    private weak var tableView: UITableView!
+    private lazy var sizingPlotSelector: PlotSelectorView = PlotSelectorView()
     
     private let model = ChartListScreen()
     private let chartCellReuseId = "chartCell"
@@ -19,7 +21,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     private var skin: Skin = DaySkin()
 
     private lazy var screenMaxEdge = max(UIScreen.main.bounds.size.height, UIScreen.main.bounds.width)
-    
+    private lazy var chartCellHeight = UIScreen.main.bounds.size.height / 2
+
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = NSLocalizedString("Statistics", comment: "")
@@ -40,7 +43,30 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }
         return 1
     }
-    
+
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if isChartRowAt(indexPath) {
+            return chartCellHeight
+        }
+        if isSwitchSkinRowAt(indexPath) {
+            return 44
+        }
+        sizingPlotSelector.bounds = tableView.bounds
+        sizingPlotSelector.layoutIfNeeded()
+        configure(plotSelector: sizingPlotSelector, atIndexPath: indexPath)
+        return sizingPlotSelector.intrinsicContentSize.height
+    }
+
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        if isChartRowAt(indexPath) {
+            return chartCellHeight
+        }
+        if isSwitchSkinRowAt(indexPath) {
+            return 44
+        }
+        return 60
+    }
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if isSwitchSkinRowAt(indexPath) {
             return switchSkinCell(tableView: tableView)
@@ -83,7 +109,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             }
         }
         if let plotCell = tableView.cellForRow(at: indexPath) as? PlotSelectorTableViewCell {
-            configure(plotSelectorCell: plotCell, atIndexPath: indexPath)
+            configure(plotSelector: plotCell.view, atIndexPath: indexPath)
         }
     }
 
@@ -167,14 +193,14 @@ fileprivate extension ViewController {
     private func plotSelectorCellAt(_ indexPath: IndexPath, tableView: UITableView) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: plotSelectorCellReuseId) as! PlotSelectorTableViewCell
         cell.selectionStyle = .none
-        cell.colorSource = self
-        cell.delegate = self
-        configure(plotSelectorCell: cell, atIndexPath: indexPath)
+        cell.view.colorSource = self
+        cell.view.delegate = self
+        configure(plotSelector: cell.view, atIndexPath: indexPath)
         return cell
     }
 
-    private func configure(plotSelectorCell cell: PlotSelectorTableViewCell, atIndexPath indexPath: IndexPath) {
-        cell.data = model.dataAt(indexPath.section)
+    private func configure(plotSelector view: PlotSelectorView, atIndexPath indexPath: IndexPath) {
+        view.data = model.dataAt(indexPath.section)
     }
 }
 
@@ -227,15 +253,15 @@ extension ViewController: ChartTableViewCellDelegate {
     }
 }
 
-extension ViewController: PlotSelectorTableViewCellColorSource {
-    public func backgroundColor(cell: PlotSelectorTableViewCell) -> UIColor {
+extension ViewController: PlotSelectorViewColorSource {
+    func backgroundColor(view: PlotSelectorView) -> UIColor {
         return skin.cellBackgroundColor
     }
 }
 
-extension ViewController: PlotSelectorTableViewCellDelegate {
-    public func plotSelectorTableViewCell(_ cell: UITableViewCell, didChangeState: ChartState) {
-        let indexPath = tableView.indexPath(for: cell)
+extension ViewController: PlotSelectorViewDelegate {
+    public func plotSelectorView(_ view: PlotSelectorView, didChangeState: ChartState) {
+//        let indexPath = tableView.indexPath(for: view)
 //        let plotIdx = indexPath.row - 1
 //        guard model.canChangeVisibilityForChartAt(section, plotIndex: plotIdx) else {
 //            let title = "Cannot change"
