@@ -159,6 +159,7 @@ fileprivate extension ViewController {
         cell.delegate = self
         cell.timeSelectorViewColorSource = self
         cell.chartViewColorSource = self
+        cell.colorSource = self
         let (chart, state) = model.dataAt(indexPath.section)
         cell.display(chart: chart, state: state, animated: false)
         return cell
@@ -245,5 +246,15 @@ extension ViewController: PlotSelectorViewDelegate {
             let (chart, state) = model.dataAt(chartIdx)
             chartCell.display(chart: chart, state: state, animated: true)
         }
+    }
+}
+
+extension ViewController: ChartTableViewColorSource {
+    public func errorTextColor(chartTableViewCell cell: ChartTableViewCell) -> UIColor {
+        return skin.mainTextColor
+    }
+
+    public func errorBackgroundColor(chartTableViewCell cell: ChartTableViewCell) -> UIColor {
+        return skin.cellBackgroundColor
     }
 }

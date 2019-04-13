@@ -12,17 +12,24 @@ public protocol ChartTableViewCellDelegate: AnyObject {
     func chartTableViewCell(_ cell: ChartTableViewCell, didChangeSelectedTimeRange timeRange: TimeRange)
 }
 
+public protocol ChartTableViewColorSource: AnyObject {
+    func errorTextColor(chartTableViewCell cell: ChartTableViewCell) -> UIColor
+    func errorBackgroundColor(chartTableViewCell cell: ChartTableViewCell) -> UIColor
+}
+
 public class ChartTableViewCell: UITableViewCell {
 
     private let chartView = CompoundChartView()
     private let miniChartView = ChartView()
     private let timeSelector = TimeFrameSelectorView()
+    private var errorView: UILabel?
 
     private var chart: Chart?
     private var state: ChartState?
     fileprivate var timeAxisDescription: TimeAxisDescription?
 
     public weak var delegate: ChartTableViewCellDelegate?
+    public weak var colorSource: ChartTableViewColorSource?
     public weak var chartViewColorSource: ChartViewColorSource? {
         didSet {
             chartView.colorSource = chartViewColorSource
@@ -69,7 +76,7 @@ public class ChartTableViewCell: UITableViewCell {
         timeSelector.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(chartView)
         contentView.addSubview(miniChartViewWrapper)
-        addSubview(timeSelector)
+        contentView.addSubview(timeSelector)
 
         let views = ["chartView": chartView, "miniChartView": miniChartViewWrapper]
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
@@ -128,8 +135,35 @@ public class ChartTableViewCell: UITableViewCell {
         self.state = state
         timeSelector.timeRange = chart.timeRange
         timeSelector.selectedTimeRange = state.selectedTimeRange
-        chartView.displayChart(chartViewDrawingChart(), animated: animated)
-        miniChartView.displayChart(miniChartViewDrawingChart(), animated: animated)
+        if state.enabledPlotId.count == 0 {
+            let prevErrorView = errorView
+            prevErrorView?.removeFromSuperview()
+            let errorView = UILabel()
+            self.errorView = errorView
+            contentView.addSubview(errorView)
+            errorView.frame = contentView.bounds
+            errorView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            errorView.textAlignment = .center
+            errorView.adjustsFontSizeToFitWidth = true
+            errorView.minimumScaleFactor = 0.5
+            errorView.text = NSLocalizedString("  Please select something to display  ", comment: "")
+            errorView.backgroundColor = colorSource?.errorBackgroundColor(chartTableViewCell: self)
+            errorView.textColor = colorSource?.errorTextColor(chartTableViewCell: self)
+            if animated && prevErrorView == nil {
+                errorView.alpha = 0
+                UIView.animate(withDuration: 0.3) { errorView.alpha = 1 }
+            }
+        } else if let errorView = errorView {
+            self.errorView = nil
+            UIView.animate(withDuration: animated ? 0.3 : 0, animations: { errorView.alpha = 0 }) { b in
+                errorView.removeFromSuperview()
+            }
+            chartView.displayChart(chartViewDrawingChart(), animated: false)
+            miniChartView.displayChart(miniChartViewDrawingChart(), animated: false)
+        } else {
+            chartView.displayChart(chartViewDrawingChart(), animated: animated)
+            miniChartView.displayChart(miniChartViewDrawingChart(), animated: animated)
+        }
     }
     
     @objc
