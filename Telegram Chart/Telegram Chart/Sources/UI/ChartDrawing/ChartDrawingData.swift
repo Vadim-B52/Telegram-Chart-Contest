@@ -159,7 +159,12 @@ public class DrawingChart {
                 idxValue += plots[i].values[idx]
             }
             var value100 = Chart.Value(0)
-            plots.forEach { value100 += $0.values[idx] }
+            var i = 0
+            let n = plots.count
+            while i < n {
+                value100 += plots[i].values[idx]
+                i += 1
+            }
             let v = CGFloat(idxValue) / CGFloat(value100)
             let y = rect.minY + rect.size.height * v
             return rect.maxY + rect.minY - y
@@ -301,10 +306,13 @@ public struct StackedValueRangeCalculation: ValueRangeCalculation {
     public let internalCalculation: ValueRangeCalculation
 
     public func valueRange(plot: Chart.Plot, visiblePlots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
-        let vrs = visiblePlots.map { internalCalculation.valueRange(plot: $0, visiblePlots: [$0], indexRange: indexRange)  }
-        var max: Chart.Value = 0
-        vrs.forEach { range in
-            max += range.max
+        var max = Chart.Value.zero
+        var i = 0
+        let n = visiblePlots.count
+        while i < n {
+            let plot = visiblePlots[i]
+            max += internalCalculation.valueRange(plot: plot, visiblePlots: [plot], indexRange: indexRange).max
+            i += 1
         }
         // TODO: assumption non negative values
         return ValueRange(min: 0, max: max)

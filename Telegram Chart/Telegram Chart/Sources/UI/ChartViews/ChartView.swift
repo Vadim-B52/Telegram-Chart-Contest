@@ -25,7 +25,9 @@ public class ChartView: UIControl, ChartViewProtocol {
     public override func layoutSubviews() {
         super.layoutSubviews()
         let frame = plotFrame()
-        layers.forEach { $0.frame = frame }
+        for l in layers {
+            l.frame = frame
+        }
         redraw()
     }
 
