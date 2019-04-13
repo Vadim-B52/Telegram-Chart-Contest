@@ -119,35 +119,34 @@ public class DrawingChart {
     }
 
     public struct YCalculator {
+        private let pow = 10
         public let valueRange: ValueRange
 
         public func y(in rect: CGRect, value: Int64) -> CGFloat {
-            let v = CGFloat(value - valueRange.min) / CGFloat(valueRange.size)
-            let y = rect.minY + rect.size.height * v
-            return rect.maxY + rect.minY - y
-        }
-
-        public func valueAt(y y0: CGFloat, rect: CGRect) -> Int64 {
-            let y = rect.maxY + rect.minY - y0
-            let d = (y - rect.minY) / rect.size.height
-            let v = CGFloat(valueRange.min) + CGFloat(valueRange.size) * d
-            return Int64(v)
+            let d = (value - valueRange.min) << pow
+            let v = d / valueRange.size
+            let y = Int64(rect.size.height) * v
+            return rect.maxY - CGFloat(y >> pow)
         }
     }
 
     public struct StackedYCalculator {
-        public let valueRange: ValueRange
+        private let calc: YCalculator
         public let plots: [Chart.Plot]
         public let plotIdx: Int
 
+        public init(valueRange: ValueRange, plots: [Chart.Plot], plotIdx: Int) {
+            self.plots = plots
+            self.plotIdx = plotIdx
+            calc = YCalculator(valueRange: valueRange)
+        }
+
         public func y(in rect: CGRect, at idx: Int) -> CGFloat {
-            var idxValue = Chart.Value.zero
+            var value = Chart.Value.zero
             for i in 0...plotIdx {
-                idxValue += plots[i].values[idx]
+                value += plots[i].values[idx]
             }
-            let v = CGFloat(idxValue - valueRange.min) / CGFloat(valueRange.size)
-            let y = rect.minY + rect.size.height * v
-            return rect.maxY + rect.minY - y
+            return calc.y(in: rect, value: value)
         }
     }
 
@@ -160,20 +159,19 @@ public class DrawingChart {
             for i in 0...plotIdx {
                 idxValue += plots[i].values[idx]
             }
-            var value100 = Chart.Value(0)
-            var i = 0
+            var value100 = idxValue
+            var i = plotIdx + 1
             let n = plots.count
             while i < n {
                 value100 += plots[i].values[idx]
                 i += 1
             }
-            let v = CGFloat(idxValue) / CGFloat(value100)
-            let y = rect.minY + rect.size.height * v
-            return rect.maxY + rect.minY - y
+            let calc = YCalculator(valueRange: ValueRange(min: 0, max: value100))
+            return calc.y(in: rect, value: idxValue)
         }
     }
 
-    public struct Calculator {
+    public struct PointCalculator {
         public let timeRange: TimeRange
         public let valueRange: ValueRange
 
@@ -220,7 +218,7 @@ public struct ValueRangeNoYAxisStrategy: YAxisCalculation {
 
 public struct ValueRangeHasStaticYAxis: YAxisCalculation {
     public static let percentage: YAxisCalculation = ValueRangeHasStaticYAxis(
-            valueRange: ValueRange(min: 0, max: 100),
+            valueRange: .percentage,
             yAxisValues: YAxisValues(zero: 0, step: 25))
 
     public let valueRange: ValueRange
@@ -272,7 +270,7 @@ public struct ValueRangeHasYAxis: YAxisCalculation {
 
 public struct StaticValueRangeCalculation: ValueRangeCalculation {
 
-    public static let percentage = StaticValueRangeCalculation(valueRange: ValueRange(min: 0, max: 100))
+    public static let percentage = StaticValueRangeCalculation(valueRange: .percentage)
 
     public let valueRange: ValueRange
 

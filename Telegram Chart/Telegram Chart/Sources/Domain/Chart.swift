@@ -82,6 +82,8 @@ public struct ValueRange: Equatable {
     public var max: Chart.Value
     public var size: Chart.Value
 
+    public static let percentage = ValueRange(min: 0, max: 100)
+
     public init(min: Chart.Value, max: Chart.Value) {
         self.min = min
         self.max = max

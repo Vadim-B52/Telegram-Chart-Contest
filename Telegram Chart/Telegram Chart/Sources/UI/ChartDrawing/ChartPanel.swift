@@ -29,7 +29,7 @@ public class LineChartPanel: ChartPanel {
 
     public func drawInContext(_ layer: CAShapeLayer, rect: CGRect, apply: ((CAShapeLayer, CGPath) -> Void)?) {
         let values = plot.values
-        let calc = DrawingChart.Calculator(timeRange: timeRange, valueRange: valueRange)
+        let calc = DrawingChart.PointCalculator(timeRange: timeRange, valueRange: valueRange)
         let startIdx = indexRange.startIdx
         let startPoint = calc.pointAtTimestamp(timestamps[startIdx], value: values[startIdx], rect: rect)
         let path = UIBezierPath()
@@ -157,7 +157,7 @@ public class BarChartPanel: ChartPanel {
         }
 
         let values = plot.values
-        let calc = DrawingChart.Calculator(timeRange: timeRange, valueRange: valueRange)
+        let calc = DrawingChart.PointCalculator(timeRange: timeRange, valueRange: valueRange)
         let startIdx = indexRange.startIdx
         let startPoint = calc.pointAtTimestamp(
                 timestamps[startIdx],
