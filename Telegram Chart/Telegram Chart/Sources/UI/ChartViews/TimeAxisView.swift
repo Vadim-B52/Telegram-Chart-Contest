@@ -74,11 +74,11 @@ public class TimeAxisView: UIView {
         let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
         for (timeIdx, label) in labels {
             let timestamp = chart.timestamps[timeIdx]
-            let size = label.sizeThatFits(.zero).integralCeil
+            let size = label.sizeThatFits(.zero)
             var frame = CGRect.zero
             frame.size = size
             label.bounds = frame
-            label.center = CGPoint(x: calc.x(in: bounds, timestamp: timestamp), y: bounds.midY).screenScaledFloor
+            label.center = CGPoint(x: calc.x(in: bounds, timestamp: timestamp), y: bounds.midY)
         }
     }
 

@@ -44,8 +44,6 @@ class YAxisView: UIView, ChartViewProtocol {
               let ctx = UIGraphicsGetCurrentContext() else {
             return
         }
-        let bounds = self.integralBounds
-
         let valuePanelConfig = self.valuePanelConfig!
         let (zeroLine, _) = bounds.divided(atDistance: ScreenHelper.lightLineWidth, from: .maxYEdge)
         valuePanelConfig.zeroAxisColor.setFill()

@@ -31,14 +31,14 @@ public class LineChartPanel: ChartPanel {
         let values = plot.values
         let calc = DrawingChart.Calculator(timeRange: timeRange, valueRange: valueRange)
         let startIdx = indexRange.startIdx
-        let startPoint = calc.pointAtTimestamp(timestamps[startIdx], value: values[startIdx], rect: rect).screenScaledFloor
+        let startPoint = calc.pointAtTimestamp(timestamps[startIdx], value: values[startIdx], rect: rect)
         let path = UIBezierPath()
         path.move(to: startPoint)
 
         for i in (startIdx + 1)...indexRange.endIdx {
             let time = timestamps[i]
             let value = values[i]
-            let point = calc.pointAtTimestamp(time, value: value, rect: rect).screenScaledFloor
+            let point = calc.pointAtTimestamp(time, value: value, rect: rect)
             path.addLine(to: point)
         }
 
@@ -161,25 +161,25 @@ public class BarChartPanel: ChartPanel {
         let startIdx = indexRange.startIdx
         let startPoint = calc.pointAtTimestamp(
                 timestamps[startIdx],
-                value: values[startIdx], rect: rect).screenScaledFloor
+                value: values[startIdx], rect: rect)
 
         path.move(to: CGPoint(x: startPoint.x, y: rect.maxY))
 
         for i in startIdx..<indexRange.endIdx {
             let currTime = timestamps[i]
             let currValue = values[i]
-            let currPoint = calc.pointAtTimestamp(currTime, value: currValue, rect: rect).screenScaledFloor
+            let currPoint = calc.pointAtTimestamp(currTime, value: currValue, rect: rect)
             path.addLine(to: currPoint)
 
             let nextTime = timestamps[i + 1]
             let nextValue = values[i + 1]
-            let nextPoint = calc.pointAtTimestamp(nextTime, value: nextValue, rect: rect).screenScaledFloor
+            let nextPoint = calc.pointAtTimestamp(nextTime, value: nextValue, rect: rect)
             path.addLine(to: CGPoint(x: nextPoint.x, y: currPoint.y))
         }
 
         let endTime = timestamps[indexRange.endIdx]
         let endValue = values[indexRange.endIdx]
-        let endPoint = calc.pointAtTimestamp(endTime, value: endValue, rect: rect).screenScaledFloor
+        let endPoint = calc.pointAtTimestamp(endTime, value: endValue, rect: rect)
         path.addLine(to: CGPoint(x: endPoint.x, y: rect.maxY))
         path.close()
     }

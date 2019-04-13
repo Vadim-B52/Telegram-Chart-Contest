@@ -22,39 +22,3 @@ public class ScreenHelper {
     
     public private(set) static var thinLineWidth =  1 / screenScale
 }
-
-// TODO: clean up
-
-extension UIView {
-    var integralBounds: CGRect {
-        return self.bounds
-//        return convert((convert(bounds, to: nil).integral), from: nil)
-    }
-}
-
-extension CGFloat {
-    var screenScaledFloor: CGFloat {
-        return self
-//        let scale = ScreenHelper.screenScale
-//        return floor(self * scale) / scale
-    }
-}
-
-extension CGPoint {
-    var screenScaledFloor: CGPoint {
-        return self
-//        return CGPoint(x: x.screenScaledFloor, y: y.screenScaledFloor)
-    }
-
-    var integralFloor: CGPoint {
-        return self
-//        return CGPoint(x: floor(x), y: floor(y))
-    }
-}
-
-extension CGSize {
-    var integralCeil: CGSize {
-        return self
-//        return CGSize(width: ceil(width), height: ceil(height))
-    }
-}
