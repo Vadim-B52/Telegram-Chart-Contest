@@ -33,9 +33,8 @@ public class CrosshairView: UIView {
             setNeedsLayout()
             if chart == nil {
                 crosshairTimeIdx = nil
-                popup?.removeFromSuperview()
-                popup = nil
             }
+            updateWithCrosshairIdx(animated: false)
         }
     }
 
