@@ -12,7 +12,7 @@ public class CrosshairView: UIView {
     private var popup: PopupView?
     private var crosshairTimeIdx: Int?
 
-    private var crosshairConfig = CrosshairPanel.Config(pointFillColor: .clear, lineColor: .gray)
+    private var crosshairConfig = CrosshairPanelConfig(pointFillColor: .clear, lineColor: .gray)
 
     public weak var delegate: CrosshairViewDelegate? {
         didSet {
@@ -63,8 +63,23 @@ public class CrosshairView: UIView {
             return
         }
 
-        let panel = CrosshairPanel(chart: chart, timestampIndex: idx, config: crosshairConfig)
+        let panel = makePanel(chart: chart, idx: idx)
         panel.drawInContext(ctx, rect: bounds)
+    }
+
+    private func makePanel(chart: DrawingChart, idx: Int) -> CrosshairPanel {
+        let panel: CrosshairPanel
+        switch (chart.chart.chartType) {
+        case .simple:
+            panel = LineCrosshairPanel(chart: chart, timestampIndex: idx, config: crosshairConfig)
+        case .yScaled:
+            panel = LineCrosshairPanel(chart: chart, timestampIndex: idx, config: crosshairConfig)
+        case .stacked:
+            panel = StackedBarCrosshairPanel(chart: chart, timestampIndex: idx, config: crosshairConfig)
+        case .percentageStacked:
+            panel = PercentageAreaCrosshairPanel(chart: chart, timestampIndex: idx, config: crosshairConfig)
+        }
+        return panel
     }
 
     public override func layoutSubviews() {
@@ -79,18 +94,15 @@ public class CrosshairView: UIView {
             let x = calc.x(in: bounds, timestamp: timestamp)
             frame.origin.x = x - frame.width / 2
 
-            for plot in chart.visiblePlots {
-                let yCalc = DrawingChart.YCalculator(valueRange: chart.valueRange(plot: plot))
-                let y = yCalc.y(in: bounds, value: plot.values[idx])
-                if frame.contains(CGPoint(x: x, y: y)) {
+            let panel = makePanel(chart: chart, idx: idx)
+
+            if let moveRectToLeft = panel.getMoveRectToLeft(bounds: bounds, frame: frame, x: x) {
+                if moveRectToLeft {
                     var frame1 = frame
                     frame1.origin.x = x - frame.width - 10
-                    if bounds.contains(frame1) {
-                        frame = frame1
-                        break
-                    }
+                    frame = frame1
+                } else {
                     frame.origin.x = x + 10
-                    break
                 }
             }
 
@@ -109,7 +121,7 @@ public class CrosshairView: UIView {
             return
         }
 
-        crosshairConfig = CrosshairPanel.Config(
+        crosshairConfig = CrosshairPanelConfig(
                 pointFillColor: colorSource.pointFillColor(crosshairView: self),
                 lineColor: colorSource.lineColor(crosshairView: self))
 
@@ -163,7 +175,7 @@ public class CrosshairView: UIView {
             guard self?.needsUpdate ?? false else {
                 return
             }
-            self?.updateWithCrosshairIdx(animated: false)
+            self?.updateWithCrosshairIdx(animated: true)
         }
     }
 
