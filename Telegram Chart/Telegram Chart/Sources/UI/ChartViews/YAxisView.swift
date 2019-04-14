@@ -57,6 +57,7 @@ class YAxisView: UIView, ChartViewProtocol {
             let maxY = calculator.y(in: bounds, value: yAxisValues.zero + Int64(idx) * yAxisValues.step)
             let height = view.sizeThatFits(.zero).height
             view.frame = CGRect(x: bounds.minX, y: maxY - height, width: bounds.width, height: height)
+            view.isHidden = maxY <= bounds.minY
         }
     }
 

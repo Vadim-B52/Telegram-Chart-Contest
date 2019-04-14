@@ -240,13 +240,49 @@ public struct ValueRangePrettyYAxis: YAxisCalculation {
         1_000_000_000,
     ]
 
-    // TODO: fix draft IMPL
+    public func yAxis(valueRange: ValueRange) -> YAxisCalculationResult {
+        let sz = valueRange.max
+        var p = 0
+        let n = 4
+        let ds = sz / Int64(n)
+        let pows = ValueRangePrettyYAxis.pows
+        while ds > pows[p] {
+            p += 1
+        }
+        let step: Int64
+        if p > 1 {
+            let t = pow(10.0, Double(p - 1))
+            step = Int64(round(Double(ds) / t) * t)
+        } else {
+            step = max(1, sz / Int64(n))
+        }
+        return YAxisCalculationResult(
+                valueRange: ValueRange(min: 0, max: valueRange.max + step / 4),
+                yAxisValues: YAxisValues(zero: 0, step: step))
+    }
+}
+
+public struct ValueRangePrettyScaledYAxis: YAxisCalculation {
+
+    private static let pows = [
+        1,
+        1_0,
+        1_00,
+        1_000,
+        1_000_0,
+        1_000_00,
+        1_000_000,
+        1_000_000_0,
+        1_000_000_00,
+        1_000_000_000,
+    ]
+
     public func yAxis(valueRange: ValueRange) -> YAxisCalculationResult {
         let sz = valueRange.size
         var p = 0
         let n = 4
         let ds = sz / Int64(n)
-        let pows = ValueRangePrettyYAxis.pows
+        let pows = ValueRangePrettyScaledYAxis.pows
         while ds > pows[p] {
             p += 1
         }
@@ -302,7 +338,6 @@ public struct YScaledValueRangeCalculation: ValueRangeCalculation {
 
     public func valueRange(plot: Chart.Plot, visiblePlots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
         let vr = internalCalculation.valueRange(plot: plot, visiblePlots: [plot], indexRange: indexRange)
-        // TODO: assumption 0 is min
         return ValueRange(min: vr.min, max: vr.max)
     }
 }
