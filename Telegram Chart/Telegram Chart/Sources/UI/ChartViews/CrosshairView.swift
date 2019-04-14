@@ -8,19 +8,18 @@ import UIKit
 public class CrosshairView: UIView {
 
     private let longPress = UILongPressGestureRecognizer()
+    private let tap = UITapGestureRecognizer()
     private var popup: PopupView?
-    private let chartView = ChartView()
+    private var crosshairTimeIdx: Int?
 
-    private var crosshairTimeIdx: Int? {
+    private var crosshairConfig = CrosshairPanel.Config(pointFillColor: .clear, lineColor: .gray)
+
+    public weak var delegate: CrosshairViewDelegate? {
         didSet {
-            guard crosshairTimeIdx != oldValue else {
-                return
-            }
+            crosshairTimeIdx = delegate?.getStoredIdx(crosshairView: self)
             updateWithCrosshairIdx()
         }
     }
-
-    private var crosshairConfig = CrosshairPanel.Config(pointFillColor: .clear, lineColor: .gray)
 
     public weak var colorSource: CrosshairViewColorSource? {
         didSet {
@@ -32,28 +31,12 @@ public class CrosshairView: UIView {
         didSet {
             setNeedsDisplay()
             setNeedsLayout()
-
-            if let chart = chart, let crosshairTimeIdx = crosshairTimeIdx  {
-                displayValue(chart: chart, crosshairTimeIdx: crosshairTimeIdx)
-            } else {
+            if chart == nil {
                 crosshairTimeIdx = nil
                 popup?.removeFromSuperview()
                 popup = nil
-                chartView.displayChart(nil, animation: .none)
             }
         }
-    }
-
-    private func displayValue(chart: DrawingChart, crosshairTimeIdx: Int) {
-//        let c = DrawingChart(
-//                allPlots: chart.allPlots,
-//                enabledPlotId: chart.enabledPlotId,
-//                timestamps: chart.timestamps,
-//                timeRange: chart.timeRange,
-//                valueRangeCalculation: chart.valueRangeCalculation,
-//                yAxisCalculation: chart.yAxisCalculation)
-//
-//        chartView.displayChart(c, animated: false)
     }
 
     public override init(frame: CGRect) {
@@ -64,10 +47,8 @@ public class CrosshairView: UIView {
         longPress.minimumPressDuration = 0.175
         longPress.addTarget(self, action: #selector(handleLongPress))
         addGestureRecognizer(longPress)
-
-        addSubview(chartView)
-        chartView.frame = bounds
-        chartView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        tap.addTarget(self, action: #selector(handleTap))
+        addGestureRecognizer(tap)
     }
 
     @available(*, unavailable)
@@ -140,6 +121,13 @@ public class CrosshairView: UIView {
     }
 
     @objc
+    private func handleTap() {
+        crosshairTimeIdx = nil
+        updateWithCrosshairIdx()
+        delegate?.crosshairView(self, storeIdx: nil)
+    }
+
+    @objc
     private func handleLongPress() {
         switch longPress.state {
         case .began:
@@ -160,6 +148,8 @@ public class CrosshairView: UIView {
         let calc = DrawingChart.XCalculator(timeRange: chart.timeRange)
         let ts = calc.timestampAt(x: point.x, rect: bounds)
         crosshairTimeIdx = chart.closestIdxTo(timestamp: ts)
+        delegate?.crosshairView(self, storeIdx: crosshairTimeIdx)
+        updateWithCrosshairIdx()
     }
 
     private func updateWithCrosshairIdx() {
@@ -179,9 +169,7 @@ public class CrosshairView: UIView {
 //            UIView.animate(withDuration: 0.05, delay: 0, options: options, animations: {
 //                self.layoutIfNeeded()
 //            }, completion: nil)
-            displayValue(chart: chart, crosshairTimeIdx: idx)
         } else {
-            chartView.displayChart(nil, animation: .none)
             popup?.removeFromSuperview()
             popup = nil
         }
@@ -255,4 +243,9 @@ public protocol CrosshairViewColorSource: AnyObject {
     func lineColor(crosshairView: CrosshairView) -> UIColor
     func popupBackgroundColor(crosshairView: CrosshairView) -> UIColor
     func popupTextColor(crosshairView: CrosshairView) -> UIColor
+}
+
+public protocol CrosshairViewDelegate: AnyObject {
+    func crosshairView(_ view: CrosshairView, storeIdx: Int?)
+    func getStoredIdx(crosshairView: CrosshairView) -> Int?
 }

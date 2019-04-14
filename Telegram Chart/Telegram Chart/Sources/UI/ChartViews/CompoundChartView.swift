@@ -36,20 +36,16 @@ public class CompoundChartView: UIView, ChartViewProtocol {
     public override init(frame: CGRect) {
         super.init(frame: frame)
         
-        yAxisView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(yAxisView)
 
         chartView.colorSource = self
         chartView.lineWidth = 2
-        chartView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(chartView)
 
-        timeAxisView.translatesAutoresizingMaskIntoConstraints = false
         timeAxisView.delegate = self
         addSubview(timeAxisView)
 
         crosshairView.colorSource = self
-        crosshairView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(crosshairView)
 
         headerView.font = Fonts.current.bold13()
