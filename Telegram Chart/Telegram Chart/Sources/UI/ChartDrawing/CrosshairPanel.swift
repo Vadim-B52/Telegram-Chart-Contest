@@ -14,7 +14,7 @@ public struct CrosshairPanel {
     public func drawInContext(_ ctx: CGContext, rect: CGRect) {
         let thinLineWidth = ScreenHelper.lightLineWidth
 
-        let xCalc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
+        let xCalc = DrawingChart.XCalculator(timeRange: chart.timeRange)
         let timestamp = chart.timestamps[timestampIndex]
         let x = xCalc.x(in: rect, timestamp: timestamp)
         var line = rect
@@ -24,7 +24,7 @@ public struct CrosshairPanel {
         ctx.fill(line)
 
         for plot in chart.visiblePlots {
-            let calc = DrawingChart.PointCalculator(timeRange: chart.selectedTimeRange, valueRange: chart.valueRange(plot: plot))
+            let calc = DrawingChart.PointCalculator(timeRange: chart.timeRange, valueRange: chart.valueRange(plot: plot))
             let point = calc.pointAtTimestamp(timestamp, value: plot.values[timestampIndex], rect: rect)
             plot.color.setFill()
             let outer = CGRect(x: point.x - 4, y: point.y - 4, width: 9, height: 9)

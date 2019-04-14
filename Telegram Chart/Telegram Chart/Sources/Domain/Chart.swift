@@ -105,13 +105,15 @@ public struct ValueRange: Equatable {
         min = values[r.startIdx]
         max = values[r.startIdx]
 
-        for i in (r.startIdx + 1)...r.endIdx {
+        var i = r.startIdx + 1
+        while i <= r.endIdx {
             let v = values[i]
             if v < min {
                 min = v
             } else if v > max {
                 max = v
             }
+            i += 1
         }
         size = max - min
     }
@@ -155,34 +157,38 @@ public struct TimeRange: Equatable {
 public struct TimeIndexRange {
     let startIdx: Int
     let length: Int
-    var endIdx: Int {
-        return startIdx + length - 1
-    }
+    let endIdx: Int
 
     public init(length: Int) {
         self.startIdx = 0
+        self.endIdx = startIdx + length - 1
         self.length = length
     }
 
     public init(timestamps: [Chart.Time], timeRange: TimeRange) {
         var startIdx = 0
-        var length = 0
+        var endIdx = 0
 
-        for i in 0..<timestamps.count - 1 {
+        var i = 0
+        while i < timestamps.count - 1 {
             if timestamps[i] == timeRange.min || (timestamps[i] < timeRange.min && timeRange.min < timestamps[i + 1]) {
                 startIdx = i
-                length = 1
                 break
             }
+            i += 1
         }
-        for i in startIdx..<timestamps.count - 1 {
-            length += 1
-            if timestamps[i] == timeRange.max || (timestamps[i] < timeRange.max && timeRange.max < timestamps[i + 1]) {
+
+        i = timestamps.count - 1
+        while i > 0 {
+            if timestamps[i] == timeRange.max || (timestamps[i - 1] < timeRange.max && timeRange.max < timestamps[i]) {
+                endIdx = i
                 break
             }
+            i -= 1
         }
 
         self.startIdx = startIdx
-        self.length = length
+        self.endIdx = endIdx
+        self.length = endIdx - startIdx + 1
     }
 }

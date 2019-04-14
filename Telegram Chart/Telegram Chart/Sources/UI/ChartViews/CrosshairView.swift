@@ -9,6 +9,7 @@ public class CrosshairView: UIView {
 
     private let longPress = UILongPressGestureRecognizer()
     private var popup: PopupView?
+    private let chartView = ChartView()
 
     private var crosshairTimeIdx: Int? {
         didSet {
@@ -29,14 +30,30 @@ public class CrosshairView: UIView {
 
     public var chart: DrawingChart? = nil {
         didSet {
-            if chart == nil {
+            setNeedsDisplay()
+            setNeedsLayout()
+
+            if let chart = chart, let crosshairTimeIdx = crosshairTimeIdx  {
+                displayValue(chart: chart, crosshairTimeIdx: crosshairTimeIdx)
+            } else {
                 crosshairTimeIdx = nil
                 popup?.removeFromSuperview()
                 popup = nil
+                chartView.displayChart(nil, animated: false)
             }
-            setNeedsDisplay()
-            setNeedsLayout()
         }
+    }
+
+    private func displayValue(chart: DrawingChart, crosshairTimeIdx: Int) {
+        let c = DrawingChart(
+                allPlots: chart.allPlots,
+                enabledPlotId: chart.enabledPlotId,
+                timestamps: [chart.timestamps[crosshairTimeIdx]],
+                timeRange: chart.timeRange,
+                valueRangeCalculation: chart.valueRangeCalculation,
+                yAxisCalculation: chart.yAxisCalculation)
+
+//        chartView.displayChart(c, animated: false)
     }
 
     public override init(frame: CGRect) {
@@ -47,6 +64,10 @@ public class CrosshairView: UIView {
         longPress.minimumPressDuration = 0.175
         longPress.addTarget(self, action: #selector(handleLongPress))
         addGestureRecognizer(longPress)
+
+        addSubview(chartView)
+        chartView.frame = bounds
+        chartView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     }
 
     @available(*, unavailable)
@@ -74,7 +95,7 @@ public class CrosshairView: UIView {
             frame.origin.y = 6
             frame.size = popup.systemLayoutSizeFitting(.zero)
             let timestamp: Int64 = chart.timestamps[idx]
-            let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
+            let calc = DrawingChart.XCalculator(timeRange: chart.timeRange)
             let x = calc.x(in: bounds, timestamp: timestamp)
             frame.origin.x = x - frame.width / 2
 
@@ -136,7 +157,7 @@ public class CrosshairView: UIView {
         guard let chart = chart else {
             return
         }
-        let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
+        let calc = DrawingChart.XCalculator(timeRange: chart.timeRange)
         let ts = calc.timestampAt(x: point.x, rect: bounds)
         crosshairTimeIdx = chart.closestIdxTo(timestamp: ts)
     }
@@ -158,7 +179,9 @@ public class CrosshairView: UIView {
 //            UIView.animate(withDuration: 0.05, delay: 0, options: options, animations: {
 //                self.layoutIfNeeded()
 //            }, completion: nil)
+            displayValue(chart: chart, crosshairTimeIdx: idx)
         } else {
+            chartView.displayChart(nil, animated: false)
             popup?.removeFromSuperview()
             popup = nil
         }

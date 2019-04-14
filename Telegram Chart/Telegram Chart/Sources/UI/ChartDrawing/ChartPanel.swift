@@ -70,7 +70,7 @@ public class LineChartPanel: ChartPanel {
         self.chart = chart
         self.timestamps = chart.timestamps
         self.indexRange = chart.timeIndexRange
-        self.timeRange = chart.selectedTimeRange
+        self.timeRange = chart.timeRange
         self.valueRange = chart.valueRange(plot: plot)
         self.plot = plot
         self.lineWidth = lineWidth
@@ -84,11 +84,13 @@ public class LineChartPanel: ChartPanel {
         let path = UIBezierPath()
         path.move(to: startPoint)
 
-        for i in (startIdx + 1)...indexRange.endIdx {
+        var i = startIdx + 1
+        while i <= indexRange.endIdx {
             let time = timestamps[i]
             let value = values[i]
             let point = calc.pointAtTimestamp(time, value: value, rect: rect)
             path.addLine(to: point)
+            i += 1
         }
 
         layer.lineJoin = .round
@@ -116,7 +118,7 @@ public class StackedBarChartPanel: ChartPanel {
         self.chart = chart
         self.timestamps = chart.timestamps
         self.indexRange = chart.timeIndexRange
-        self.timeRange = chart.selectedTimeRange
+        self.timeRange = chart.timeRange
         self.valueRange = chart.valueRange(plot: plot)
         self.plot = plot
         self.lineWidth = lineWidth
@@ -180,7 +182,7 @@ public class BarChartPanel: ChartPanel {
         self.chart = chart
         self.timestamps = chart.timestamps
         self.indexRange = chart.timeIndexRange
-        self.timeRange = chart.selectedTimeRange
+        self.timeRange = chart.timeRange
         self.valueRange = chart.valueRange(plot: plot)
         self.plot = plot
         self.lineWidth = lineWidth
@@ -239,7 +241,7 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
         self.chart = chart
         self.timestamps = chart.timestamps
         self.indexRange = chart.timeIndexRange
-        self.timeRange = chart.selectedTimeRange
+        self.timeRange = chart.timeRange
         self.valueRange = chart.valueRange(plot: plot)
         self.plot = plot
         self.lineWidth = lineWidth

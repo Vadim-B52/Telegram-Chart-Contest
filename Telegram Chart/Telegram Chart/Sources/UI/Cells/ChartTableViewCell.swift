@@ -187,8 +187,7 @@ public class ChartTableViewCell: UITableViewCell {
                 allPlots: chart.plots,
                 enabledPlotId: state.enabledPlotId,
                 timestamps: chart.timestamps,
-                timeRange: chart.timeRange,
-                selectedTimeRange: state.selectedTimeRange,
+                timeRange: state.selectedTimeRange,
                 valueRangeCalculation: valueRangeCalculation(baseCalculation: vrc, chart: chart),
                 yAxisCalculation: yAxis)
     }
@@ -202,7 +201,6 @@ public class ChartTableViewCell: UITableViewCell {
                 allPlots: chart.plots,
                 enabledPlotId: state.enabledPlotId,
                 timestamps: chart.timestamps,
-                timeRange: chart.timeRange,
                 valueRangeCalculation: valueRangeCalculation(baseCalculation: vrc, chart: chart),
                 yAxisCalculation: ValueRangeNoYAxisStrategy())
     }

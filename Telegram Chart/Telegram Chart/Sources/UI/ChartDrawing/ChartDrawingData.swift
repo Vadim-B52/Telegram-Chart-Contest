@@ -13,15 +13,14 @@ public class DrawingChart {
     public let visiblePlots: [Chart.Plot]
     public let timestamps: [Chart.Time]
     public let timeRange: TimeRange
-    public let selectedTimeRange: TimeRange
+    public let timeIndexRange: TimeIndexRange
     public let valueRangeCalculation: ValueRangeCalculation
     public let yAxisCalculation: YAxisCalculation
 
     public init(allPlots: [Chart.Plot],
                 enabledPlotId: Set<String>,
                 timestamps: [Chart.Time],
-                timeRange: TimeRange,
-                selectedTimeRange: TimeRange? = nil,
+                timeRange: TimeRange? = nil,
                 valueRangeCalculation: ValueRangeCalculation,
                 yAxisCalculation: YAxisCalculation) {
 
@@ -29,19 +28,16 @@ public class DrawingChart {
         self.enabledPlotId = enabledPlotId
         visiblePlots = allPlots.filter { enabledPlotId.contains($0.identifier) }
         self.timestamps = timestamps
-        self.timeRange = timeRange
-        self.selectedTimeRange = selectedTimeRange ?? timeRange
+        if let timeRange = timeRange {
+            self.timeRange = timeRange
+            self.timeIndexRange = TimeIndexRange(timestamps: timestamps, timeRange: timeRange)
+        } else {
+            self.timeRange = TimeRange(min: timestamps[0], max: timestamps[timestamps.count - 1])
+            self.timeIndexRange = TimeIndexRange(length: timestamps.count)
+        }
         self.valueRangeCalculation = valueRangeCalculation
         self.yAxisCalculation = yAxisCalculation
     }
-
-    public private(set) lazy var timeIndexRange: TimeIndexRange = {
-        if selectedTimeRange != timeRange {
-            return TimeIndexRange(timestamps: timestamps, timeRange: selectedTimeRange)
-        } else {
-            return TimeIndexRange(length: timestamps.count)
-        }
-    }()
 
     private func rawValueRange(plot: Chart.Plot) -> ValueRange {
         if let vr = valueRangeCache[plot.identifier] {
@@ -74,10 +70,10 @@ public class DrawingChart {
     }
 
     public func closestIdxTo(timestamp: Int64) -> Int {
-        if timestamp <= selectedTimeRange.min {
+        if timestamp <= timeRange.min {
             return timeIndexRange.startIdx
         }
-        if timestamp >= selectedTimeRange.max {
+        if timestamp >= timeRange.max {
             return timeIndexRange.endIdx
         }
         var low = timeIndexRange.startIdx

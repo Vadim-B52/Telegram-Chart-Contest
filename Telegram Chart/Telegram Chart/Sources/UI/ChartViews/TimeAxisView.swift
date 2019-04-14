@@ -71,7 +71,7 @@ public class TimeAxisView: UIView {
     }
 
     private func updatePosition(labels: [Int: UILabel], chart: DrawingChart) {
-        let calc = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
+        let calc = DrawingChart.XCalculator(timeRange: chart.timeRange)
         for (timeIdx, label) in labels {
             let timestamp = chart.timestamps[timeIdx]
             let size = label.sizeThatFits(.zero)
@@ -133,7 +133,7 @@ public class TimeAxisView: UIView {
             return
         }
         let rect = bounds
-        let calculator = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
+        let calculator = DrawingChart.XCalculator(timeRange: chart.timeRange)
         var currDescr: TimeAxisDescription
         var dateSize = self.dateSize
         dateSize.width += 10

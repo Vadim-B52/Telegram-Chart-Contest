@@ -14,7 +14,7 @@ public class TimeAxisPanel {
     private lazy var formatter = ChartTextFormatter.shared
     private lazy var options = NSStringDrawingOptions.usesLineFragmentOrigin
     private lazy var attributes: [NSAttributedString.Key: Any]? = [NSAttributedString.Key.foregroundColor: config.textColor]
-    private lazy var calculator = DrawingChart.XCalculator(timeRange: chart.selectedTimeRange)
+    private lazy var calculator = DrawingChart.XCalculator(timeRange: chart.timeRange)
 
     public init(chart: DrawingChart, description: TimeAxisDescription?, config: Config) {
         self.chart = chart
