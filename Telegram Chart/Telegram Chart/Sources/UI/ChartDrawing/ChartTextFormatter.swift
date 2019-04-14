@@ -95,7 +95,7 @@ public final class ChartTextFormatter {
         return str
     }
 
-    private func paragraphStyle(alignment: NSTextAlignment) -> NSMutableParagraphStyle {
+    public func paragraphStyle(alignment: NSTextAlignment) -> NSMutableParagraphStyle {
         let paragraph = NSMutableParagraphStyle()
         paragraph.lineSpacing = 2
         paragraph.alignment = alignment

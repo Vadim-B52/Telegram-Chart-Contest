@@ -8,25 +8,23 @@ import UIKit
 public class DrawingChart {
     private var valueRangeCache = [Chart.Plot.Identifier: ValueRange]()
     private var yAxisCache = [Chart.Plot.Identifier: YAxisCalculationResult]()
-    public let allPlots: [Chart.Plot]
+    public let chart: Chart
     public let enabledPlotId: Set<Chart.Plot.Identifier>
-    public let visiblePlots: [Chart.Plot]
     public let timestamps: [Chart.Time]
     public let timeRange: TimeRange
     public let timeIndexRange: TimeIndexRange
     public let valueRangeCalculation: ValueRangeCalculation
     public let yAxisCalculation: YAxisCalculation
 
-    public init(allPlots: [Chart.Plot],
+    public init(chart: Chart,
                 enabledPlotId: Set<String>,
                 timestamps: [Chart.Time],
                 timeRange: TimeRange? = nil,
                 valueRangeCalculation: ValueRangeCalculation,
                 yAxisCalculation: YAxisCalculation) {
 
-        self.allPlots = allPlots
+        self.chart = chart
         self.enabledPlotId = enabledPlotId
-        visiblePlots = allPlots.filter { enabledPlotId.contains($0.identifier) }
         self.timestamps = timestamps
         if let timeRange = timeRange {
             self.timeRange = timeRange
@@ -38,6 +36,14 @@ public class DrawingChart {
         self.valueRangeCalculation = valueRangeCalculation
         self.yAxisCalculation = yAxisCalculation
     }
+
+    public var allPlots: [Chart.Plot] {
+        return chart.plots
+    }
+
+    public private(set) lazy var visiblePlots: [Chart.Plot] = {
+        allPlots.filter { enabledPlotId.contains($0.identifier) }
+    }()
 
     private func rawValueRange(plot: Chart.Plot) -> ValueRange {
         if let vr = valueRangeCache[plot.identifier] {
@@ -143,6 +149,14 @@ public class DrawingChart {
                 value += plots[i].values[idx]
             }
             return calc.y(in: rect, value: value)
+        }
+
+        public func allValueAt(_ idx: Int) -> Chart.Value {
+            var value = Chart.Value.zero
+            for plot in plots {
+                value += plot.values[idx]
+            }
+            return value
         }
     }
 

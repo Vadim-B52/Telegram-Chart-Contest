@@ -192,7 +192,7 @@ public class ChartTableViewCell: UITableViewCell {
         }
         
         return DrawingChart(
-                allPlots: chart.plots,
+                chart: chart,
                 enabledPlotId: state.enabledPlotId,
                 timestamps: chart.timestamps,
                 timeRange: state.selectedTimeRange,
@@ -206,7 +206,7 @@ public class ChartTableViewCell: UITableViewCell {
         }
         let vrc = FullValueRangeCalculation()
         return DrawingChart(
-                allPlots: chart.plots,
+                chart: chart,
                 enabledPlotId: state.enabledPlotId,
                 timestamps: chart.timestamps,
                 valueRangeCalculation: valueRangeCalculation(baseCalculation: vrc, chart: chart),

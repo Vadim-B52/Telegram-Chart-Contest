@@ -199,7 +199,7 @@ public class CrosshairView: UIView {
         let timestamp: Int64 = chart.timestamps[idx]
         let formatter = ChartTextFormatter.shared
         popup.timeLabel.attributedText = formatter.popupDateText(timestamp: timestamp)
-        popup.valueLabel.attributedText = formatter.popupValueText(index: idx, plots: chart.visiblePlots)
+        let valueText = formatter.popupValueText(index: idx, plots: chart.visiblePlots).mutableCopy() as! NSMutableAttributedString
 
         var attributes = [NSAttributedString.Key: Any]()
         attributes[.foregroundColor] = colorSource?.popupTextColor(crosshairView: self)
@@ -211,10 +211,32 @@ public class CrosshairView: UIView {
         if str != nil {
             str.removeFirst()
         }
-        popup.descriptionLabel.attributedText = NSAttributedString(
+
+        let descr = NSMutableAttributedString(
                 string: str,
                 attributes: attributes)
-//        if chart.
+
+        // TODO: extract classes
+        switch chart.chart.chartType {
+        case .simple:
+            break
+        case .yScaled:
+            break
+        case .percentageStacked:
+            break
+        case .stacked:
+            descr.append(NSAttributedString(string: NSLocalizedString("\nAll", comment: ""), attributes: attributes))
+            let calc = DrawingChart.StackedYCalculator(valueRange: .percentage, plots: chart.visiblePlots, plotIdx: 0)
+            valueText.append(NSAttributedString(string: "\n\(calc.allValueAt(idx))", attributes: attributes))
+        }
+
+        descr.addAttribute(
+                NSAttributedString.Key.paragraphStyle,
+                value: formatter.paragraphStyle(alignment: popup.descriptionLabel.textAlignment),
+                range: NSRange(location: 0, length: descr.length))
+
+        popup.valueLabel.attributedText = valueText
+        popup.descriptionLabel.attributedText = descr
     }
 
     private func ensurePopupView() -> PopupView {
@@ -251,7 +273,7 @@ fileprivate extension CrosshairView {
 
             timeLabel.font = Fonts.current.bold11()
             descriptionLabel.textAlignment = .left
-            descriptionLabel.font = Fonts.current.regular12()
+            descriptionLabel.font = Fonts.current.regular11()
             valueLabel.textAlignment = .right
             valueLabel.font = Fonts.current.semibold12()
 
