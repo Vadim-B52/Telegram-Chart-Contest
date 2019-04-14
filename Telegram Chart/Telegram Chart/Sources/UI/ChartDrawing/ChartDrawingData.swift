@@ -225,7 +225,7 @@ public struct ValueRangeHasStaticYAxis: YAxisCalculation {
     }
 }
 
-public struct ValueRangeHasYAxis: YAxisCalculation {
+public struct ValueRangePrettyYAxis: YAxisCalculation {
 
     private static let pows = [
         1,
@@ -244,9 +244,9 @@ public struct ValueRangeHasYAxis: YAxisCalculation {
     public func yAxis(valueRange: ValueRange) -> YAxisCalculationResult {
         let sz = valueRange.size
         var p = 0
-        let n = 5
+        let n = 4
         let ds = sz / Int64(n)
-        let pows = ValueRangeHasYAxis.pows
+        let pows = ValueRangePrettyYAxis.pows
         while ds > pows[p] {
             p += 1
         }
@@ -259,8 +259,17 @@ public struct ValueRangeHasYAxis: YAxisCalculation {
         }
         let zero = valueRange.min / step * step
         return YAxisCalculationResult(
-                valueRange: ValueRange(min: min(valueRange.min, zero), max: valueRange.max + step / 2),
+                valueRange: ValueRange(min: min(valueRange.min, zero), max: valueRange.max + step / 4),
                 yAxisValues: YAxisValues(zero: zero, step: step))
+    }
+}
+
+public struct ValueRangeExactYAxis: YAxisCalculation {
+    public func yAxis(valueRange: ValueRange) -> YAxisCalculationResult {
+        let step: Int64 = valueRange.size / 4
+        return YAxisCalculationResult(
+                valueRange: ValueRange(min: max(0, valueRange.min - step / 4), max: valueRange.max + step / 4),
+                yAxisValues: YAxisValues(zero: valueRange.min, step: step))
     }
 }
 
@@ -294,7 +303,7 @@ public struct YScaledValueRangeCalculation: ValueRangeCalculation {
     public func valueRange(plot: Chart.Plot, visiblePlots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
         let vr = internalCalculation.valueRange(plot: plot, visiblePlots: [plot], indexRange: indexRange)
         // TODO: assumption 0 is min
-        return ValueRange(min: 0, max: vr.max)
+        return ValueRange(min: vr.min, max: vr.max)
     }
 }
 

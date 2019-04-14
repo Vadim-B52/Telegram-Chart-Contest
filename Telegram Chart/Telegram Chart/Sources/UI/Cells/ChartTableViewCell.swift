@@ -179,10 +179,18 @@ public class ChartTableViewCell: UITableViewCell {
             return nil
         }
         let vrc = SelectedValueRangeCalculation()
-        let yAxis = chart.chartType != .percentageStacked ?
-                ValueRangeHasYAxis() :
-                ValueRangeHasStaticYAxis.percentage
-
+        let yAxis: YAxisCalculation
+        switch chart.chartType {
+        case .simple:
+            yAxis = ValueRangePrettyYAxis()
+        case .stacked:
+            yAxis = ValueRangePrettyYAxis()
+        case .percentageStacked:
+            yAxis = ValueRangeHasStaticYAxis.percentage
+        case .yScaled:
+            yAxis = ValueRangeExactYAxis()
+        }
+        
         return DrawingChart(
                 allPlots: chart.plots,
                 enabledPlotId: state.enabledPlotId,
