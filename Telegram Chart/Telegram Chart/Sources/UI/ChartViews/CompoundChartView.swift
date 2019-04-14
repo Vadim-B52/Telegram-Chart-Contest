@@ -11,6 +11,7 @@ public class CompoundChartView: UIView, ChartViewProtocol {
     private let crosshairView = CrosshairView()
     private let timeAxisView = TimeAxisView()
     private let yAxisView = YAxisView()
+    private let headerView = UILabel()
 
     public weak var timeAxisDelegate: ChartViewTimeAxisDelegate?
     fileprivate var timeAxisDescription: TimeAxisDescription? {
@@ -50,6 +51,10 @@ public class CompoundChartView: UIView, ChartViewProtocol {
         crosshairView.colorSource = self
         crosshairView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(crosshairView)
+
+        headerView.font = Fonts.current.bold13()
+        headerView.textAlignment = .center
+        addSubview(headerView)
         
         reloadColors()
     }
@@ -72,7 +77,10 @@ public class CompoundChartView: UIView, ChartViewProtocol {
     }
     
     public override func layoutSubviews() {
-        let (timeFrame, chartFrame) = bounds.divided(atDistance: 24, from: .maxYEdge)
+        let headerFrame: CGRect
+        var (timeFrame, chartFrame) = bounds.divided(atDistance: 24, from: .maxYEdge)
+        (headerFrame, chartFrame) = chartFrame.divided(atDistance: 40, from: .minYEdge)
+        headerView.frame = headerFrame
         timeAxisView.frame = timeFrame
         crosshairView.frame = chartFrame
         chartView.frame = chartFrame
@@ -89,9 +97,17 @@ public class CompoundChartView: UIView, ChartViewProtocol {
         timeAxisView.displayChart(chart: chart, timeAxisDescription: self.timeAxisDescription)
         chartView.displayChart(chart, animation: animation)
         yAxisView.displayChart(chart, animation: animation)
+
+        if let chart = chart {
+            let ts1 = chart.timestamps[chart.timeIndexRange.startIdx]
+            let ts2 = chart.timestamps[chart.timeIndexRange.endIdx]
+            let f = ChartTextFormatter.shared
+            headerView.text = "\(f.headerText(timestamp: ts1)) - \(f.headerText(timestamp: ts2))"
+        }
     }
 
     public func reloadColors() {
+        headerView.textColor = colorSource?.headerTextColor(chartView: self)
         crosshairView.reloadColors()
         reloadValuePanelConfig()
         setNeedsDisplay()
@@ -155,6 +171,7 @@ public protocol CompoundChartViewColorSource: AnyObject {
     func popupLabelColor(chartView: CompoundChartView) -> UIColor
     func backgroundColor(chartView: CompoundChartView) -> UIColor
     func colorToUseForAdjusting(chartView: CompoundChartView) -> UIColor
+    func headerTextColor(chartView: CompoundChartView) -> UIColor
 }
 
 public protocol ChartViewAnimationProgressDataSource: AnyObject {

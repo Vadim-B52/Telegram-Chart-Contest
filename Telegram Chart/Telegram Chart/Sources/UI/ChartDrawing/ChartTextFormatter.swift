@@ -29,14 +29,27 @@ public final class ChartTextFormatter {
         return formatter
     }()
 
+    private lazy var headerFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        return formatter
+    }()
+
+    func headerText(timestamp: Int64) -> String {
+        let date = Date(timestamp: timestamp)
+        let str = headerFormatter.string(from: date)
+        return str
+    }
+
     func axisDateText(timestamp: Int64) -> String {
-        let date = Date(timeIntervalSince1970: Double(timestamp) / 1000.0)
+        let date = Date(timestamp: timestamp)
         let str = axisFormatter.string(from: date)
         return str
     }
 
     func popupDateText(timestamp: Int64) -> NSAttributedString {
-        let date = Date(timeIntervalSince1970: TimeInterval(timestamp / 1000))
+        let date = Date(timestamp: timestamp)
         let style = paragraphStyle(alignment: .left)
         let str = NSMutableAttributedString()
 
@@ -81,5 +94,11 @@ public final class ChartTextFormatter {
         paragraph.lineSpacing = 2
         paragraph.alignment = alignment
         return paragraph
+    }
+}
+
+private extension Date {
+    init(timestamp: Int64) {
+        self.init(timeIntervalSince1970: TimeInterval(timestamp / 1000))
     }
 }
