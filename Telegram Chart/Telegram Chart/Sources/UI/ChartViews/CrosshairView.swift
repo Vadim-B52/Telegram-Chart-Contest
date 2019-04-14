@@ -115,7 +115,9 @@ public class CrosshairView: UIView {
                 lineColor: colorSource.lineColor(crosshairView: self))
 
         popup?.backgroundColor = colorSource.popupBackgroundColor(crosshairView: self)
-        popup?.timeLabel.textColor = colorSource.popupTextColor(crosshairView: self)
+        let textColor = colorSource.popupTextColor(crosshairView: self)
+        popup?.timeLabel.textColor = textColor
+        popup?.descriptionLabel.textColor = textColor
 
         setNeedsDisplay()
     }
@@ -220,6 +222,7 @@ fileprivate extension CrosshairView {
     private class PopupView: UIView {
 
         let timeLabel = UILabel()
+        let descriptionLabel = UILabel()
         let valueLabel = UILabel()
 
         public override init(frame: CGRect) {
@@ -228,28 +231,33 @@ fileprivate extension CrosshairView {
             backgroundColor = UIColor(red: 0.96, green: 0.96, blue: 0.98, alpha: 1)
             layer.cornerRadius = 4
 
-            timeLabel.numberOfLines = 0
             timeLabel.font = Fonts.current.bold11()
-            valueLabel.numberOfLines = 0
+            descriptionLabel.textAlignment = .left
+            descriptionLabel.font = Fonts.current.semibold12()
             valueLabel.textAlignment = .right
             valueLabel.font = Fonts.current.semibold12()
 
-            timeLabel.translatesAutoresizingMaskIntoConstraints = false
-            valueLabel.translatesAutoresizingMaskIntoConstraints = false
-            addSubview(timeLabel)
-            addSubview(valueLabel)
+            let views = ["time": timeLabel, "value": valueLabel, "description": descriptionLabel]
+            views.values.forEach { l in
+                l.numberOfLines = 0
+                l.translatesAutoresizingMaskIntoConstraints = false
+                addSubview(l)
+            }
 
-            let views = ["time": timeLabel, "value": valueLabel]
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
-                    withVisualFormat: "H:|-9-[time]-20@750-[value]-9-|",
+                    withVisualFormat: "H:|-9-[time]-(>=9)-|",
                     metrics: nil,
                     views: views))
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
-                    withVisualFormat: "V:|-5-[time]->=5-|",
+                    withVisualFormat: "H:|-9-[description]-20@750-[value]-9-|",
                     metrics: nil,
                     views: views))
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
-                    withVisualFormat: "V:|-5-[value]-5@249-|",
+                    withVisualFormat: "V:|-5-[time]-[description]->=5-|",
+                    metrics: nil,
+                    views: views))
+            NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
+                    withVisualFormat: "V:|-5-[time]-3-[value]-5@249-|",
                     metrics: nil,
                     views: views))
         }

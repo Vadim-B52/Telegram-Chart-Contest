@@ -17,9 +17,15 @@ public final class ChartTextFormatter {
     private init() {
     }
 
-    private lazy var popupFormatter: DateFormatter = {
+    private lazy var popupYearFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy"
+        return formatter
+    }()
+
+    private lazy var popupDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE, dd MMM"
         return formatter
     }()
 
@@ -54,16 +60,16 @@ public final class ChartTextFormatter {
         let str = NSMutableAttributedString()
 
         str.append(NSAttributedString(
-                string: axisDateText(timestamp: timestamp),
+                string: popupDateFormatter.string(from: date),
                 attributes: [
                     NSAttributedString.Key.font: dateFont,
                     NSAttributedString.Key.paragraphStyle: style,
                 ]))
 
-        str.append(NSAttributedString(string: "\n"))
+        str.append(NSAttributedString(string: " "))
 
         str.append(NSAttributedString(
-                string:  popupFormatter.string(from: date),
+                string:  popupYearFormatter.string(from: date),
                 attributes: [
                     NSAttributedString.Key.font: yearFont,
                     NSAttributedString.Key.paragraphStyle: style,
