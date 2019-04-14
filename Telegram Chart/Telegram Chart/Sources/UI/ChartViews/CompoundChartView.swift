@@ -22,7 +22,7 @@ public class CompoundChartView: UIView, ChartViewProtocol {
         }
     }
 
-    public weak var colorSource: ChartViewColorSource? {
+    public weak var colorSource: CompoundChartViewColorSource? {
         didSet {
             reloadColors()
         }
@@ -38,6 +38,7 @@ public class CompoundChartView: UIView, ChartViewProtocol {
         yAxisView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(yAxisView)
 
+        chartView.colorSource = self
         chartView.lineWidth = 2
         chartView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(chartView)
@@ -135,18 +136,25 @@ extension CompoundChartView: TimeAxisViewDelegate {
     }
 }
 
+extension CompoundChartView: ChartViewColorSource {
+    public func colorToUseForAdjusting(chartView: ChartView) -> UIColor? {
+        return colorSource?.colorToUseForAdjusting(chartView: self)
+    }
+}
+
 public protocol ChartViewTimeAxisDelegate: AnyObject {
     func chartView(_ chartView: CompoundChartView, didChangeTimeAxisDescription description: TimeAxisDescription?)
     func timeAxisDescription(chartView: CompoundChartView) -> TimeAxisDescription?
 }
 
-public protocol ChartViewColorSource: AnyObject {
+public protocol CompoundChartViewColorSource: AnyObject {
     func valueAxisColor(chartView: CompoundChartView) -> UIColor
     func zeroValueAxisColor(chartView: CompoundChartView) -> UIColor
     func chartAxisLabelColor(chartView: CompoundChartView) -> UIColor
     func popupBackgroundColor(chartView: CompoundChartView) -> UIColor
     func popupLabelColor(chartView: CompoundChartView) -> UIColor
     func backgroundColor(chartView: CompoundChartView) -> UIColor
+    func colorToUseForAdjusting(chartView: CompoundChartView) -> UIColor
 }
 
 public protocol ChartViewAnimationProgressDataSource: AnyObject {

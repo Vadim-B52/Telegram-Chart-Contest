@@ -30,7 +30,7 @@ public class ChartTableViewCell: UITableViewCell {
 
     public weak var delegate: ChartTableViewCellDelegate?
     public weak var colorSource: ChartTableViewColorSource?
-    public weak var chartViewColorSource: ChartViewColorSource? {
+    public weak var chartViewColorSource: CompoundChartViewColorSource? {
         didSet {
             chartView.colorSource = chartViewColorSource
         }
@@ -46,6 +46,7 @@ public class ChartTableViewCell: UITableViewCell {
         chartView.timeAxisDelegate = self
         chartView.translatesAutoresizingMaskIntoConstraints = false
         miniChartView.translatesAutoresizingMaskIntoConstraints = false
+        miniChartView.colorSource = chartView // FIXME: hack
 
         let miniChartViewWrapper = UIView()
         miniChartViewWrapper.translatesAutoresizingMaskIntoConstraints = false

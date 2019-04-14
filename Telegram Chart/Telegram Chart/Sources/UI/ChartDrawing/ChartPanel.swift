@@ -6,7 +6,35 @@
 import UIKit
 
 public protocol ChartPanel {
+    var delegate: ChartPanelDelegate? { get set }
+
     func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animated: Bool)
+    
+    func adjustedColor(_ color: UIColor) -> UIColor
+}
+
+extension ChartPanel {
+    public func adjustedColor(_ color: UIColor) -> UIColor {
+        guard let colorForAdjusting = delegate?.colorToUseForAdjusting(chartPanel: self) else {
+            return color
+        }
+        let r0 = UnsafeMutablePointer<CGFloat>.allocate(capacity: 1)
+        let g0 = UnsafeMutablePointer<CGFloat>.allocate(capacity: 1)
+        let b0 = UnsafeMutablePointer<CGFloat>.allocate(capacity: 1)
+        let ra = UnsafeMutablePointer<CGFloat>.allocate(capacity: 1)
+        let ga = UnsafeMutablePointer<CGFloat>.allocate(capacity: 1)
+        let ba = UnsafeMutablePointer<CGFloat>.allocate(capacity: 1)
+        guard color.getRed(r0, green: g0, blue: b0, alpha: nil),
+              colorForAdjusting.getRed(ra, green: ga, blue: ba, alpha: nil) else {
+
+            return color
+        }
+        return UIColor(
+                red: r0.pointee + 0.5 * (ra.pointee - r0.pointee),
+                green: g0.pointee + 0.5 * (ga.pointee - g0.pointee),
+                blue: b0.pointee + 0.5 * (ba.pointee - b0.pointee),
+                alpha: 1)
+    }
 }
 
 public protocol ChartPanelDelegate: AnyObject {
@@ -22,6 +50,9 @@ public protocol ChartPanelDelegate: AnyObject {
             _ panel: ChartPanel,
             applyBackgroundColor color: UIColor,
             toSuperlayerAnimated animated: Bool)
+
+    // TODO: separate delegate?
+    func colorToUseForAdjusting(chartPanel: ChartPanel) -> UIColor
 }
 
 public class LineChartPanel: ChartPanel {
@@ -35,9 +66,8 @@ public class LineChartPanel: ChartPanel {
     public let lineWidth: CGFloat
     public weak var delegate: ChartPanelDelegate?
 
-    public init(delegate: ChartPanelDelegate, chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
+    public init(chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
         self.chart = chart
-        self.delegate = delegate
         self.timestamps = chart.timestamps
         self.indexRange = chart.timeIndexRange
         self.timeRange = chart.selectedTimeRange
@@ -82,8 +112,7 @@ public class StackedBarChartPanel: ChartPanel {
     public let lineWidth: CGFloat
     public weak var delegate: ChartPanelDelegate?
 
-    public init(delegate: ChartPanelDelegate, chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
-        self.delegate = delegate
+    public init(chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
         self.chart = chart
         self.timestamps = chart.timestamps
         self.indexRange = chart.timeIndexRange
@@ -98,7 +127,7 @@ public class StackedBarChartPanel: ChartPanel {
         let path = UIBezierPath()
         defer {
             layer.lineWidth = 0
-            layer.fillColor = plot.color.lighter().cgColor
+            layer.fillColor = adjustedColor(plot.color).cgColor
             delegate?.charPanel(self, applyPath: path.cgPath, isVisible: chart.isPlotVisible(plot), toLayer: layer, animated: animated)
         }
 
@@ -147,8 +176,7 @@ public class BarChartPanel: ChartPanel {
     public let lineWidth: CGFloat
     public weak var delegate: ChartPanelDelegate?
 
-    public init(delegate: ChartPanelDelegate, chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
-        self.delegate = delegate
+    public init(chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
         self.chart = chart
         self.timestamps = chart.timestamps
         self.indexRange = chart.timeIndexRange
@@ -163,7 +191,7 @@ public class BarChartPanel: ChartPanel {
         let path = UIBezierPath()
         defer {
             layer.lineWidth = 0
-            layer.fillColor = plot.color.lighter().cgColor
+            layer.fillColor = adjustedColor(plot.color).cgColor
             delegate?.charPanel(self, applyPath: path.cgPath, isVisible: chart.isPlotVisible(plot), toLayer: layer, animated: animated)
         }
 
@@ -207,8 +235,7 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
     public let lineWidth: CGFloat
     public weak var delegate: ChartPanelDelegate?
 
-    public init(delegate: ChartPanelDelegate, chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
-        self.delegate = delegate
+    public init(chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
         self.chart = chart
         self.timestamps = chart.timestamps
         self.indexRange = chart.timeIndexRange
@@ -222,12 +249,12 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
         guard let plotIdx = chart.visiblePlots.firstIndex(where: { $0 === plot } ) else {
             let path = UIBezierPath()
             layer.lineWidth = 0
-            layer.fillColor = plot.color.lighter().cgColor
+            layer.fillColor = adjustedColor(plot.color).cgColor
             delegate?.charPanel(self, applyPath: path.cgPath, isVisible: false, toLayer: layer, animated: animated)
             return
         }
         guard plotIdx < chart.visiblePlots.count - 1 else {
-            delegate?.charPanel(self, applyBackgroundColor: plot.color.lighter(), toSuperlayerAnimated: animated)
+            delegate?.charPanel(self, applyBackgroundColor: adjustedColor(plot.color), toSuperlayerAnimated: animated)
             return
         }
 
@@ -259,20 +286,7 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
         path.close()
 
         layer.lineWidth = 0
-        layer.fillColor = plot.color.lighter().cgColor
+        layer.fillColor = adjustedColor(plot.color).cgColor
         delegate?.charPanel(self, applyPath: path.cgPath, isVisible: true, toLayer: layer, animated: animated)
-    }
-}
-
-fileprivate extension UIColor {
-    func lighter() -> UIColor {
-        let r = UnsafeMutablePointer<CGFloat>.allocate(capacity: 1)
-        let g = UnsafeMutablePointer<CGFloat>.allocate(capacity: 1)
-        let b = UnsafeMutablePointer<CGFloat>.allocate(capacity: 1)
-        getRed(r, green: g, blue: b, alpha: nil)
-        func adjust(_ v: UnsafeMutablePointer<CGFloat>) -> CGFloat {
-            return v.pointee + 0.5 * (1 - v.pointee)
-        }
-        return UIColor(red: adjust(r), green: adjust(g), blue: adjust(b), alpha: 1)
     }
 }

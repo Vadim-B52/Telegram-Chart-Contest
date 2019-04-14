@@ -194,7 +194,7 @@ extension ViewController: MiniChartTimeSelectorViewColorSource {
     }
 }
 
-extension ViewController: ChartViewColorSource {
+extension ViewController: CompoundChartViewColorSource {
     public func valueAxisColor(chartView: CompoundChartView) -> UIColor {
         return skin.valueAxisColor
     }
@@ -217,6 +217,10 @@ extension ViewController: ChartViewColorSource {
 
     public func backgroundColor(chartView: CompoundChartView) -> UIColor {
         return skin.cellBackgroundColor
+    }
+
+    public func colorToUseForAdjusting(chartView: CompoundChartView) -> UIColor {
+        return skin.colorToUseForAdjusting
     }
 }
 

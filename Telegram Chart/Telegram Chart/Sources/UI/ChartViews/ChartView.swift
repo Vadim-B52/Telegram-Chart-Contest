@@ -5,12 +5,18 @@
 
 import UIKit
 
+public protocol ChartViewColorSource: AnyObject {
+    func colorToUseForAdjusting(chartView: ChartView) -> UIColor?
+}
+
 public class ChartView: UIControl, ChartViewProtocol {
 
     private var layers = [CAShapeLayer]()
     private var chart: DrawingChart?
+    private var colorToUseForAdjusting: UIColor!
 
     public var lineWidth: CGFloat = 1
+    public weak var colorSource: ChartViewColorSource?
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -35,6 +41,7 @@ public class ChartView: UIControl, ChartViewProtocol {
         if chart == nil {
             layer.backgroundColor = nil
         }
+        colorToUseForAdjusting = colorSource?.colorToUseForAdjusting(chartView: self) ?? UIColor.white
         self.chart = chart
         updateLayers()
         redraw(animated: animated)
@@ -76,15 +83,18 @@ public class ChartView: UIControl, ChartViewProtocol {
 
     // TODO: type dispatch vs case
     private func makeChartPanel(chart: DrawingChart, plot: Chart.Plot) -> ChartPanel {
+        var chartPanel: ChartPanel
         switch plot.type {
         case .line:
-            return LineChartPanel(delegate: self, chart: chart, plot: plot, lineWidth: lineWidth)
+            chartPanel = LineChartPanel(chart: chart, plot: plot, lineWidth: lineWidth)
         case .area:
-            return PercentageStackedAreaChartPanel(delegate: self, chart: chart, plot: plot, lineWidth: lineWidth)
+            chartPanel = PercentageStackedAreaChartPanel(chart: chart, plot: plot, lineWidth: lineWidth)
         case .bar:
 //          TODO: bar chart drawer if needed
-            return StackedBarChartPanel(delegate: self, chart: chart, plot: plot, lineWidth: lineWidth)
+            chartPanel = StackedBarChartPanel(chart: chart, plot: plot, lineWidth: lineWidth)
         }
+        chartPanel.delegate = self
+        return chartPanel
     }
 }
 
@@ -120,5 +130,9 @@ extension ChartView: ChartPanelDelegate {
             animation.toValue = color.cgColor
             layer.add(animation, forKey: "backgroundColorAnimationKey")
         }
+    }
+
+    public func colorToUseForAdjusting(chartPanel: ChartPanel) -> UIColor {
+        return colorToUseForAdjusting
     }
 }

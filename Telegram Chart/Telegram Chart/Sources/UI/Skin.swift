@@ -24,6 +24,7 @@ public protocol Skin {
     var chartAxisLabelColor: UIColor { get }
     var popupBackgroundColor: UIColor { get }
     var popupLabelColor: UIColor { get }
+    var colorToUseForAdjusting: UIColor { get }
 }
 
 extension Skin {
@@ -89,6 +90,10 @@ public class NightSkin: Skin {
     public var popupLabelColor: UIColor {
         return UIColor.white
     }
+
+    public var colorToUseForAdjusting: UIColor {
+        return UIColor(red: 0.129, green: 0.184, blue: 0.247, alpha: 1)
+    }
 }
 
 public class DaySkin: Skin {
@@ -150,5 +155,9 @@ public class DaySkin: Skin {
     
     public var popupLabelColor: UIColor {
         return UIColor(red: 0.42, green: 0.42, blue: 0.4, alpha: 1)
+    }
+
+    public var colorToUseForAdjusting: UIColor {
+        return UIColor(red: 1, green: 1, blue: 1, alpha: 1)
     }
 }
