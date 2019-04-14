@@ -164,7 +164,7 @@ public class CrosshairView: UIView {
             guard self?.needsUpdate ?? false else {
                 return
             }
-            self?.updateWithCrosshairIdx(animated: true)
+            self?.updateWithCrosshairIdx(animated: false)
         }
     }
 
@@ -176,10 +176,7 @@ public class CrosshairView: UIView {
 
         if let idx = crosshairTimeIdx {
             let popup = ensurePopupView()
-            let timestamp: Int64 = chart.timestamps[idx]
-            let formatter = ChartTextFormatter.shared
-            popup.timeLabel.attributedText = formatter.popupDateText(timestamp: timestamp)
-            popup.valueLabel.attributedText = formatter.popupValueText(index: idx, plots: chart.visiblePlots)
+            updateData(popup: popup, chart: chart, idx: idx)
             setNeedsLayout()
             if animated {
                 let options: UIView.AnimationOptions = [.beginFromCurrentState, .curveLinear]
@@ -197,6 +194,28 @@ public class CrosshairView: UIView {
             }
         }
         setNeedsDisplay()
+    }
+
+    private func updateData(popup: PopupView, chart: DrawingChart, idx: Int) {
+        let timestamp: Int64 = chart.timestamps[idx]
+        let formatter = ChartTextFormatter.shared
+        popup.timeLabel.attributedText = formatter.popupDateText(timestamp: timestamp)
+        popup.valueLabel.attributedText = formatter.popupValueText(index: idx, plots: chart.visiblePlots)
+
+        var attributes = [NSAttributedString.Key: Any]()
+        attributes[.foregroundColor] = colorSource?.popupTextColor(crosshairView: self)
+        var str: String!
+        chart.visiblePlots.forEach { plot in
+            str = str ?? ""
+            str += "\n\(plot.name)"
+        }
+        if str != nil {
+            str.removeFirst()
+        }
+        popup.descriptionLabel.attributedText = NSAttributedString(
+                string: str,
+                attributes: attributes)
+//        if chart.
     }
 
     private func ensurePopupView() -> PopupView {
@@ -233,7 +252,7 @@ fileprivate extension CrosshairView {
 
             timeLabel.font = Fonts.current.bold11()
             descriptionLabel.textAlignment = .left
-            descriptionLabel.font = Fonts.current.semibold12()
+            descriptionLabel.font = Fonts.current.regular12()
             valueLabel.textAlignment = .right
             valueLabel.font = Fonts.current.semibold12()
 
@@ -249,11 +268,15 @@ fileprivate extension CrosshairView {
                     metrics: nil,
                     views: views))
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
-                    withVisualFormat: "H:|-9-[description]-20@750-[value]-9-|",
+                    withVisualFormat: "H:[time]-9@249-|",
                     metrics: nil,
                     views: views))
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
-                    withVisualFormat: "V:|-5-[time]-[description]->=5-|",
+                    withVisualFormat: "H:|-9-[description]-(>=20)-[value]-9-|",
+                    metrics: nil,
+                    views: views))
+            NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
+                    withVisualFormat: "V:|-5-[time]-3-[description]->=5-|",
                     metrics: nil,
                     views: views))
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
