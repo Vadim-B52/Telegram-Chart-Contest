@@ -17,7 +17,7 @@ public class CrosshairView: UIView {
     public weak var delegate: CrosshairViewDelegate? {
         didSet {
             crosshairTimeIdx = delegate?.getStoredIdx(crosshairView: self)
-            updateWithCrosshairIdx()
+            updateWithCrosshairIdx(animated: false)
         }
     }
 
@@ -123,7 +123,7 @@ public class CrosshairView: UIView {
     @objc
     private func handleTap() {
         crosshairTimeIdx = nil
-        updateWithCrosshairIdx()
+        updateWithCrosshairIdx(animated: true)
         delegate?.crosshairView(self, storeIdx: nil)
     }
 
@@ -149,14 +149,29 @@ public class CrosshairView: UIView {
         let ts = calc.timestampAt(x: point.x, rect: bounds)
         crosshairTimeIdx = chart.closestIdxTo(timestamp: ts)
         delegate?.crosshairView(self, storeIdx: crosshairTimeIdx)
-        updateWithCrosshairIdx()
+        setNeedsUpdate()
     }
 
-    private func updateWithCrosshairIdx() {
-        guard let chart = chart else {
-// TODO: fatal error
+    private var needsUpdate = false
+    private func setNeedsUpdate() {
+        guard !needsUpdate else {
             return
         }
+        needsUpdate = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) { [weak self] in
+            guard self?.needsUpdate ?? false else {
+                return
+            }
+            self?.updateWithCrosshairIdx(animated: true)
+        }
+    }
+
+    private func updateWithCrosshairIdx(animated: Bool) {
+        needsUpdate = false
+        guard let chart = chart else {
+            return
+        }
+
         if let idx = crosshairTimeIdx {
             let popup = ensurePopupView()
             let timestamp: Int64 = chart.timestamps[idx]
@@ -164,14 +179,20 @@ public class CrosshairView: UIView {
             popup.timeLabel.attributedText = formatter.popupDateText(timestamp: timestamp)
             popup.valueLabel.attributedText = formatter.popupValueText(index: idx, plots: chart.visiblePlots)
             setNeedsLayout()
-//            TODO: animated if needed
-//            let options: UIView.AnimationOptions = [.beginFromCurrentState, .curveLinear]
-//            UIView.animate(withDuration: 0.05, delay: 0, options: options, animations: {
-//                self.layoutIfNeeded()
-//            }, completion: nil)
+            if animated {
+                let options: UIView.AnimationOptions = [.beginFromCurrentState, .curveLinear]
+                UIView.animate(withDuration: 0.25, delay: 0, options: options, animations: {
+                    self.layoutIfNeeded()
+                }, completion: nil)
+            }
         } else {
-            popup?.removeFromSuperview()
-            popup = nil
+            let popup = self.popup
+            self.popup = nil
+            UIView.animate(withDuration: animated ? 0.25 : 0, animations: {
+                popup?.alpha = 0
+            }) { b in
+                popup?.removeFromSuperview()
+            }
         }
         setNeedsDisplay()
     }
@@ -181,6 +202,7 @@ public class CrosshairView: UIView {
             return view
         }
         let view = PopupView()
+        view.alpha = 0
         view.isUserInteractionEnabled = false
         view.translatesAutoresizingMaskIntoConstraints = false
         addSubview(view)
@@ -189,6 +211,7 @@ public class CrosshairView: UIView {
             view.backgroundColor = colorSource.popupBackgroundColor(crosshairView: self)
             view.timeLabel.textColor = colorSource.popupTextColor(crosshairView: self)
         }
+        layoutIfNeeded()
         return view
     }
 }
