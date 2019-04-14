@@ -124,12 +124,12 @@ public class ChartTableViewCell: UITableViewCell {
 
     public override func prepareForReuse() {
         super.prepareForReuse()
-        chartView.displayChart(nil, animated: false)
-        miniChartView.displayChart(nil, animated: false)
+        chartView.displayChart(nil, animation: .none)
+        miniChartView.displayChart(nil, animation: .none)
         timeSelector.update(timeRange: nil, selectedTimeRange: nil)
     }
 
-    public func display(chart: Chart, state: ChartState, animated: Bool) {
+    public func display(chart: Chart, state: ChartState, animation: ChartViewAnimation) {
         self.chart = chart
         self.state = state
         timeSelector.update(timeRange: chart.timeRange, selectedTimeRange: state.selectedTimeRange)
@@ -147,20 +147,20 @@ public class ChartTableViewCell: UITableViewCell {
             errorView.text = NSLocalizedString("  Please select something to display  ", comment: "")
             errorView.backgroundColor = colorSource?.errorBackgroundColor(chartTableViewCell: self)
             errorView.textColor = colorSource?.errorTextColor(chartTableViewCell: self)
-            if animated && prevErrorView == nil {
+            if animation != .none && prevErrorView == nil {
                 errorView.alpha = 0
                 UIView.animate(withDuration: 0.3) { errorView.alpha = 1 }
             }
         } else if let errorView = errorView {
             self.errorView = nil
-            UIView.animate(withDuration: animated ? 0.3 : 0, animations: { errorView.alpha = 0 }) { b in
+            UIView.animate(withDuration: animation != .none ? 0.3 : 0, animations: { errorView.alpha = 0 }) { b in
                 errorView.removeFromSuperview()
             }
-            chartView.displayChart(chartViewDrawingChart(), animated: false)
-            miniChartView.displayChart(miniChartViewDrawingChart(), animated: false)
+            chartView.displayChart(chartViewDrawingChart(), animation: .none)
+            miniChartView.displayChart(miniChartViewDrawingChart(), animation: .none)
         } else {
-            chartView.displayChart(chartViewDrawingChart(), animated: animated)
-            miniChartView.displayChart(miniChartViewDrawingChart(), animated: animated)
+            chartView.displayChart(chartViewDrawingChart(), animation: animation)
+            miniChartView.displayChart(miniChartViewDrawingChart(), animation: animation)
         }
     }
     
@@ -170,7 +170,7 @@ public class ChartTableViewCell: UITableViewCell {
             return
         }
         state = state?.byChanging(selectedTimeRange: selectedTimeRange)
-        chartView.displayChart(chartViewDrawingChart(), animated: false)
+        chartView.displayChart(chartViewDrawingChart(), animation: .none)
         delegate?.chartTableViewCell(self, didChangeSelectedTimeRange: selectedTimeRange)
     }
 

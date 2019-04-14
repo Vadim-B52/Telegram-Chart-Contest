@@ -5,6 +5,10 @@
 
 import UIKit
 
+public enum ChartViewAnimation {
+    case none, smooth, linear
+}
+
 public protocol ChartViewProtocol: AnyObject {
-    func displayChart(_ :DrawingChart?, animated: Bool)
+    func displayChart(_ :DrawingChart?, animation: ChartViewAnimation)
 }

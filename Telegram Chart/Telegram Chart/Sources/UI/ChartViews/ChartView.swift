@@ -34,17 +34,17 @@ public class ChartView: UIControl, ChartViewProtocol {
         for l in layers {
             l.frame = frame
         }
-        redraw(animated: false)
+        redraw(animation: .none)
     }
 
-    public func displayChart(_ chart: DrawingChart?, animated: Bool) {
+    public func displayChart(_ chart: DrawingChart?, animation: ChartViewAnimation) {
         if chart == nil {
             layer.backgroundColor = nil
         }
         colorToUseForAdjusting = colorSource?.colorToUseForAdjusting(chartView: self) ?? UIColor.white
         self.chart = chart
         updateLayers()
-        redraw(animated: animated)
+        redraw(animation: animation)
     }
 
     private func updateLayers() {
@@ -69,7 +69,7 @@ public class ChartView: UIControl, ChartViewProtocol {
         return layer.bounds
     }
 
-    private func redraw(animated: Bool) {
+    private func redraw(animation: ChartViewAnimation) {
         guard let chart = chart else {
             return
         }
@@ -77,7 +77,7 @@ public class ChartView: UIControl, ChartViewProtocol {
         for (idx, plot) in chart.allPlots.enumerated().reversed() {
             let plotLayer = layers[idx]
             let panel = makeChartPanel(chart: chart, plot: plot)
-            panel.drawInLayer(plotLayer, rect: plotLayer.bounds, animated: animated)
+            panel.drawInLayer(plotLayer, rect: plotLayer.bounds, animation: animation)
         }
     }
 
@@ -99,16 +99,21 @@ public class ChartView: UIControl, ChartViewProtocol {
 }
 
 extension ChartView: ChartPanelDelegate {
-    public func charPanel(_ panel: ChartPanel, applyPath path: CGPath, isVisible: Bool, toLayer layer: CAShapeLayer, animated: Bool) {
+    public func charPanel(_ panel: ChartPanel, applyPath path: CGPath, isVisible: Bool, toLayer layer: CAShapeLayer, animation: ChartViewAnimation) {
         layer.path = path
         layer.opacity = isVisible ? 1 : 0
-        if animated {
+        if animation != .none {
             let animationGroup = CAAnimationGroup()
             let pathAnimation = CABasicAnimation(keyPath: "path")
             let opacityAnimation = CABasicAnimation(keyPath: "opacity")
             animationGroup.animations = [pathAnimation, opacityAnimation]
-            animationGroup.duration = 0.4
-            animationGroup.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+            if animation == .linear {
+                animationGroup.duration = 0.2
+                animationGroup.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
+            } else {
+                animationGroup.duration = 0.2
+                animationGroup.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+            }
 
             pathAnimation.fromValue = layer.presentation()?.path ?? layer.path
             pathAnimation.toValue = path
@@ -120,12 +125,17 @@ extension ChartView: ChartPanelDelegate {
         }
     }
 
-    public func charPanel(_ panel: ChartPanel, applyBackgroundColor color: UIColor, toSuperlayerAnimated animated: Bool) {
+    public func charPanel(_ panel: ChartPanel, applyBackgroundColor color: UIColor, toSuperlayerAnimated a: ChartViewAnimation) {
         layer.backgroundColor = color.cgColor
-        if animated {
+        if a != .none {
             let animation = CABasicAnimation(keyPath: "backgroundColor")
-            animation.duration = 0.4
-            animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+            if a == .linear {
+                animation.duration = 0.2
+                animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
+            } else {
+                animation.duration = 0.2
+                animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+            }
             animation.fromValue = layer.presentation()?.backgroundColor ?? layer.backgroundColor
             animation.toValue = color.cgColor
             layer.add(animation, forKey: "backgroundColorAnimationKey")

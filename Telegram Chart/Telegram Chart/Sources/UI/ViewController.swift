@@ -161,7 +161,7 @@ fileprivate extension ViewController {
         cell.chartViewColorSource = self
         cell.colorSource = self
         let (chart, state) = model.dataAt(indexPath.section)
-        cell.display(chart: chart, state: state, animated: false)
+        cell.display(chart: chart, state: state, animation: .none)
         return cell
     }
 
@@ -249,7 +249,7 @@ extension ViewController: PlotSelectorViewDelegate {
         let chartIndexPath = IndexPath(row: 0, section: chartIdx)
         if let chartCell = tableView.cellForRow(at: chartIndexPath) as? ChartTableViewCell {
             let (chart, state) = model.dataAt(chartIdx)
-            chartCell.display(chart: chart, state: state, animated: true)
+            chartCell.display(chart: chart, state: state, animation: .smooth)
         }
     }
 }

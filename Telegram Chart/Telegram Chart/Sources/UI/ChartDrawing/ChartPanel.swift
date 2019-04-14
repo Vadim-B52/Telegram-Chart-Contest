@@ -8,7 +8,7 @@ import UIKit
 public protocol ChartPanel {
     var delegate: ChartPanelDelegate? { get set }
 
-    func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animated: Bool)
+    func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animation: ChartViewAnimation)
     
     func adjustedColor(_ color: UIColor) -> UIColor
 }
@@ -43,13 +43,13 @@ public protocol ChartPanelDelegate: AnyObject {
             applyPath path: CGPath,
             isVisible: Bool,
             toLayer layer: CAShapeLayer,
-            animated: Bool)
+            animation: ChartViewAnimation)
 
     // TODO: separate delegate
     func charPanel(
             _ panel: ChartPanel,
             applyBackgroundColor color: UIColor,
-            toSuperlayerAnimated animated: Bool)
+            toSuperlayerAnimated animation: ChartViewAnimation)
 
     // TODO: separate delegate?
     func colorToUseForAdjusting(chartPanel: ChartPanel) -> UIColor
@@ -76,7 +76,7 @@ public class LineChartPanel: ChartPanel {
         self.lineWidth = lineWidth
     }
 
-    public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animated: Bool) {
+    public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animation: ChartViewAnimation) {
         let values = plot.values
         let calc = DrawingChart.PointCalculator(timeRange: timeRange, valueRange: valueRange)
         let startIdx = indexRange.startIdx
@@ -98,7 +98,7 @@ public class LineChartPanel: ChartPanel {
         layer.strokeColor = plot.color.cgColor
         layer.fillColor = UIColor.clear.cgColor
 
-        delegate?.charPanel(self, applyPath: path.cgPath, isVisible: chart.isPlotVisible(plot), toLayer: layer, animated: animated)
+        delegate?.charPanel(self, applyPath: path.cgPath, isVisible: chart.isPlotVisible(plot), toLayer: layer, animation: animation)
     }
 }
 
@@ -125,12 +125,12 @@ public class StackedBarChartPanel: ChartPanel {
     }
 
     // FIXME: bug at first and last point
-    public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animated: Bool) {
+    public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animation: ChartViewAnimation) {
         let path = UIBezierPath()
         defer {
             layer.lineWidth = 0
             layer.fillColor = adjustedColor(plot.color).cgColor
-            delegate?.charPanel(self, applyPath: path.cgPath, isVisible: chart.isPlotVisible(plot), toLayer: layer, animated: animated)
+            delegate?.charPanel(self, applyPath: path.cgPath, isVisible: chart.isPlotVisible(plot), toLayer: layer, animation: animation)
         }
 
         guard let plotIdx = chart.visiblePlots.firstIndex(where: { $0 === plot } ) else {
@@ -189,12 +189,12 @@ public class BarChartPanel: ChartPanel {
     }
 
     // FIXME: bug at first and last point
-    public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animated: Bool) {
+    public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animation: ChartViewAnimation) {
         let path = UIBezierPath()
         defer {
             layer.lineWidth = 0
             layer.fillColor = adjustedColor(plot.color).cgColor
-            delegate?.charPanel(self, applyPath: path.cgPath, isVisible: chart.isPlotVisible(plot), toLayer: layer, animated: animated)
+            delegate?.charPanel(self, applyPath: path.cgPath, isVisible: chart.isPlotVisible(plot), toLayer: layer, animation: animation)
         }
 
         let values = plot.values
@@ -247,16 +247,16 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
         self.lineWidth = lineWidth
     }
 
-    public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animated: Bool) {
+    public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animation: ChartViewAnimation) {
         guard let plotIdx = chart.visiblePlots.firstIndex(where: { $0 === plot } ) else {
             let path = UIBezierPath()
             layer.lineWidth = 0
             layer.fillColor = adjustedColor(plot.color).cgColor
-            delegate?.charPanel(self, applyPath: path.cgPath, isVisible: false, toLayer: layer, animated: animated)
+            delegate?.charPanel(self, applyPath: path.cgPath, isVisible: false, toLayer: layer, animation: animation)
             return
         }
         guard plotIdx < chart.visiblePlots.count - 1 else {
-            delegate?.charPanel(self, applyBackgroundColor: adjustedColor(plot.color), toSuperlayerAnimated: animated)
+            delegate?.charPanel(self, applyBackgroundColor: adjustedColor(plot.color), toSuperlayerAnimated: animation)
             return
         }
 
@@ -289,6 +289,6 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
 
         layer.lineWidth = 0
         layer.fillColor = adjustedColor(plot.color).cgColor
-        delegate?.charPanel(self, applyPath: path.cgPath, isVisible: true, toLayer: layer, animated: animated)
+        delegate?.charPanel(self, applyPath: path.cgPath, isVisible: true, toLayer: layer, animation: animation)
     }
 }

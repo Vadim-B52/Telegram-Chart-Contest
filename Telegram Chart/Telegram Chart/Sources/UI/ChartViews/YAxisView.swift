@@ -33,7 +33,7 @@ class YAxisView: UIView, ChartViewProtocol {
         backgroundColor = .clear
     }
 
-    func displayChart(_ chart: DrawingChart?, animated: Bool) {
+    func displayChart(_ chart:DrawingChart?, animation: ChartViewAnimation) {
         self.chart = chart
         setNeedsDisplay()
     }

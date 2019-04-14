@@ -39,20 +39,20 @@ public class CrosshairView: UIView {
                 crosshairTimeIdx = nil
                 popup?.removeFromSuperview()
                 popup = nil
-                chartView.displayChart(nil, animated: false)
+                chartView.displayChart(nil, animation: .none)
             }
         }
     }
 
     private func displayValue(chart: DrawingChart, crosshairTimeIdx: Int) {
-        let c = DrawingChart(
-                allPlots: chart.allPlots,
-                enabledPlotId: chart.enabledPlotId,
-                timestamps: [chart.timestamps[crosshairTimeIdx]],
-                timeRange: chart.timeRange,
-                valueRangeCalculation: chart.valueRangeCalculation,
-                yAxisCalculation: chart.yAxisCalculation)
-
+//        let c = DrawingChart(
+//                allPlots: chart.allPlots,
+//                enabledPlotId: chart.enabledPlotId,
+//                timestamps: chart.timestamps,
+//                timeRange: chart.timeRange,
+//                valueRangeCalculation: chart.valueRangeCalculation,
+//                yAxisCalculation: chart.yAxisCalculation)
+//
 //        chartView.displayChart(c, animated: false)
     }
 
@@ -181,7 +181,7 @@ public class CrosshairView: UIView {
 //            }, completion: nil)
             displayValue(chart: chart, crosshairTimeIdx: idx)
         } else {
-            chartView.displayChart(nil, animated: false)
+            chartView.displayChart(nil, animation: .none)
             popup?.removeFromSuperview()
             popup = nil
         }

@@ -79,7 +79,7 @@ public class CompoundChartView: UIView, ChartViewProtocol {
         yAxisView.frame = chartFrame
     }
 
-    public func displayChart(_ chart: DrawingChart?, animated: Bool) {
+    public func displayChart(_ chart: DrawingChart?, animation: ChartViewAnimation) {
         if chart?.allPlots.first(where: { $0.type != .line }) == nil {
             [yAxisView, chartView, timeAxisView, crosshairView].forEach { bringSubviewToFront($0) }
         } else {
@@ -87,8 +87,8 @@ public class CompoundChartView: UIView, ChartViewProtocol {
         }
         crosshairView.chart = chart
         timeAxisView.displayChart(chart: chart, timeAxisDescription: self.timeAxisDescription)
-        chartView.displayChart(chart, animated: animated)
-        yAxisView.displayChart(chart, animated: animated)
+        chartView.displayChart(chart, animation: animation)
+        yAxisView.displayChart(chart, animation: animation)
     }
 
     public func reloadColors() {
