@@ -220,7 +220,7 @@ public class ChartTableViewCell: UITableViewCell {
         case .yScaled:
             return YScaledValueRangeCalculation(internalCalculation: baseCalculation)
         case .stacked:
-            return StackedValueRangeCalculation(internalCalculation: baseCalculation)
+            return StackedValueRangeCalculation()
         case .percentageStacked:
             return StaticValueRangeCalculation.percentage
         }

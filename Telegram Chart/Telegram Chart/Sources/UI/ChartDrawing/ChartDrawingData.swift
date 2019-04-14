@@ -343,15 +343,21 @@ public struct YScaledValueRangeCalculation: ValueRangeCalculation {
 }
 
 public struct StackedValueRangeCalculation: ValueRangeCalculation {
-    public let internalCalculation: ValueRangeCalculation
-
     public func valueRange(plot: Chart.Plot, visiblePlots: [Chart.Plot], indexRange: TimeIndexRange) -> ValueRange {
+        var i = indexRange.startIdx
         var max = Chart.Value.zero
-        var i = 0
-        let n = visiblePlots.count
-        while i < n {
-            let plot = visiblePlots[i]
-            max += internalCalculation.valueRange(plot: plot, visiblePlots: [plot], indexRange: indexRange).max
+        while i <= indexRange.endIdx {
+            var m = Chart.Value.zero
+            var j = 0
+            let n = visiblePlots.count
+            while j < n {
+                let plot = visiblePlots[j]
+                m += plot.values[i]
+                j += 1
+            }
+            if m > max {
+                max = m
+            }
             i += 1
         }
         // TODO: assumption non negative values
