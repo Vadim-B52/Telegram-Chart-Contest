@@ -84,17 +84,18 @@ class YAxisView: UIView, ChartViewProtocol {
         }
         for (idx, view) in views.enumerated() {
             view.lineColor = valuePanelConfig.axisColor
+            var leftValue: NSAttributedString!
             var rightValue: NSMutableAttributedString!
-            for (plotIdx, plot) in chart.visiblePlots.enumerated() {
-                let firstPlotYAxisValues = chart.axisValues(plot: chart.visiblePlots.first!)
+            for plot in chart.visiblePlots {
+                let firstPlotYAxisValues = chart.axisValues(plot: chart.allPlots.first!)
                 let firstPlotVal = firstPlotYAxisValues.zero + Int64(idx) * firstPlotYAxisValues.step
                 let yAxisValues = chart.axisValues(plot: plot)
                 let val = yAxisValues.zero + Int64(idx) * yAxisValues.step
-                if plotIdx == 0 {
-                    view.setLeftValue(NSAttributedString(
+                if firstPlotVal == val {
+                    leftValue = NSAttributedString(
                             string: "\(val)",
-                            attributes: [NSAttributedString.Key.foregroundColor: valuePanelConfig.textColor]))
-                } else if firstPlotVal != val {
+                            attributes: [NSAttributedString.Key.foregroundColor: valuePanelConfig.textColor])
+                } else {
                     if rightValue == nil {
                         rightValue = NSMutableAttributedString()
                     }
@@ -109,11 +110,8 @@ class YAxisView: UIView, ChartViewProtocol {
             if rightValue != nil {
                 rightValue.replaceCharacters(in: NSRange(location: 0, length: 2), with: "")
             }
+            view.setLeftValue(leftValue)
             view.setRightValue(rightValue)
-//            let calculator = DrawingChart.YCalculator(valueRange: chart.valueRange(plot: plot))
-//            let maxY = calculator.y(in: bounds, value: yAxisValues.zero + Int64(idx) * yAxisValues.step)
-//            let height = view.sizeThatFits(.zero).height
-//            view.frame = CGRect(x: bounds.minX, y: maxY - height, width: bounds.width, height: height)
         }
     }
 }
