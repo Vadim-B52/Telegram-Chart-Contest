@@ -21,7 +21,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     private var skin: Skin = DaySkin()
 
     private lazy var screenMaxEdge = max(UIScreen.main.bounds.size.height, UIScreen.main.bounds.width)
-    private lazy var chartCellHeight = UIScreen.main.bounds.size.height / 2 + 40
+    private lazy var chartCellHeight = UIScreen.main.bounds.size.height / 2 + 100
 
     override func viewDidLoad() {
         super.viewDidLoad()

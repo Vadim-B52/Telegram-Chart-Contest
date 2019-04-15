@@ -156,39 +156,18 @@ public struct TimeRange: Equatable {
 
 public struct TimeIndexRange {
     let startIdx: Int
-    let length: Int
     let endIdx: Int
+    let length: Int
+
+    public init(startIdx: Int, endIdx: Int) {
+        self.startIdx = startIdx
+        self.endIdx = endIdx
+        length = endIdx - startIdx + 1
+    }
 
     public init(length: Int) {
         self.startIdx = 0
-        self.endIdx = startIdx + length - 1
+        self.endIdx = length - 1
         self.length = length
-    }
-
-    public init(timestamps: [Chart.Time], timeRange: TimeRange) {
-        var startIdx = 0
-        var endIdx = 0
-
-        var i = 0
-        while i < timestamps.count - 1 {
-            if timestamps[i] == timeRange.min || (timestamps[i] < timeRange.min && timeRange.min < timestamps[i + 1]) {
-                startIdx = i
-                break
-            }
-            i += 1
-        }
-
-        i = timestamps.count - 1
-        while i > 0 {
-            if timestamps[i] == timeRange.max || (timestamps[i - 1] < timeRange.max && timeRange.max < timestamps[i]) {
-                endIdx = i
-                break
-            }
-            i -= 1
-        }
-
-        self.startIdx = startIdx
-        self.endIdx = endIdx
-        self.length = endIdx - startIdx + 1
     }
 }

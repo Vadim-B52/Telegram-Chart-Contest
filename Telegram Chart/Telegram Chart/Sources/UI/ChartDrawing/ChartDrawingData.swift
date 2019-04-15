@@ -19,22 +19,21 @@ public class DrawingChart {
     public init(chart: Chart,
                 enabledPlotId: Set<String>,
                 timestamps: [Chart.Time],
-                timeRange: TimeRange? = nil,
+                timeRange tr: TimeRange? = nil,
                 valueRangeCalculation: ValueRangeCalculation,
                 yAxisCalculation: YAxisCalculation) {
 
         self.chart = chart
         self.enabledPlotId = enabledPlotId
         self.timestamps = timestamps
-        if let timeRange = timeRange {
-            self.timeRange = timeRange
-            self.timeIndexRange = TimeIndexRange(timestamps: timestamps, timeRange: timeRange)
-        } else {
-            self.timeRange = TimeRange(min: timestamps[0], max: timestamps[timestamps.count - 1])
-            self.timeIndexRange = TimeIndexRange(length: timestamps.count)
-        }
+        let timeRange = tr ?? chart.timeRange
+        self.timeRange = timeRange
         self.valueRangeCalculation = valueRangeCalculation
         self.yAxisCalculation = yAxisCalculation
+
+        timeIndexRange = TimeIndexRange(
+                startIdx: DrawingChart.closestIdxTo(timestamp: timeRange.min, timestamps: timestamps),
+                endIdx: DrawingChart.closestIdxTo(timestamp: timeRange.max, timestamps: timestamps))
     }
 
     public var allPlots: [Chart.Plot] {
@@ -76,14 +75,12 @@ public class DrawingChart {
     }
 
     public func closestIdxTo(timestamp: Int64) -> Int {
-        if timestamp <= timeRange.min {
-            return timeIndexRange.startIdx
-        }
-        if timestamp >= timeRange.max {
-            return timeIndexRange.endIdx
-        }
-        var low = timeIndexRange.startIdx
-        var high = timeIndexRange.endIdx
+        return DrawingChart.closestIdxTo(timestamp: timestamp, timestamps: timestamps)
+    }
+
+    public static func closestIdxTo(timestamp: Int64, timestamps: [Int64]) -> Int {
+        var low = 0
+        var high = timestamps.count - 1
         while low != high {
             let mid = low + (high - low) / 2
             if timestamps[mid] <= timestamp && timestamp <= timestamps[mid + 1] {

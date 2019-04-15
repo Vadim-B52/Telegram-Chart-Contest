@@ -141,7 +141,6 @@ public class TimeFrameSelectorView: UIControl {
     @objc
     private func handleGesture() {
         let newPanPoint = gesture.location(in: self)
-//        let newPanPoint = CGPoint(x: floor(gesturePoint.x), y: gesturePoint.y)
         switch gesture.state {
         case .began:
             updateActionView(point: newPanPoint)
