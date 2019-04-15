@@ -12,7 +12,7 @@ public protocol ChartPanel {
     var delegate: ChartPanelDelegate? { get set }
 
     func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animation: ChartViewAnimation)
-    
+
     func adjustedColor(_ color: UIColor) -> UIColor
 }
 
@@ -38,6 +38,10 @@ extension ChartPanel {
                 blue: b0.pointee + 0.5 * (ba.pointee - b0.pointee),
                 alpha: 1)
     }
+
+    func clearBackground() {
+        delegate?.charPanel(self, applyBackgroundPath: UIBezierPath().cgPath, fillColor: .clear, animation: .none)
+    }
 }
 
 public protocol ChartPanelDelegate: AnyObject {
@@ -51,8 +55,9 @@ public protocol ChartPanelDelegate: AnyObject {
     // TODO: separate delegate
     func charPanel(
             _ panel: ChartPanel,
-            applyBackgroundColor color: UIColor,
-            toSuperlayerAnimated animation: ChartViewAnimation)
+            applyBackgroundPath path: CGPath,
+            fillColor: UIColor,
+            animation: ChartViewAnimation)
 
     // TODO: separate delegate?
     func colorToUseForAdjusting(chartPanel: ChartPanel) -> UIColor
@@ -78,6 +83,7 @@ public class LineChartPanel: ChartPanel {
     }
 
     public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animation: ChartViewAnimation) {
+        clearBackground()
         let values = plot.values
         let calc = DrawingChart.PointCalculator(timeRange: timeRange, valueRange: valueRange)
         let startPoint = calc.pointAtTimestamp(timestamps[0], value: values[0], rect: rect)
@@ -125,6 +131,7 @@ public class StackedBarChartPanel: ChartPanel {
 
     // FIXME: bug at first and last point
     public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animation: ChartViewAnimation) {
+        clearBackground()
         let path = UIBezierPath()
         defer {
             layer.lineWidth = 0
@@ -190,6 +197,7 @@ public class BarChartPanel: ChartPanel {
 
     // FIXME: bug at first and last point
     public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animation: ChartViewAnimation) {
+        clearBackground()
         let path = UIBezierPath()
         defer {
             layer.lineWidth = 0
@@ -247,15 +255,12 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
     }
 
     public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animation: ChartViewAnimation) {
+        let fillColor = adjustedColor(plot.color)
         guard let plotIdx = chart.visiblePlots.firstIndex(where: { $0 === plot } ) else {
             let path = UIBezierPath()
             layer.lineWidth = 0
-            layer.fillColor = adjustedColor(plot.color).cgColor
+            layer.fillColor = fillColor.cgColor
             delegate?.charPanel(self, applyPath: path.cgPath, isVisible: false, toLayer: layer, animation: animation)
-            return
-        }
-        guard plotIdx < chart.visiblePlots.count - 1 else {
-            delegate?.charPanel(self, applyBackgroundColor: adjustedColor(plot.color), toSuperlayerAnimated: animation)
             return
         }
 
@@ -269,6 +274,18 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
                 x: xCalc.x(in: rect, timestamp: timestamps[startIdx]),
                 y: rect.maxY)
 
+
+        let endPoint = CGPoint(
+                x: xCalc.x(in: rect, timestamp: timestamps[endIdx]),
+                y: rect.maxY)
+
+        if plotIdx == chart.visiblePlots.count - 1 {
+            var r = rect
+            r.origin.x = startPoint.x
+            r.size.width = endPoint.x - startPoint.x
+            delegate?.charPanel(self, applyBackgroundPath: UIBezierPath(rect: r).cgPath, fillColor: fillColor, animation: animation)
+        }
+
         path.move(to: startPoint)
 
         for i in startIdx...endIdx {
@@ -279,15 +296,11 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
             path.addLine(to: currPoint)
         }
 
-        let endPoint = CGPoint(
-                x: xCalc.x(in: rect, timestamp: timestamps[endIdx]),
-                y: rect.maxY)
-
         path.addLine(to: endPoint)
         path.close()
 
         layer.lineWidth = 0
-        layer.fillColor = adjustedColor(plot.color).cgColor
+        layer.fillColor = fillColor.cgColor
         delegate?.charPanel(self, applyPath: path.cgPath, isVisible: true, toLayer: layer, animation: animation)
     }
 }

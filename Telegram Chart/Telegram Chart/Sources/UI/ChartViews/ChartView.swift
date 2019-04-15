@@ -12,6 +12,7 @@ public protocol ChartViewColorSource: AnyObject {
 public class ChartView: UIControl, ChartViewProtocol {
 
     private var layers = [CAShapeLayer]()
+    private var bgLayer = CAShapeLayer()
     private var chart: DrawingChart?
     private var colorToUseForAdjusting: UIColor!
 
@@ -40,6 +41,7 @@ public class ChartView: UIControl, ChartViewProtocol {
         for l in layers {
             l.frame = frame
         }
+        bgLayer.frame = frame
         redraw(animation: .none)
     }
 
@@ -62,10 +64,12 @@ public class ChartView: UIControl, ChartViewProtocol {
             }
         } else if d < 0 {
             let frame = plotFrame()
+            layer.insertSublayer(bgLayer, at: 0)
+            bgLayer.frame = frame
             for _ in 0..<(-d) {
                 let plotLayer = CAShapeLayer()
                 plotLayer.frame = frame
-                layer.insertSublayer(plotLayer, at: 0)
+                layer.insertSublayer(plotLayer, at: 1)
                 layers.append(plotLayer)
             }
         }
@@ -106,6 +110,19 @@ public class ChartView: UIControl, ChartViewProtocol {
 
 extension ChartView: ChartPanelDelegate {
     public func charPanel(_ panel: ChartPanel, applyPath path: CGPath, isVisible: Bool, toLayer layer: CAShapeLayer, animation: ChartViewAnimation) {
+        applyPath(path, toLayer: layer, isVisible: isVisible, animation: animation)
+    }
+
+    public func charPanel(_ panel: ChartPanel, applyBackgroundPath path: CGPath, fillColor: UIColor, animation: ChartViewAnimation) {
+        bgLayer.fillColor = fillColor.cgColor
+        applyPath(path, toLayer: bgLayer, isVisible: true, animation: animation)
+    }
+
+    public func colorToUseForAdjusting(chartPanel: ChartPanel) -> UIColor {
+        return colorToUseForAdjusting
+    }
+
+    private func applyPath(_ path: CGPath, toLayer layer: CAShapeLayer, isVisible: Bool, animation: ChartViewAnimation) {
         layer.path = path
         layer.opacity = isVisible ? 1 : 0
         if animation != .none {
@@ -128,25 +145,5 @@ extension ChartView: ChartPanelDelegate {
 
             layer.add(animationGroup, forKey: "opacityAndPathAnimationKey")
         }
-    }
-
-    public func charPanel(_ panel: ChartPanel, applyBackgroundColor color: UIColor, toSuperlayerAnimated a: ChartViewAnimation) {
-        layer.backgroundColor = color.cgColor
-        if a != .none {
-            let animation = CABasicAnimation(keyPath: "backgroundColor")
-            animation.duration = Animations.duration
-            if a == .linear {
-                animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
-            } else {
-                animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-            }
-            animation.fromValue = layer.presentation()?.backgroundColor ?? layer.backgroundColor
-            animation.toValue = color.cgColor
-            layer.add(animation, forKey: "backgroundColorAnimationKey")
-        }
-    }
-
-    public func colorToUseForAdjusting(chartPanel: ChartPanel) -> UIColor {
-        return colorToUseForAdjusting
     }
 }
