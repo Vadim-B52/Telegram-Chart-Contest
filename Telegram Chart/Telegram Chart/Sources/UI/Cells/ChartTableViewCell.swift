@@ -173,7 +173,7 @@ public class ChartTableViewCell: UITableViewCell {
             return
         }
         state = state?.byChanging(selectedTimeRange: selectedTimeRange)
-        chartView.displayChart(chartViewDrawingChart(), animation: .linear)
+        chartView.displayChart(chartViewDrawingChart(), animation: .none)
         delegate?.chartTableViewCell(self, didChangeSelectedTimeRange: selectedTimeRange)
     }
 
