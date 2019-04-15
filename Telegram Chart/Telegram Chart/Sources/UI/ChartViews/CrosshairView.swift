@@ -196,12 +196,19 @@ public class CrosshairView: UIView {
         if let idx = crosshairTimeIdx {
             let popup = ensurePopupView()
             updateData(popup: popup, chart: chart, idx: idx)
-            setNeedsLayout()
             if animated {
+                setNeedsLayout()
+                if popup.alpha == 0 {
+                    layoutIfNeeded()
+                    popup.layoutIfNeeded()
+                }
                 let options: UIView.AnimationOptions = [.beginFromCurrentState, .curveLinear]
                 UIView.animate(withDuration: Animations.duration, delay: 0, options: options, animations: {
+                    popup.alpha = 1
                     self.layoutIfNeeded()
                 }, completion: nil)
+            } else {
+                setNeedsLayout()
             }
         } else {
             let popup = self.popup
@@ -273,7 +280,6 @@ public class CrosshairView: UIView {
             view.backgroundColor = colorSource.popupBackgroundColor(crosshairView: self)
             view.timeLabel.textColor = colorSource.popupTextColor(crosshairView: self)
         }
-        layoutIfNeeded()
         return view
     }
 }
@@ -309,7 +315,7 @@ fileprivate extension CrosshairView {
                     metrics: nil,
                     views: views))
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
-                    withVisualFormat: "H:[time]-9@249-|",
+                    withVisualFormat: "H:[time(>=100)]-9@249-|",
                     metrics: nil,
                     views: views))
             NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
