@@ -6,6 +6,9 @@
 import UIKit
 
 public protocol ChartPanel {
+
+    var plot: Chart.Plot { get }
+
     var delegate: ChartPanelDelegate? { get set }
 
     func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animation: ChartViewAnimation)

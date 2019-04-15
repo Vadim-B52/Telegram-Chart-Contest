@@ -120,7 +120,7 @@ public class TimeAxisView: UIView {
             toInsetLabels.append(label)
         }
 
-        UIView.animate(withDuration: animated ? 0.3 : 0, animations: {
+        UIView.animate(withDuration: animated ? Animations.duration : 0, animations: {
             toRemoveLabels.forEach { $0.alpha = 0 }
             toInsetLabels.forEach { $0.alpha = 1 }
         }, completion: { b in

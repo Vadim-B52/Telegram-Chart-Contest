@@ -191,14 +191,14 @@ public class CrosshairView: UIView {
             setNeedsLayout()
             if animated {
                 let options: UIView.AnimationOptions = [.beginFromCurrentState, .curveLinear]
-                UIView.animate(withDuration: 0.25, delay: 0, options: options, animations: {
+                UIView.animate(withDuration: Animations.duration, delay: 0, options: options, animations: {
                     self.layoutIfNeeded()
                 }, completion: nil)
             }
         } else {
             let popup = self.popup
             self.popup = nil
-            UIView.animate(withDuration: animated ? 0.25 : 0, animations: {
+            UIView.animate(withDuration: animated ? Animations.duration : 0, animations: {
                 popup?.alpha = 0
             }) { b in
                 popup?.removeFromSuperview()

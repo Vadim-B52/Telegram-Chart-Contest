@@ -149,11 +149,11 @@ public class ChartTableViewCell: UITableViewCell {
             errorView.textColor = colorSource?.errorTextColor(chartTableViewCell: self)
             if animation != .none && prevErrorView == nil {
                 errorView.alpha = 0
-                UIView.animate(withDuration: 0.3) { errorView.alpha = 1 }
+                UIView.animate(withDuration: Animations.duration) { errorView.alpha = 1 }
             }
         } else if let errorView = errorView {
             self.errorView = nil
-            UIView.animate(withDuration: animation != .none ? 0.3 : 0, animations: { errorView.alpha = 0 }) { b in
+            UIView.animate(withDuration: animation != .none ? Animations.duration : 0, animations: { errorView.alpha = 0 }) { b in
                 errorView.removeFromSuperview()
             }
             chartView.displayChart(chartViewDrawingChart(), animation: .none)
@@ -170,7 +170,7 @@ public class ChartTableViewCell: UITableViewCell {
             return
         }
         state = state?.byChanging(selectedTimeRange: selectedTimeRange)
-        chartView.displayChart(chartViewDrawingChart(), animation: .none)
+        chartView.displayChart(chartViewDrawingChart(), animation: .linear)
         delegate?.chartTableViewCell(self, didChangeSelectedTimeRange: selectedTimeRange)
     }
 

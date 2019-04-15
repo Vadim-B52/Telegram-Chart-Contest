@@ -102,16 +102,16 @@ extension ChartView: ChartPanelDelegate {
     public func charPanel(_ panel: ChartPanel, applyPath path: CGPath, isVisible: Bool, toLayer layer: CAShapeLayer, animation: ChartViewAnimation) {
         layer.path = path
         layer.opacity = isVisible ? 1 : 0
-        if animation != .none {
+        // FIXME: animation
+        if animation != .none && (panel.plot.type == .line || animation != .linear) {
             let animationGroup = CAAnimationGroup()
             let pathAnimation = CABasicAnimation(keyPath: "path")
             let opacityAnimation = CABasicAnimation(keyPath: "opacity")
             animationGroup.animations = [pathAnimation, opacityAnimation]
+            animationGroup.duration = Animations.duration
             if animation == .linear {
-                animationGroup.duration = 0.2
                 animationGroup.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
             } else {
-                animationGroup.duration = 0.2
                 animationGroup.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
             }
 
@@ -129,11 +129,10 @@ extension ChartView: ChartPanelDelegate {
         layer.backgroundColor = color.cgColor
         if a != .none {
             let animation = CABasicAnimation(keyPath: "backgroundColor")
+            animation.duration = Animations.duration
             if a == .linear {
-                animation.duration = 0.2
                 animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
             } else {
-                animation.duration = 0.2
                 animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
             }
             animation.fromValue = layer.presentation()?.backgroundColor ?? layer.backgroundColor

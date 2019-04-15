@@ -11,6 +11,7 @@
 		6AC713A923BFECA23488860A /* CrosshairView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC715096E2D394D012B9201 /* CrosshairView.swift */; };
 		6AC713C9F6AFFE68F4AA6B0D /* ScreenHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC713A024D7DADDC16C0CA3 /* ScreenHelper.swift */; };
 		6AC7145D7B7D27C40DBDE2F2 /* ChartTextFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC711BE80856EF5178E381E /* ChartTextFormatter.swift */; };
+		6AC714C19FE451C924B93C48 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC712B0B155C23334441B1D /* Animations.swift */; };
 		6AC7150428B2635F24CD07F3 /* ValueAxisPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC7172228330B7244FC78BC /* ValueAxisPanel.swift */; };
 		6AC7159FFEB32682CBDD7576 /* LayoutConstraints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC710DA89436DEEE7B615BA /* LayoutConstraints.swift */; };
 		6AC71680C695B78D82912F8E /* Chart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC715D6F57BFF6CEAC49574 /* Chart.swift */; };
@@ -60,6 +61,7 @@
 		6AC7120BA3BC285553BA4F18 /* CrosshairPanel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrosshairPanel.swift; sourceTree = "<group>"; };
 		6AC712480BA5369ECEAD436E /* ChartDrawingData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartDrawingData.swift; sourceTree = "<group>"; };
 		6AC712854E421161A8F67D8C /* ChartViewProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartViewProtocol.swift; sourceTree = "<group>"; };
+		6AC712B0B155C23334441B1D /* Animations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
 		6AC713A024D7DADDC16C0CA3 /* ScreenHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenHelper.swift; sourceTree = "<group>"; };
 		6AC714CB094D58FC75364142 /* PlotSelectorTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlotSelectorTableViewCell.swift; sourceTree = "<group>"; };
 		6AC715096E2D394D012B9201 /* CrosshairView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CrosshairView.swift; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 			isa = PBXGroup;
 			children = (
 				6AC710DA89436DEEE7B615BA /* LayoutConstraints.swift */,
+				6AC712B0B155C23334441B1D /* Animations.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -395,6 +398,7 @@
 				6AC71C880AFFFE32E4563AC2 /* YAxisView.swift in Sources */,
 				6AC716BCE71657022E8A2872 /* PlotSelectorTableViewCell.swift in Sources */,
 				6AC7159FFEB32682CBDD7576 /* LayoutConstraints.swift in Sources */,
+				6AC714C19FE451C924B93C48 /* Animations.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
