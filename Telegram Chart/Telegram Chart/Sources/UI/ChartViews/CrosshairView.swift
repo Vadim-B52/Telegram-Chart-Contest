@@ -38,6 +38,13 @@ public class CrosshairView: UIView {
         }
     }
 
+    public var chartInsets = UIEdgeInsets.zero {
+        didSet {
+            setNeedsLayout()
+            setNeedsDisplay()
+        }
+    }
+
     public override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .clear
@@ -64,7 +71,7 @@ public class CrosshairView: UIView {
         }
 
         let panel = makePanel(chart: chart, idx: idx)
-        panel.drawInContext(ctx, rect: bounds)
+        panel.drawInContext(ctx, rect: bounds.inset(by: chartInsets))
     }
 
     private func makePanel(chart: DrawingChart, idx: Int) -> CrosshairPanel {
@@ -86,6 +93,7 @@ public class CrosshairView: UIView {
         super.layoutSubviews()
 
         if let popup = popup, let idx = crosshairTimeIdx, let chart = chart  {
+            let bounds = self.bounds.inset(by: chartInsets)
             var frame = CGRect.zero
             frame.origin.y = 6
             frame.size = popup.systemLayoutSizeFitting(.zero)
@@ -159,7 +167,7 @@ public class CrosshairView: UIView {
             return
         }
         let calc = DrawingChart.XCalculator(timeRange: chart.timeRange)
-        let ts = calc.timestampAt(x: point.x, rect: bounds)
+        let ts = calc.timestampAt(x: point.x, rect: bounds.inset(by: chartInsets))
         crosshairTimeIdx = chart.closestIdxTo(timestamp: ts)
         delegate?.crosshairView(self, storeIdx: crosshairTimeIdx)
         setNeedsUpdate()

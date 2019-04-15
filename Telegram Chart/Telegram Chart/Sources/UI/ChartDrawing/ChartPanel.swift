@@ -62,7 +62,6 @@ public class LineChartPanel: ChartPanel {
 
     public let chart: DrawingChart
     public let timestamps: [Int64]
-    public let indexRange: TimeIndexRange
     public let timeRange: TimeRange
     public let valueRange: ValueRange
     public let plot: Chart.Plot
@@ -72,7 +71,6 @@ public class LineChartPanel: ChartPanel {
     public init(chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
         self.chart = chart
         self.timestamps = chart.timestamps
-        self.indexRange = chart.timeIndexRange
         self.timeRange = chart.timeRange
         self.valueRange = chart.valueRange(plot: plot)
         self.plot = plot
@@ -82,12 +80,11 @@ public class LineChartPanel: ChartPanel {
     public func drawInLayer(_ layer: CAShapeLayer, rect: CGRect, animation: ChartViewAnimation) {
         let values = plot.values
         let calc = DrawingChart.PointCalculator(timeRange: timeRange, valueRange: valueRange)
-        let startIdx = indexRange.startIdx
-        let startPoint = calc.pointAtTimestamp(timestamps[startIdx], value: values[startIdx], rect: rect)
+        let startPoint = calc.pointAtTimestamp(timestamps[0], value: values[0], rect: rect)
         let path = UIBezierPath()
         path.move(to: startPoint)
 
-        var i = 0
+        var i = 1
         let n = chart.timestamps.count
         while i < n {
             let time = timestamps[i]
@@ -111,7 +108,6 @@ public class StackedBarChartPanel: ChartPanel {
 
     public let chart: DrawingChart
     public let timestamps: [Int64]
-    public let indexRange: TimeIndexRange
     public let timeRange: TimeRange
     public let valueRange: ValueRange
     public let plot: Chart.Plot
@@ -121,7 +117,6 @@ public class StackedBarChartPanel: ChartPanel {
     public init(chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
         self.chart = chart
         self.timestamps = chart.timestamps
-        self.indexRange = chart.timeIndexRange
         self.timeRange = chart.timeRange
         self.valueRange = chart.valueRange(plot: plot)
         self.plot = plot
@@ -141,15 +136,18 @@ public class StackedBarChartPanel: ChartPanel {
             return
         }
 
+        let startIdx = 0
+        let endIdx = timestamps.count - 1
+
         let xCalc = DrawingChart.XCalculator(timeRange: timeRange)
         let yCalc = DrawingChart.StackedYCalculator(valueRange: valueRange, plots: chart.visiblePlots, plotIdx: plotIdx)
         let startPoint = CGPoint(
-                x: xCalc.x(in: rect, timestamp: timestamps[indexRange.startIdx]),
+                x: xCalc.x(in: rect, timestamp: timestamps[startIdx]),
                 y: rect.maxY)
         
         path.move(to: startPoint)
 
-        for i in indexRange.startIdx..<indexRange.endIdx {
+        for i in startIdx..<endIdx {
             let currPoint = CGPoint(
                     x: xCalc.x(in: rect, timestamp: timestamps[i]),
                     y: yCalc.y(in: rect, at: i))
@@ -163,7 +161,7 @@ public class StackedBarChartPanel: ChartPanel {
         }
 
         let endPoint = CGPoint(
-                x: xCalc.x(in: rect, timestamp: timestamps[indexRange.endIdx]),
+                x: xCalc.x(in: rect, timestamp: timestamps[endIdx]),
                 y: rect.maxY)
 
         path.addLine(to: endPoint)
@@ -175,7 +173,6 @@ public class BarChartPanel: ChartPanel {
 
     public let chart: DrawingChart
     public let timestamps: [Int64]
-    public let indexRange: TimeIndexRange
     public let timeRange: TimeRange
     public let valueRange: ValueRange
     public let plot: Chart.Plot
@@ -185,7 +182,6 @@ public class BarChartPanel: ChartPanel {
     public init(chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
         self.chart = chart
         self.timestamps = chart.timestamps
-        self.indexRange = chart.timeIndexRange
         self.timeRange = chart.timeRange
         self.valueRange = chart.valueRange(plot: plot)
         self.plot = plot
@@ -201,16 +197,17 @@ public class BarChartPanel: ChartPanel {
             delegate?.charPanel(self, applyPath: path.cgPath, isVisible: chart.isPlotVisible(plot), toLayer: layer, animation: animation)
         }
 
+        let startIdx = 0
+        let endIdx = timestamps.count - 1
         let values = plot.values
         let calc = DrawingChart.PointCalculator(timeRange: timeRange, valueRange: valueRange)
-        let startIdx = indexRange.startIdx
         let startPoint = calc.pointAtTimestamp(
                 timestamps[startIdx],
                 value: values[startIdx], rect: rect)
 
         path.move(to: CGPoint(x: startPoint.x, y: rect.maxY))
 
-        for i in startIdx..<indexRange.endIdx {
+        for i in startIdx..<endIdx {
             let currTime = timestamps[i]
             let currValue = values[i]
             let currPoint = calc.pointAtTimestamp(currTime, value: currValue, rect: rect)
@@ -222,8 +219,8 @@ public class BarChartPanel: ChartPanel {
             path.addLine(to: CGPoint(x: nextPoint.x, y: currPoint.y))
         }
 
-        let endTime = timestamps[indexRange.endIdx]
-        let endValue = values[indexRange.endIdx]
+        let endTime = timestamps[endIdx]
+        let endValue = values[endIdx]
         let endPoint = calc.pointAtTimestamp(endTime, value: endValue, rect: rect)
         path.addLine(to: CGPoint(x: endPoint.x, y: rect.maxY))
         path.close()
@@ -234,7 +231,6 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
 
     public let chart: DrawingChart
     public let timestamps: [Int64]
-    public let indexRange: TimeIndexRange
     public let timeRange: TimeRange
     public let valueRange: ValueRange
     public let plot: Chart.Plot
@@ -244,7 +240,6 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
     public init(chart: DrawingChart, plot: Chart.Plot, lineWidth: CGFloat) {
         self.chart = chart
         self.timestamps = chart.timestamps
-        self.indexRange = chart.timeIndexRange
         self.timeRange = chart.timeRange
         self.valueRange = chart.valueRange(plot: plot)
         self.plot = plot
@@ -268,14 +263,15 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
         let xCalc = DrawingChart.XCalculator(timeRange: timeRange)
         let yCalc = DrawingChart.PercentageStackedYCalculator(plots: chart.visiblePlots, plotIdx: plotIdx)
 
-        let startIdx = indexRange.startIdx
+        let startIdx = 0
+        let endIdx = timestamps.count - 1
         let startPoint = CGPoint(
                 x: xCalc.x(in: rect, timestamp: timestamps[startIdx]),
                 y: rect.maxY)
 
         path.move(to: startPoint)
 
-        for i in startIdx...indexRange.endIdx {
+        for i in startIdx...endIdx {
             let currPoint = CGPoint(
                     x: xCalc.x(in: rect, timestamp: timestamps[i]),
                     y: yCalc.y(in: rect, at: i))
@@ -283,7 +279,6 @@ public class PercentageStackedAreaChartPanel: ChartPanel {
             path.addLine(to: currPoint)
         }
 
-        let endIdx = indexRange.endIdx
         let endPoint = CGPoint(
                 x: xCalc.x(in: rect, timestamp: timestamps[endIdx]),
                 y: rect.maxY)

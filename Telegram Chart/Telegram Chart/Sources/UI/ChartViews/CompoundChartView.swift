@@ -55,6 +55,14 @@ public class CompoundChartView: UIView, ChartViewProtocol {
         reloadColors()
     }
 
+    public var chartInsets = UIEdgeInsets.zero {
+        didSet {
+            crosshairView.chartInsets = chartInsets
+            chartView.chartInsets = chartInsets
+            setNeedsLayout()
+        }
+    }
+
     @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -77,10 +85,10 @@ public class CompoundChartView: UIView, ChartViewProtocol {
         var (timeFrame, chartFrame) = bounds.divided(atDistance: 24, from: .maxYEdge)
         (headerFrame, chartFrame) = chartFrame.divided(atDistance: 40, from: .minYEdge)
         headerView.frame = headerFrame
-        timeAxisView.frame = timeFrame
+        timeAxisView.frame = timeFrame.inset(by: chartInsets)
         crosshairView.frame = chartFrame
         chartView.frame = chartFrame
-        yAxisView.frame = chartFrame
+        yAxisView.frame = chartFrame.inset(by: chartInsets)
     }
 
     public func displayChart(_ chart: DrawingChart?, animation: ChartViewAnimation) {

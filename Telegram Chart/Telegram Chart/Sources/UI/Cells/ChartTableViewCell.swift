@@ -79,13 +79,16 @@ public class ChartTableViewCell: UITableViewCell {
         contentView.addSubview(miniChartViewWrapper)
         contentView.addSubview(timeSelector)
 
+        let insets = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
+        chartView.chartInsets = insets
+
         let views = ["chartView": chartView, "miniChartView": miniChartViewWrapper]
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
             withVisualFormat: "V:|[chartView][miniChartView(==60)]|",
             metrics: nil,
             views: views))
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(
-            withVisualFormat: "H:|-15-[chartView]-15-|",
+            withVisualFormat: "H:|[chartView]|",
             metrics: nil,
             views: views))
         NSLayoutConstraint.activate(NSLayoutConstraint.constraints(

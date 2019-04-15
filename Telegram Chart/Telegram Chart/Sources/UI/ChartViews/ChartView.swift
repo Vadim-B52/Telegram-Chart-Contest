@@ -18,6 +18,12 @@ public class ChartView: UIControl, ChartViewProtocol {
     public var lineWidth: CGFloat = 1
     public weak var colorSource: ChartViewColorSource?
 
+    public var chartInsets = UIEdgeInsets.zero {
+        didSet {
+            redraw(animation: .none)
+        }
+    }
+
     public override init(frame: CGRect) {
         super.init(frame: frame)
         clipsToBounds = true // TODO: improve?
@@ -77,7 +83,7 @@ public class ChartView: UIControl, ChartViewProtocol {
         for (idx, plot) in chart.allPlots.enumerated().reversed() {
             let plotLayer = layers[idx]
             let panel = makeChartPanel(chart: chart, plot: plot)
-            panel.drawInLayer(plotLayer, rect: plotLayer.bounds, animation: animation)
+            panel.drawInLayer(plotLayer, rect: plotLayer.bounds.inset(by: chartInsets), animation: animation)
         }
     }
 
