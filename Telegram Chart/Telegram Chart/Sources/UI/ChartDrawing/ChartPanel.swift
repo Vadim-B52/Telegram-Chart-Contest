@@ -84,8 +84,9 @@ public class LineChartPanel: ChartPanel {
         let path = UIBezierPath()
         path.move(to: startPoint)
 
-        var i = startIdx + 1
-        while i <= indexRange.endIdx {
+        var i = 0
+        let n = chart.timestamps.count
+        while i < n {
             let time = timestamps[i]
             let value = values[i]
             let point = calc.pointAtTimestamp(time, value: value, rect: rect)
