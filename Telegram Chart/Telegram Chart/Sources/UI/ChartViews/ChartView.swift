@@ -108,8 +108,7 @@ extension ChartView: ChartPanelDelegate {
     public func charPanel(_ panel: ChartPanel, applyPath path: CGPath, isVisible: Bool, toLayer layer: CAShapeLayer, animation: ChartViewAnimation) {
         layer.path = path
         layer.opacity = isVisible ? 1 : 0
-        // FIXME: animation
-        if animation != .none && (panel.plot.type == .line || animation != .linear) {
+        if animation != .none {
             let animationGroup = CAAnimationGroup()
             let pathAnimation = CABasicAnimation(keyPath: "path")
             let opacityAnimation = CABasicAnimation(keyPath: "opacity")
