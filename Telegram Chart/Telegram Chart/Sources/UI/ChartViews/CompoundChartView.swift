@@ -35,7 +35,8 @@ public class CompoundChartView: UIView, ChartViewProtocol {
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
-        
+
+        yAxisView.isUserInteractionEnabled = false
         addSubview(yAxisView)
 
         chartView.colorSource = self
@@ -95,7 +96,7 @@ public class CompoundChartView: UIView, ChartViewProtocol {
         if chart?.allPlots.first(where: { $0.type != .line }) == nil {
             [yAxisView, chartView, timeAxisView, crosshairView].forEach { bringSubviewToFront($0) }
         } else {
-            [chartView, yAxisView, timeAxisView, crosshairView].forEach { bringSubviewToFront($0) }
+            [chartView, timeAxisView, crosshairView, yAxisView].forEach { bringSubviewToFront($0) }
         }
         crosshairView.chart = chart
         timeAxisView.displayChart(chart: chart, timeAxisDescription: self.timeAxisDescription)
